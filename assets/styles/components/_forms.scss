@@ -1,0 +1,39 @@
+// Search form
+.search-form {
+  @extend .form-inline;
+}
+.search-form label {
+  font-weight: normal;
+  @extend .form-group;
+}
+.search-form .search-field {
+  @extend .form-control;
+}
+.search-form .search-submit {
+  @extend .btn;
+  @extend .btn-secondary;
+}
+
+
+// Gravity form
+.gform_wrapper {
+	.ginput_container {
+		.medium {
+			width: 100%!important;
+			max-width: 100%!important;
+		}
+	}
+	.ginput_container_text, .ginput_container_textarea {
+		input {
+			background: $white;
+			border: 1px solid $color-grey;
+		}
+		textarea {
+			background: $white;
+			border: 1px solid $color-grey;
+		}
+	}
+	input.button {
+		@include button-default;
+	}
+}

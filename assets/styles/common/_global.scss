@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700&display=swap');
+
+@mixin font-display {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: bold;
+  font-size: 46px;
+  line-height: 60px;
+  letter-spacing: -0.1px;
+}
+@mixin font-h1 {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: bold;
+  font-size: 40px;
+  line-height: 48px;
+  letter-spacing: -0.5px;
+}
+@mixin font-h2 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  font-size: 32px;
+  line-height: 38px;
+  letter-spacing: -0.4px;
+}
+@mixin font-h3 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.1px;
+}
+@mixin font-h4 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: -0px;
+}
+@mixin font-h5 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.1px;
+}
+@mixin font-h6 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0px;
+}
+@mixin font-h5 {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.1px;
+}
+
+
+@mixin font-link-18 {
+	font-family: 'Quicksand', sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	line-height: 28px;
+}
+@mixin font-link-16 {
+	font-family: 'Quicksand', sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 16px;
+}
+
+@mixin font-16 {
+	font-family: 'Quicksand', sans-serif;
+	font-size: 16px;
+	line-height: 32px;
+}
+@mixin font-14 {
+	font-family: 'Quicksand', sans-serif;
+	font-size: 14px;
+	line-height: 16px;
+}
+
+h1 {
+	@include font-h1;
+	color: $color-primary-1;
+}
+h2 {
+	@include font-h2;
+	color: $color-primary-1;
+}
+h3 {
+	@include font-h3;
+	color: $color-primary-1;
+}
+h4 {
+	@include font-h4;
+	color: $color-primary-1;
+}
+h5 {
+	@include font-h5;
+	color: $color-primary-1;
+}
+h6 {
+	@include font-h6;
+	color: $color-primary-1;
+}
+
+p {
+	@include font-16;
+}
+a {
+	color: $black;
+}
+
+@mixin button-default-light {
+	float: left;
+	background: $white;
+	border: 0;
+	padding: 8px 16px 8px 16px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	color: $color-primary-1;
+	@include font-link-18;
+	transition: all 0.25s ease;
+	&:hover {
+		text-decoration: none;
+		transform: scale(1.15);
+		color: $white;
+		background-color: $color-primary-1;
+	}
+}
+@mixin button-default {
+	float: left;
+	background: $color-primary-1;
+	border: 0;
+	padding: 8px 16px 8px 16px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	color: $white;
+	@include font-link-18;
+	transition: all 0.25s ease;
+	&:hover {
+		text-decoration: none;
+		transform: scale(1.15);
+		color: $white;
+		background-color: $color-primary-2;
+	}
+}
+@mixin button-default-small {
+	float: left;
+	background: $color-primary-1;
+	border: 0;
+	padding: 8px 8px 8px 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	color: $white;
+	@include font-link-16;
+	transition: all 0.25s ease;
+	&:hover {
+		text-decoration: none;
+		transform: scale(1.15);
+		color: $white;
+		background-color: $color-primary-2;
+	}
+}

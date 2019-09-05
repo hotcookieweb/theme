@@ -1,0 +1,40 @@
+.woocommerce-cart {
+	.header {
+		background: $color-primary-1!important;
+	}
+	.content-ultrawide {
+		padding-top: 114px;
+		.woocommerce {
+			background: none;
+			.product-name {
+				a {
+					&:hover {
+						color: $black;
+					}
+				}
+			}
+		}
+		.coupon {
+			#coupon_code {
+				width: 100%;
+			}
+			.button {
+				float: right;
+				margin-top: -37.5px;
+				border: 1px solid #cccccc;
+			}
+		}
+		a.checkout-button {
+			background-color: $color-primary-1;
+			&:hover {
+				background-color: $color-primary-2;
+			}
+		}
+	}
+}
+.cart_totals {
+
+	h2 {
+		display: none!important;
+	}
+}

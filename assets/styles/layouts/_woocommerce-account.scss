@@ -1,0 +1,208 @@
+.woocommerce-account {
+	.page-banner {
+		display: none;
+	}
+}
+
+.my-account {
+	.header, .page-header, .quick-nav, .footer {
+		display: none;
+	}
+	.content-ultrawide {
+
+		h2 {
+			padding-top: 32px;
+			text-align: center;
+			@include font-h1;
+		}
+		.woocommerce-form-login {
+			width: 50%;
+			margin: 0 auto 32px auto;
+			@include media-breakpoint-down(sm) {
+				width: 100%;
+				input.woocommerce-Input--text {
+					background: #f5f5f5;
+					border: 0;
+					padding: 15px;
+				}
+			}
+			.form-row {
+				float: left;
+				width: 100%;
+				display: block;
+				.woocommerce-form-login__rememberme {
+					padding-top: 6px;
+					span {
+						padding-left: 6px;
+					}
+				}
+			}
+			.lost_password {
+				text-align: right;
+			}
+			.woocommerce-button {
+				@include button-default;
+				float: right;
+				margin: 0;
+			}
+		}
+	}
+	.center {
+		float: left;
+		width: 100%;
+		text-align: center;
+		.button {
+			@include button-default;
+			float: none;
+		}
+	}
+}
+
+.logged-in {
+	&.woocommerce-account {
+		@include media-breakpoint-down(sm) {
+			.container {
+				padding: 0;
+			}
+		}
+		.content-ultrawide {
+			@include media-breakpoint-down(sm) {
+				padding-top: 60px;
+			}
+			.page-header {
+				text-align: center;
+			}
+		}
+		.center {
+			float: left;
+			width: 100%;
+			background: #f5f5f5;
+			position: absolute;
+			top: 0px;
+			left: 0;
+			right: 0;
+			height: 44px;
+			margin: 0;
+			overflow: hidden;
+			a {
+				float: right;
+				-webkit-border-radius: 0px;
+				-moz-border-radius: 0px;
+				border-radius: 0px;
+			    background-color: #cccccc;
+			    color: #666666;
+			}
+		}
+		.woocommerce {
+			background-color: $color-primary-1;
+			-webkit-border-radius: 8px;
+			-moz-border-radius: 8px;
+			border-radius: 8px;
+			overflow: hidden;
+			margin-bottom: 64px;
+			@include media-breakpoint-down(sm) {
+				background: $white;
+				-webkit-border-radius: 0px;
+				-moz-border-radius: 0px;
+				border-radius: 0px;
+			}
+		}
+		.woocommerce-MyAccount-navigation {
+			width: 32%;
+			@include media-breakpoint-down(sm) {
+				float: left;
+				width: 100%;
+				background: $color-primary-1;
+				margin-bottom: 16px;
+				padding-bottom: 16px;
+			}
+			ul {
+				float: left;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+				padding-top: 16px;
+				li {
+					float: left;
+					width: 100%;
+					list-style: none;
+					padding: 0;
+					margin: 0;
+					border-bottom: 1px solid $white;
+					@include media-breakpoint-down(sm) {
+						&:last-child {
+							border: 0;
+						}
+					}
+					a {
+						float: left;
+						width: 100%;
+						padding: 6px 16px;
+						text-align: right;
+						color: $white;
+						transition: all 0.25s ease;
+						&:hover {
+							color: $white;
+							padding: 6px 32px 6px 16px;
+						}
+					}
+					&.is-active {
+						a {
+							padding: 6px 32px 6px 16px;
+							font-weight: bold;
+						}
+					}
+				}
+			}
+		}
+		.woocommerce-MyAccount-content {
+			background: #ffffff;
+			border: 1px solid #cccccc;
+			border-left: none;
+			-webkit-border-top-right-radius: 8px;
+			-webkit-border-bottom-right-radius: 8px;
+			-moz-border-radius-topright: 8px;
+			-moz-border-radius-bottomright: 8px;
+			border-top-right-radius: 8px;
+			border-bottom-right-radius: 8px;
+			min-height: 500px;
+			padding: 16px;
+			@include media-breakpoint-down(sm) {
+				float: left;
+				width: 100%;
+				border: 0;
+				-webkit-border-radius: 0px;
+				-moz-border-radius: 0px;
+				border-radius: 0px;
+			    input {
+			    	background: #f5f5f5;
+			    	padding: 15px;
+			    	border: #000;
+			    }
+			}
+			.col-1, .col-2 {
+				width: 50%;
+				flex: 50%;
+				max-width: 50%;
+				@include media-breakpoint-down(sm) {
+					width: 100%;
+					flex: 100%;
+					max-width: 100%;
+				}
+				a {
+					@include button-default-small;
+					float: right;
+					font-size: 11px;
+				}
+			}
+			.woocommerce-input-wrapper {
+				float: left;
+				width: 100%;
+			}
+			button.button {
+				float: right;
+				@include button-default;
+			}
+		}
+	}
+}

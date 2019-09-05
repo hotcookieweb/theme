@@ -1,0 +1,293 @@
+.quick-nav {
+	float: left;
+	width: 100%;
+	@include media-breakpoint-down(sm) {
+		display: none;
+	}
+	.logos {
+		float: left;
+		width: 100%;
+		background-color: $color-lightgrey;
+		h5 {
+			float: left;
+			width: 25%;
+			padding-top: 32px;
+			padding-bottom: 32px;
+			@include font-link-16;
+			text-align: right;
+			color: rgba($color-secondary-1, 0.4);
+			text-shadow: 0 1px 0 $white;
+		}
+		ul {
+			float: left;
+			width: 75%;
+			margin: 0;
+			margin-top: 32px;
+			padding: 0 0 0 32px;
+			li {
+				float: left;
+				padding: 0;
+				margin: 0;
+				list-style: none;
+				width: 20%;
+				img {
+					opacity: 0.5;
+				}
+			}
+		}
+	}
+	ul.container {
+		li {
+			float: left;
+			list-style-type: none;
+			margin-top: 32px;
+			margin-bottom: 32px;
+			margin-right: 1.15%;
+			margin-left: 1.15%;
+			width: 31%;
+			text-align: center;
+			overflow: hidden;
+			-webkit-border-radius: 8px;
+			-moz-border-radius: 8px;
+			border-radius: 8px;
+			img {
+				width: 100%;
+				-webkit-border-radius: 8px;
+				-moz-border-radius: 8px;
+				border-radius: 8px;
+			    transition: all 0.25s ease;
+			}
+			h2 {
+				float: left;
+				width: 100%;
+				margin-top: 16px;
+				@include font-h4;
+			}
+			p {
+				padding-left: 16px;
+				padding-right: 16px;
+				@include font-16;
+				color: $black;
+			}
+			a {
+				float: left;
+				width: 100%;
+				border: 1px solid $white;
+				text-decoration: none;
+				transition: all 0.25s ease;
+				-webkit-border-radius: 8px;
+				-moz-border-radius: 8px;
+				border-radius: 8px;
+				&:hover {
+					background: $color-lightgrey;
+					border-color: $color-grey;
+					img {
+						-webkit-border-bottom-right-radius: 0px;
+						-webkit-border-bottom-left-radius: 0px;
+						-moz-border-radius-bottomright: 0px;
+						-moz-border-radius-bottomleft: 0px;
+						border-bottom-right-radius: 0px;
+						border-bottom-left-radius: 0px;
+					}
+					h2 {
+
+					}
+					p {
+
+					}
+				}
+			}
+		}
+	}
+}
+
+.footer {
+	float: left;
+	width: 100%;
+	background: $color-primary-1;
+	padding-top: 32px;
+	h2 {
+		float: left;
+		width: 305px;
+		color: $white;
+		font-size: 16px;
+		font-family: 'Nunito Sans', sans-serif;
+		font-weight: lighter;
+		text-transform: uppercase;
+		line-height: 23px;
+		letter-spacing: -1px;
+		border-top: 1px solid $white;
+		border-bottom: 1px solid $white;
+		text-align: center;
+		padding-top: 8px;
+		padding-bottom: 8px;
+		margin-top: 32px;
+		@include media-breakpoint-down(sm) {
+			float: none;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		@include media-breakpoint-down(lg) {
+			float: none;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		span {
+			float: left;
+			background-image: url('../images/logo-hotcookie.svg');
+			background-repeat: no-repeat;
+			-webkit-background-size: auto 45px;
+			     -o-background-size: auto 45px;
+			        background-size: auto 45px;
+			width: 85px;
+			height: 0;
+			padding-top: 45px;
+			overflow: hidden;
+		}
+	}
+	.footer-nav {
+		float: right;
+		width: 70%;
+		padding-top: 26px;
+		@include media-breakpoint-down(sm) {
+			text-align: center;
+			width: 100%;
+		}
+		@include media-breakpoint-down(lg) {
+			width: 100%;
+		}
+		.main, .second, .third {
+			float: left;
+			width: 33.3333%;
+			@include media-breakpoint-down(sm) {
+				float: left;
+				width: 100%;
+				max-width: 100%;
+				padding-bottom: 32px;
+			}
+		}
+		h3 {
+			color: $white;
+			float: left;
+			text-align: right;
+			width: 100%;
+			@include media-breakpoint-down(sm) {
+				text-align: center;
+			}
+			@include media-breakpoint-down(lg) {
+				text-align: center;
+			}
+		}
+		ul {
+			float: left;
+			width: 100%;
+			margin: 0;
+			padding: 0;
+			li {
+				float: left;
+				width: 100%;
+				padding: 0;
+				margin: 0;
+				list-style: none;
+				ul {
+					margin: 0;
+					padding: 0;
+					width: 100%;
+					li {
+						padding: 0;
+						margin: 0;
+					}
+				}
+				@include media-breakpoint-down(sm) {
+					float: left;
+					width: 100%;
+					text-align: center;
+				}
+				a {
+					font-weight: lighter;
+					float: right;
+					color: $white;
+					padding-top: 0;
+					padding-bottom: 0;
+					text-align: right;
+					text-decoration: none;
+					border-bottom: 1px solid $color-primary-1;
+					transition: all 0.25s ease;
+					@include media-breakpoint-down(sm) {
+						float: left;
+						width: 100%;
+						text-align: center;
+					}
+					@include media-breakpoint-down(lg) {
+						width: 100%;
+						text-align: center;
+					}
+					&:hover {
+						border-bottom: 1px solid $white;
+					}
+				}
+			}
+		}
+	}
+	.contact {
+		float: left;
+		color: $white;
+		text-align: left;
+		@include media-breakpoint-down(lg) {
+			text-align: center;
+			width: 100%;
+		}
+		h6 {
+			@include font-link-16;
+		}
+		p {
+			font-weight: lighter;
+		}
+		ul.socialmedia {
+			float: left!important;
+			@include media-breakpoint-down(lg) {
+				float: left;
+				width: 100%;
+				text-align: center;
+				li {
+					width: 12.5%;
+					margin: 0 0 0 12.5%;
+				}
+			}
+		}
+	}
+	.copyright {
+		float: left;
+		background: $black;
+		width: 100%;
+		margin-top: 32px;
+		padding-top: 12px;
+		padding-bottom: 12px;
+		@include font-14;
+		.container {
+			p {
+				float: left;
+				width: 50%;
+				opacity: 0.5;
+				margin: 0;
+				padding: 0;
+				color: $white;
+				font-weight: lighter;
+				@include media-breakpoint-down(sm) {
+					text-align: center;
+					width: 100%;
+				}
+				a {
+					float: right;
+					color: $white;
+					border-bottom: 1px solid $black;
+					text-decoration: none;
+					transition: all 0.25s ease;
+					&:hover {
+						border-bottom: 1px solid $white;
+					}
+				}
+			}
+		}
+	}
+}

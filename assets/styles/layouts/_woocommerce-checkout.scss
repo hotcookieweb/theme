@@ -1,0 +1,30 @@
+.checkout {
+	.header {
+		background: $color-primary-1!important;
+	}
+	.content-ultrawide {
+		padding-top: 114px;
+		padding-bottom: 32px;
+		.woocommerce {
+			background: none;
+		}
+		.col-1, .col-2 {
+			max-width: 100%;
+			.woocommerce-input-wrapper {
+				width: 100%;
+				@include media-breakpoint-down(sm) {
+				    .input-text {
+				    	background: #f5f5f5;
+				    	padding: 15px;
+				    	border: 0;
+				    }
+				}
+			}
+		}
+		.place-order {
+			button.button {
+				@include button-default;
+			}
+		}
+	}
+}
