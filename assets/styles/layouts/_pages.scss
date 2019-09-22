@@ -14,7 +14,8 @@
 		h1 {
 			@include font-display;
 			color: $white;
-			width: 800px;
+			width: 100%;
+			text-align: center;
 			@include media-breakpoint-down(md) {
 				width: 100%;
 			}
@@ -22,7 +23,8 @@
 		p {
 			@include font-16;
 			color: $white;
-			width: 800px;
+			width: 100%;
+			text-align: center;
 			@include media-breakpoint-down(md) {
 				width: 100%;
 			}
@@ -197,6 +199,15 @@ ul.socialmedia-red {
 	}
 }
 
+.page-template-template-gifts, .page-template-template-specials {
+	h1 {
+		text-align: center;
+	}
+	p {
+		text-align: center;
+	}
+}
+
 
 .team {
 	margin: 0;
@@ -307,5 +318,12 @@ ul.socialmedia-red {
 				}
 			}
 		}
+	}
+}
+
+
+.page-template-template-text {
+	.header {
+		background: $color-primary-1;
 	}
 }

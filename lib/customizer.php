@@ -122,3 +122,58 @@ function cfwc_display_custom_field() {
  }
 }
 add_action( 'woocommerce_before_add_to_cart_button', __NAMESPACE__ . '\\cfwc_display_custom_field' );
+
+
+
+
+
+remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
+add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
+
+
+add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
+add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
+add_filter('woocommerce_coupon_error', __NAMESPACE__ . '\\rename_coupon_label', 10, 3);
+add_filter('woocommerce_coupon_message', __NAMESPACE__ . '\\rename_coupon_label', 10, 3);
+add_filter('woocommerce_cart_totals_coupon_label', __NAMESPACE__ . '\\rename_coupon_label',10, 1);
+add_filter( 'woocommerce_checkout_coupon_message', __NAMESPACE__ . '\\woocommerce_rename_coupon_message_on_checkout' );
+
+
+function woocommerce_rename_coupon_field_on_cart( $translated_text, $text, $text_domain ) {
+	// bail if not modifying frontend woocommerce text
+	if ( is_admin() || 'woocommerce' !== $text_domain ) {
+		return $translated_text;
+	}
+	if ( 'Coupon:' === $text ) {
+		$translated_text = 'Discount Code:';
+	}
+
+	if ('Coupon has been removed.' === $text){
+		$translated_text = 'Discount code has been removed.';
+	}
+
+	if ( 'Apply coupon' === $text ) {
+		$translated_text = 'Apply Discount';
+	}
+
+	if ( 'Coupon code' === $text ) {
+		$translated_text = 'Discount Code';
+
+	}
+
+	return $translated_text;
+}
+
+
+// rename the "Have a Coupon?" message on the checkout page
+function woocommerce_rename_coupon_message_on_checkout() {
+	return 'Have an Discount Code?' . ' ' . __( 'Click here to enter your code', 'woocommerce' ) . '';
+}
+
+
+function rename_coupon_label($err, $err_code=null, $something=null){
+
+	$err = str_ireplace("Coupon","Discount Code ",$err);
+
+	return $err;
+}

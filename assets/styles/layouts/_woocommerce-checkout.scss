@@ -2,6 +2,11 @@
 	.header {
 		background: $color-primary-1!important;
 	}
+	.page-header {
+		h1 {
+			text-align: center;
+		}
+	}
 	.content-ultrawide {
 		padding-top: 114px;
 		padding-bottom: 32px;
@@ -26,5 +31,46 @@
 				@include button-default;
 			}
 		}
+	}
+}
+
+#e_deliverydate_field {
+	margin-top: 15px;
+}
+
+#e_deliverydate_field, #orddd_time_slot_field {
+	border: 1px solid #cccccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+    padding: 15px;
+    .woocommerce-input-wrapper {
+    	padding-left: 15px;
+    }
+	.orddd_field_note {
+		float: left;
+		width: 100%;
+		font-size: 14px;
+	}
+}
+
+#payment {
+	margin-top: 30px;
+}
+
+.woocommerce-form-coupon-toggle {
+	display: none;
+}
+
+#order_review {
+	.form-row-first {
+		width: 50%;
+		padding-left: 15px;
+		input {
+			padding: 6px 15px 6px 15px;
+		}
+	}
+	.form-row-last {
+		width: 50%;
 	}
 }

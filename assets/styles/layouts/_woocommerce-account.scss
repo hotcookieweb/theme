@@ -1,6 +1,40 @@
 .woocommerce-account {
+	.header {
+		background-color: $color-primary-1;
+	}
 	.page-banner {
 		display: none;
+	}
+	.page-header {
+		h1 {
+			text-align: center;
+		}
+	}
+	.col2-set {
+		.col-1, .col-2 {
+			width: 50%;
+			flex: 50%;
+			max-width: 50%;
+			margin-bottom: 15px;
+			form {
+				float: left;
+				width: 100%;
+				margin: 0;
+				input {
+					border: 1px solid #cccccc;
+					padding: 5px;
+				}
+			}
+			@include media-breakpoint-down(sm) {
+				float: left;
+				width: 100%;
+				flex: 100%;
+				max-width: 100%;
+			}
+			a {
+
+			}
+		}
 	}
 }
 
