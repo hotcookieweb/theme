@@ -43,7 +43,7 @@ function wc_add_long_description() {
 
 	?>
         <div itemprop="description">
-            <?php echo apply_filters( 'the_content', $product->post->post_content ) ?>
+            <?php // echo apply_filters( 'the_content', $product->post->post_content ) ?>
         </div>
 	<?php
 }
