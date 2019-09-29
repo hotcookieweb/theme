@@ -7,10 +7,9 @@
   <div class="container">
     <h1><?php the_field('title'); ?></h1>
     <p><?php the_field('intro'); ?></p>
-    <div>
-      <input autocomplete="off" class="frontpage-input" maxlength="100" name="mysearchstring" placeholder="Address, example Streetname 10" type="text" value="">
-      <button class="icon-search" href="#" id="submit_deliveryarea" title="Zoek restaurants">Search</button>
-    </div>
+
+    <?php do_shortcode('wls-search'); ?>
+    
     <?php if( have_rows('buttons') ): ?>
       <ul>
         <?php while ( have_rows('buttons') ) : the_row(); ?>
