@@ -8,8 +8,8 @@
     <h1><?php the_field('title'); ?></h1>
     <p><?php the_field('intro'); ?></p>
 
-    <?php do_shortcode('wls-search'); ?>
-    
+    <?php echo do_shortcode('wls-search'); ?>
+
     <?php if( have_rows('buttons') ): ?>
       <ul>
         <?php while ( have_rows('buttons') ) : the_row(); ?>
