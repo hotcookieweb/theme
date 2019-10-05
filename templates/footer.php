@@ -1,6 +1,6 @@
 <div class="footer">
   <div class="container">
-    <h2><span>Hot Cookie</span> Putting something<br />sweet in your mouth</h2>
+    <h2><span>Hot Cookie</span></h2>
     <div class="footer-nav">
       <div class="main">
         <h3>Pages</h3>

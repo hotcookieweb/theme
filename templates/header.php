@@ -14,7 +14,7 @@
 
 <div class="header">
   <div class="container">
-    <h2 class="brand"><a href="<?= esc_url(home_url('/')); ?>"><span><?php bloginfo('name'); ?></span> Putting something<br />sweet in your mouth</a></h2>
+    <h2 class="brand"><a href="<?= esc_url(home_url('/')); ?>"><span><?php bloginfo('name'); ?></span></a></h2>
     <nav class="nav-primary">
       <?php
       if (has_nav_menu('primary_navigation')) :
