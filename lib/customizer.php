@@ -79,23 +79,21 @@ add_theme_support( 'wc-product-gallery-lightbox' );
 
 add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
 function exetera_custom_product_tabs( $tabs ) {
+
     // Custom description callback.
     $tabs['description']['callback'] = function() {
-        global $post, $product;
+      global $post, $product;
 
-		echo '<div class="left"><h2>Additional Information</h2>';
+		  echo '<div class="left"><h2>Additional Information</h2>';
+      // Display the heading and content of the Additional Information tab.
+		  do_action( 'woocommerce_product_additional_information', $product );
 
-        // Display the content of the Description tab.
-		do_action( 'woocommerce_product_additional_information', $product );
-
-
-        // Display the heading and content of the Additional Information tab.
-
+      // Display the content of the Description tab of not empty
+      if (! empty($post->post_content)) {
         echo '</div><div class="right"><h2>Description</h2>';
-
         the_content();
-
         echo '</div>';
+      };
     };
 
     // Remove the additional information tab.
