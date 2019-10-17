@@ -175,3 +175,6 @@ function rename_coupon_label($err, $err_code=null, $something=null){
 
 	return $err;
 }
+
+// default to billing address is shipping address
+add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );
