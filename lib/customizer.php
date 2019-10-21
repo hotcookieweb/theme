@@ -32,22 +32,6 @@ if( function_exists('acf_add_options_page') ) {
 
 }
 
-add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\wc_add_long_description' );
-/**
- * WooCommerce, Add Long Description to Products on Shop Page
- *
- * @link https://wpbeaches.com/woocommerce-add-short-or-long-description-to-products-on-shop-page
- */
-function wc_add_long_description() {
-	global $product;
-
-	?>
-        <!-- <div itemprop="description">
-            <?php // echo apply_filters( 'the_content', $product->post->post_content ) ?>
-        </div> -->
-	<?php
-}
-
 remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
 remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
 
@@ -79,21 +63,23 @@ add_theme_support( 'wc-product-gallery-lightbox' );
 
 add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
 function exetera_custom_product_tabs( $tabs ) {
-
     // Custom description callback.
     $tabs['description']['callback'] = function() {
-      global $post, $product;
+        global $post, $product;
 
-		  echo '<div class="left"><h2>Additional Information</h2>';
-      // Display the heading and content of the Additional Information tab.
-		  do_action( 'woocommerce_product_additional_information', $product );
+		echo '<div class="left"><h2>Additional Information</h2>';
 
-      // Display the content of the Description tab of not empty
-      if (! empty($post->post_content)) {
+        // Display the content of the Description tab.
+		do_action( 'woocommerce_product_additional_information', $product );
+
+
+        // Display the heading and content of the Additional Information tab.
+
         echo '</div><div class="right"><h2>Description</h2>';
+
         the_content();
+
         echo '</div>';
-      };
     };
 
     // Remove the additional information tab.
@@ -175,6 +161,3 @@ function rename_coupon_label($err, $err_code=null, $something=null){
 
 	return $err;
 }
-
-// default to billing address is shipping address
-add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );
