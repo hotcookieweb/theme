@@ -3,7 +3,7 @@
     <h2><span>Hot Cookie</span></h2>
     <div class="footer-nav">
       <div class="main">
-        <h3>Pages</h3>
+        <h3>About Us</h3>
         <?php wp_nav_menu( array( 'theme_location' => 'footer_navigation_main' ) ); ?>
       </div>
       <div class="second">
