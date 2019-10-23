@@ -27,7 +27,7 @@
 			<h1><?= Titles\title(); ?></h1>
 			<?php get_template_part('templates/content', 'page'); ?>
 			<div class="product-ultrawide">
-				<?php echo do_shortcode('[products columns="2" category="specials" cat_operator="AND" limit="99994" paginate="true"]'); ?>
+				<?php echo do_shortcode('[products columns="2" category="special-orders" cat_operator="AND" limit="99994" paginate="true"]'); ?>
 			</div>
 		<?php endwhile; ?>
 	</div>
