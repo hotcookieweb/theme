@@ -30,7 +30,7 @@
 			<p><?php the_field('intro'); ?></p>
 			<?php $term = get_field('select_product_category'); if( $term ): ?>
 				<div class="product-wide">
-					<?php echo do_shortcode('[products columns="1" category="' . $term->slug . '" cat_operator="AND" limit="99999" paginate="true"]'); ?>
+					<?php echo do_shortcode('[products columns="1" category="' . $term->slug . '" orderby="menu_order" cat_operator="AND" limit="99999" paginate="true"]'); ?>
 				</div>
 			<?php endif; ?>
 		<?php endwhile; ?>

@@ -27,7 +27,7 @@
 			<h1><?= Titles\title(); ?></h1>
 			<?php get_template_part('templates/content', 'page'); ?>
 			<div class="product-small-long">
-				<?php echo do_shortcode('[products columns="3" category="gift-boxes" cat_operator="AND" limit="9999" paginate="true"]'); ?>
+				<?php echo do_shortcode('[products columns="3" category="gift-boxes" orderby="menu_order" cat_operator="AND" limit="9999" paginate="true"]'); ?>
 			</div>
 		<?php endwhile; ?>
 	</div>
