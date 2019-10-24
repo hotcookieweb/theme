@@ -32,16 +32,3 @@
     </ul>
 <?php else : ?>
 <?php endif; ?>
-
-<?php if (has_post_thumbnail( $post->ID ) ): ?>
-  <?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' ); ?>
-  <div class="mobile-about" style="background-image:url('<?php echo $image[0]; ?>')">
-<?php else : ?>
-  <div class="mobile-about">
-<?php endif; ?>
-  <div class="effect">
-    <h2><?php the_field('title'); ?></h2>
-    <p><?php the_field('intro'); ?></p>
-    <a href="#" title="About us" class="button">About us</a>
-  </div>
-</div>
