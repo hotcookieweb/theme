@@ -36,3 +36,15 @@ function wc_empty_cart_redirect_url() {
 	return get_home_url();
 }
 add_filter( 'woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url' );
+
+function woocommerce_change_text($translated, $text, $domain) {
+  switch ( $translated ) {
+    case 'If you have a coupon code, please apply it below.':
+      $translated= __( 'If you have a promo code, please apply it below.', 'woocommerce' );
+      break;
+  }
+  return $translated;
+}
+add_filter( 'gettext', 'woocommerce_change_text', 20, 3 );
+
+add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );

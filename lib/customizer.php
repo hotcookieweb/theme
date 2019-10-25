@@ -129,35 +129,25 @@ function woocommerce_rename_coupon_field_on_cart( $translated_text, $text, $text
 		return $translated_text;
 	}
 	if ( 'Coupon:' === $text ) {
-		$translated_text = 'Discount Code:';
+		$translated_text = 'Promo Code:';
 	}
-
 	if ('Coupon has been removed.' === $text){
-		$translated_text = 'Discount code has been removed.';
+		$translated_text = 'Promo code has been removed.';
 	}
-
 	if ( 'Apply coupon' === $text ) {
-		$translated_text = 'Apply Discount';
+		$translated_text = 'Apply Promo';
 	}
-
 	if ( 'Coupon code' === $text ) {
-		$translated_text = 'Discount Code';
+		$translated_text = 'Promo Code';
 
 	}
-
 	return $translated_text;
 }
-
-
 // rename the "Have a Coupon?" message on the checkout page
 function woocommerce_rename_coupon_message_on_checkout() {
-	return 'Have an Discount Code?' . ' ' . __( 'Click here to enter your code', 'woocommerce' ) . '';
+	return 'Have an Promo Code?' . ' ' . __( 'Click here to enter your code', 'woocommerce' ) . '';
 }
-
-
 function rename_coupon_label($err, $err_code=null, $something=null){
-
-	$err = str_ireplace("Coupon","Discount Code ",$err);
-
+	$err = str_ireplace("Coupon","Promo Code ",$err);
 	return $err;
 }
