@@ -48,6 +48,14 @@
 			.products {
 				.product {
 					width: 25%;
+					a {
+						.price {
+							font-size: 12px!important;
+						}
+					}
+					a.add_to_cart_button {
+						width: 80%;
+					}
 				}
 			}
 		}
