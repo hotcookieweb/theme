@@ -26,7 +26,7 @@
 		<?php while (have_posts()) : the_post(); ?>
 			<h1><?= Titles\title(); ?></h1>
 			<?php get_template_part('templates/content', 'page'); ?>
-			<div class="product-ultrawide">
+			<div class="product-small-long">
 				<?php echo do_shortcode('[products columns="2" category="special-orders" orderby="menu_order" cat_operator="AND" limit="99994" paginate="true"]'); ?>
 			</div>
 		<?php endwhile; ?>

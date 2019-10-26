@@ -5,7 +5,7 @@
 			padding: 16px 16px 32px 16px!important;
 			text-align: center;
 			margin: 0!important;
-			width: 33.3333%!important;
+
 			@include media-breakpoint-down(sm) {
 				width: 100%!important;
 			}
@@ -30,18 +30,18 @@
 					margin-bottom: 0!important;
 				}
 				h2 {
-					text-align: left;
+					text-align: center;
 					margin: 0!important;
 					padding: 0!important;
 					color: $black;
 				}
 				span {
-					text-align: left;
+					text-align: center;
 					@include font-h1;
 					color: $color-primary-1;
 				}
 				p {
-					text-align: left;
+					text-align: center;
 				}
 				&:hover {
 					border: 2px solid $color-primary-1;
@@ -56,7 +56,7 @@
 				background-image: url('../images/icon-bag.svg');
 				background-repeat: no-repeat;
 				background-position: 12px 5px;
-				text-align: left;
+				text-align: center;
 				color: $color-primary-1;
 				border: 2px solid $color-primary-1;
 				-webkit-border-radius: 48px;
@@ -126,4 +126,13 @@
 			}
 		}
 	}
+}
+
+body.page-id-15 {
+	.gifts_only {
+		display: block!important;
+	}
+}
+.gifts_only {
+	display: none;
 }
