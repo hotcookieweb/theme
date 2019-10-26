@@ -48,3 +48,15 @@ function woocommerce_change_text($translated, $text, $domain) {
 add_filter( 'gettext', 'woocommerce_change_text', 20, 3 );
 
 add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );
+
+/**
+* WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
+*/
+add_filter( 'woocommerce_coupons_enabled', 'woocommerce_coupons_enabled_checkout' );
+function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
+    global $woocommerce;
+    if ( ! empty( $woocommerce->cart->applied_coupons ) ) {
+        return false;
+    }
+    return $coupons_enabled;
+}
