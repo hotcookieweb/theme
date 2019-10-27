@@ -59,27 +59,25 @@ function mytheme_add_woocommerce_support() {
 
 add_action( 'after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support' );
 
-add_theme_support( 'wc-product-gallery-lightbox' );
-
 add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
 function exetera_custom_product_tabs( $tabs ) {
     // Custom description callback.
     $tabs['description']['callback'] = function() {
-        global $post, $product;
+      global $post, $product;
 
-		echo '<div class="left"><h2>Additional Information</h2>';
+		  echo '<div class="left"><h2>Additional Information</h2>';
+      // Display the heading and content of the Additional Information tab.
+		  do_action( 'woocommerce_product_additional_information', $product );
+      echo '</div>';
 
-        // Display the content of the Description tab.
-		do_action( 'woocommerce_product_additional_information', $product );
-
-
-        // Display the heading and content of the Additional Information tab.
-
-        echo '</div><div class="right"><h2>Description</h2>';
+      // Display the content of the Description tab of not empty
+      if (! empty($post->post_content)) {
+        echo '<div class="right"><h2>Description</h2>';
 
         the_content();
 
         echo '</div>';
+      };
     };
 
     // Remove the additional information tab.
@@ -111,8 +109,8 @@ add_action( 'woocommerce_before_add_to_cart_button', __NAMESPACE__ . '\\cfwc_dis
 
 
 
-remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
-add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
+//remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
+//add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
 
 
 add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
@@ -159,3 +157,42 @@ function short_des_product() {
     echo '</div>';
 }
 add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\short_des_product', 40 );
+
+/**
+ * Changes the redirect URL for the Return To Shop button in the cart.
+ *
+ * @return string
+ */
+function wc_empty_cart_redirect_url() {
+	return get_home_url();
+}
+add_filter( 'woocommerce_return_to_shop_redirect', __NAMESPACE__ . '\\wc_empty_cart_redirect_url' );
+
+function woocommerce_change_text($translated, $text, $domain) {
+  switch ( $translated ) {
+    case 'If you have a coupon code, please apply it below.':
+      $translated= __( 'If you have a promo code, please apply it below.', 'woocommerce' );
+      break;
+  }
+  return $translated;
+}
+add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_change_text', 20, 3 );
+
+add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );
+
+/**
+* WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
+*/
+add_filter( 'woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout' );
+function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
+    global $woocommerce;
+    if ( ! empty( $woocommerce->cart->applied_coupons ) ) {
+        return false;
+    }
+    return $coupons_enabled;
+}
+
+/**
+ * Remove related products output
+ */
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
