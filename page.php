@@ -1,19 +1,24 @@
-<?php while (have_posts()) : the_post(); ?>
-	<?php if (has_post_thumbnail( $post->ID ) ): ?>
-  	<?php $image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'single-post-thumbnail' ); ?>
-	  <div class="page-banner" style="background-image:url('<?php echo $image[0]; ?>')">
-	<?php else : ?>
-	  <div class="page-banner">
-	<?php endif; ?>
-<?php endwhile; ?>
+<?php get_template_part('templates/components/page', 'banner'); ?>
 
-<div class="container">
-	<div class="content-ultrawide">
-		<?php while (have_posts()) : the_post(); ?>
-			<?php get_template_part('templates/page', 'header'); ?>
-			<?php get_template_part('templates/content', 'page'); ?>
-		<?php endwhile; ?>
-	</div>
+<div class="container text-page">
+<?php while (have_posts()) : the_post(); ?>
+
+		<?php if( get_field('display_sidebar') == 'show' ) { get_template_part('templates/components/sidebar', 'secondary'); } ?>
+
+		<?php if( get_field('display_sidebar') == 'show' ) { ?><div class="content"><?php } ?>
+			<?php if( get_field('display_address') == 'show' ) { ?>
+				<div class="content-small">
+			<?php } ?>
+				<h1><?php the_title(); ?></h1>
+				<?php the_content(); ?>
+				<?php get_template_part('templates/components/products', 'list'); ?>
+			<?php if( get_field('display_address') == 'show' ) { ?>
+				</div>
+				<?php get_template_part('templates/components/sidebar', 'contact'); ?>
+			<?php } ?>
+		<?php if( get_field('display_sidebar') == 'show' ) { ?></div><?php } ?>
+
+<?php endwhile; ?>
 </div>
 
-<?php get_template_part('templates/quick', 'nav'); ?>
+<?php get_template_part('templates/components/quick', 'nav'); ?>

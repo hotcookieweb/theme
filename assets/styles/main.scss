@@ -5,21 +5,29 @@
 @import "../../bower_components/bootstrap/scss/bootstrap.scss";
 // endbower
 
+
 @import "common/global";
 @import "components/buttons";
 @import "components/comments";
+
+@import "components/delivery-form";
+@import "components/page_banner";
+@import "components/products-list";
+
 @import "components/forms";
 @import "components/grid";
 @import "components/wp-classes";
-@import "layouts/header";
-@import "layouts/sidebar";
+@import "components/header";
+
+@import "layouts/sidebars";
 @import "layouts/footer";
 @import "layouts/frontpage";
+@import "layouts/template-team";
+@import "layouts/template-store";
 @import "layouts/pages";
+
+
 @import "layouts/woocommerce";
-@import "layouts/woocommerce-wide";
-@import "layouts/woocommerce-ultrawide";
-@import "layouts/woocommerce-smalllong";
 @import "layouts/woocommerce-product";
 @import "layouts/woocommerce-cart";
 @import "layouts/woocommerce-checkout";

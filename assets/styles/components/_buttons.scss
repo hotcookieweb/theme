@@ -1,0 +1,146 @@
+ul.socialmedia-red {
+	float: left;
+	margin: 0;
+	padding: 0;
+	li {
+		float: left;
+		margin: 0 16px 0 0;
+		padding: 0;
+		list-style: none;
+		a {
+			float: left;
+			width: 16px;
+			height: 0;
+			padding-top: 16px;
+			overflow: hidden;
+			transition: all 0.25s ease;
+			&:hover {
+				transform: scale(2);
+			}
+		}
+		&.Instagram {
+			a {
+				background-image: url('../images/icon-instagram-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Facebook {
+			a {
+				background-image: url('../images/icon-facebook-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Twitter {
+			a {
+				background-image: url('../images/icon-twitter-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Pintrest {
+			a {
+				background-image: url('../images/icon-pintrest-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Tumblr {
+			a {
+				background-image: url('../images/icon-tumblr-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Snapchat {
+			a {
+				background-image: url('../images/icon-snapchat-red.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+	}
+}
+
+ul.socialmedia {
+	float: left;
+	margin: 0;
+	padding: 0;
+	li {
+		float: left;
+		margin: 0 0 0 16px;
+		padding: 0;
+		list-style: none;
+		a {
+			float: left;
+			width: 16px;
+			height: 0;
+			padding-top: 16px;
+			overflow: hidden;
+			transition: all 0.25s ease;
+			&:hover {
+				transform: scale(2);
+			}
+		}
+		&.Instagram {
+			a {
+				background-image: url('../images/icon-instagram.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Facebook {
+			a {
+				background-image: url('../images/icon-facebook.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Twitter {
+			a {
+				background-image: url('../images/icon-twitter.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Pintrest {
+			a {
+				background-image: url('../images/icon-pintrest.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Tumblr {
+			a {
+				background-image: url('../images/icon-tumblr.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+		&.Snapchat {
+			a {
+				background-image: url('../images/icon-snapchat.svg');
+				-webkit-background-size: 100%;
+				     -o-background-size: 100%;
+				        background-size: 100%;
+			}
+		}
+	}
+}
+
+.btn {
+	@include button-default;
+	float: none;
+}

@@ -1,0 +1,40 @@
+.team {
+	margin: 0;
+	padding: 0;
+	li {
+		float: left;
+		width: 50%;
+		margin: 0;
+		padding: 0;
+		padding-bottom: 32px;
+		list-style: none;
+		@include media-breakpoint-down(md) {
+			width: 100%;
+		}
+		img {
+			float: left;
+			-webkit-border-radius: 100px;
+			-moz-border-radius: 100px;
+			border-radius: 100px;
+			width: 50px;
+			margin-right: 16px;
+		}
+		h3 {
+			float: left;
+			margin: 0;
+			padding: 0;
+			line-height: 32px;
+		}
+		small {
+			float: left;
+			width: 100%;
+			padding-left: 66px;
+			margin-top: -16px;
+			margin-bottom: 16px;
+		}
+		p {
+			float: left;
+			width: 100%;
+		}
+	}
+}

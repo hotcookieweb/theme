@@ -27,16 +27,6 @@ foreach ($sage_includes as $file) {
 }
 unset($file, $filepath);
 
-/**
- * Changes the redirect URL for the Return To Shop button in the cart.
- *
- * @return string
- */
-function wc_empty_cart_redirect_url() {
-	return get_home_url();
-}
-add_filter( 'woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url' );
-
 function woocommerce_change_text($translated, $text, $domain) {
   switch ( $translated ) {
     case 'If you have a coupon code, please apply it below.':
@@ -48,15 +38,3 @@ function woocommerce_change_text($translated, $text, $domain) {
 add_filter( 'gettext', 'woocommerce_change_text', 20, 3 );
 
 add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false' );
-
-/**
-* WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
-*/
-add_filter( 'woocommerce_coupons_enabled', 'woocommerce_coupons_enabled_checkout' );
-function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
-    global $woocommerce;
-    if ( ! empty( $woocommerce->cart->applied_coupons ) ) {
-        return false;
-    }
-    return $coupons_enabled;
-}
