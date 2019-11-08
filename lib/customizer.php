@@ -59,27 +59,25 @@ function mytheme_add_woocommerce_support() {
 
 add_action( 'after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support' );
 
-add_theme_support( 'wc-product-gallery-lightbox' );
-
 add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
 function exetera_custom_product_tabs( $tabs ) {
     // Custom description callback.
     $tabs['description']['callback'] = function() {
-        global $post, $product;
+      global $post, $product;
 
-		echo '<div class="left"><h2>Additional Information</h2>';
+		  echo '<div class="left"><h2>Additional Information</h2>';
+      // Display the heading and content of the Additional Information tab.
+		  do_action( 'woocommerce_product_additional_information', $product );
+      echo '</div>';
 
-        // Display the content of the Description tab.
-		do_action( 'woocommerce_product_additional_information', $product );
-
-
-        // Display the heading and content of the Additional Information tab.
-
-        echo '</div><div class="right"><h2>Description</h2>';
+      // Display the content of the Description tab of not empty
+      if (! empty($post->post_content)) {
+        echo '<div class="right"><h2>Description</h2>';
 
         the_content();
 
         echo '</div>';
+      };
     };
 
     // Remove the additional information tab.
@@ -111,8 +109,8 @@ add_action( 'woocommerce_before_add_to_cart_button', __NAMESPACE__ . '\\cfwc_dis
 
 
 
-remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
-add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
+//remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
+//add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
 
 
 add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
