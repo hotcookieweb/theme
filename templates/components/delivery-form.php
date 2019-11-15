@@ -16,7 +16,7 @@
 	      var str = [];
 	      for (var p in obj)
 	        if (obj.hasOwnProperty(p)) {
-	          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+	          str.push(encodeURIComponent(p) + "/" + encodeURIComponent(obj[p]));
 	        }
 	      return str.join("&");
 	    }
@@ -30,16 +30,15 @@
 	    wls_submit.addEventListener("click", function() {
 	      var zip = document.getElementById("wls-address-input").value;
 	      var query = [];
-	      query["product_cat"] = [];
+	      query["delivery"] = [];
 
 	      if (wls_zips.includes(zip)) {
-	        query["product_cat"].push("SF-Pickup");
-	        query["product_cat"].push("SF-Delivery");
+	        query["delivery"].push("pickup");
 	      } else {
-	        query["product_cat"].push("Anywhere-Delivery");
+	        query["delivery"].push("anywhere");
 	      }
 
-	      query = "?" + serialize(query);
+	      query = "" + serialize(query);
 
 	      window.location.href = query;
 	    });
