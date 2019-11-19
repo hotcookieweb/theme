@@ -179,3 +179,13 @@ function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
     return $coupons_enabled;
 }
 add_filter( 'woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout' );
+
+function woocommerce_change_text($translated, $text, $domain) {
+  switch ( $translated ) {
+    case 'If you have a coupon code, please apply it below.':
+      $translated= __( 'If you have a promo code, please apply it below.', 'woocommerce' );
+      break;
+  }
+  return $translated;
+}
+add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_change_text', 20, 3 );
