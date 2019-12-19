@@ -185,6 +185,18 @@ function woocommerce_change_text($translated, $text, $domain) {
     case 'If you have a coupon code, please apply it below.':
       $translated= __( 'If you have a promo code, please apply it below.', 'woocommerce' );
       break;
+    case 'Invoice':
+      $translated= __( 'Receipt', 'woocommerce' );
+      break;
+    case 'PDF Invoice data':
+        $translated= __( 'PDF Receipt data', 'woocommerce' );
+        break;
+    case 'Invoice number:':
+        $translated= __( 'Invoice Number', 'woocommerce' );
+        break;
+      case 'Invoice date:':
+        $translated= __( 'Invoice Date', 'woocommerce' );
+        break;
   }
   return $translated;
 }

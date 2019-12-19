@@ -51,6 +51,11 @@ $show_shipping = true;
 			<h2 class="woocommerce-column__title"><?php esc_html_e( 'Shipping address', 'woocommerce' ); ?></h2>
 			<address>
 				<?php echo wp_kses_post( $order->get_formatted_shipping_address( esc_html__( 'N/A', 'woocommerce' ) ) ); ?>
+
+				<!-- change to standard template -->
+				<?php do_action( 'woocommerce_order_details_after_shipping_address', $order ); ?>
+				<!-- change to standard template -->
+
 			</address>
 		</div><!-- /.col-2 -->
 
