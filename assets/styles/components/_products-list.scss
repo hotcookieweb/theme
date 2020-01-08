@@ -9,6 +9,9 @@
 		@include media-breakpoint-down(sm) {
 			width: 100%!important;
 		}
+		.gifts_only {
+			display: none;
+		}
 		a {
 			float: left;
 			width: 100%;
@@ -50,7 +53,7 @@
 				box-shadow:         0px 3px 6px 6px rgba($color-grey, 1.0);
 			}
 		}
-		.add_to_cart_button {
+		.add_to_cart_button, .product_type_variable, .product_type_simple {
 			float: none;
 			background: $white;
 			background-image: url('../images/icon-bag.svg');
@@ -151,5 +154,11 @@
 				background: none!important;
 			}
 		}
+	}
+}
+
+body.gift-boxes {
+	.gifts_only {
+		display: block!important;
 	}
 }
