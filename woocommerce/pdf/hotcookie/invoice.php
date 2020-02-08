@@ -73,7 +73,15 @@ RECEIPT
 				</tr>
 				<tr class="payment-method">
 					<th><?php _e( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php $this->payment_method(); ?></td>
+					<?php
+						$pay_method = $this->get_payment_method();
+						$card_digits = $order->get_meta('_wc_square_credit_card_account_four');
+						$card_type = $order->get_meta('_wc_square_credit_card_card_type');
+						if (!empty($card_type)) {
+							$pay_method = $card_type . " " . $card_digits;
+						}
+					?>
+					<td><?php echo $pay_method; ?></td>
 				</tr>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->type, $this->order ); ?>
 			</table>
