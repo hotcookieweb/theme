@@ -5,9 +5,14 @@
 		padding: 16px 16px 32px 16px!important;
 		text-align: center;
 		margin: 0!important;
-
+		@include media-breakpoint-down(md) {
+			width: 50%!important;
+		}
 		@include media-breakpoint-down(sm) {
 			width: 100%!important;
+		}
+		.gifts_only {
+			display: none;
 		}
 		a {
 			float: left;
@@ -50,7 +55,7 @@
 				box-shadow:         0px 3px 6px 6px rgba($color-grey, 1.0);
 			}
 		}
-		.add_to_cart_button {
+		.add_to_cart_button, .product_type_variable, .product_type_simple {
 			float: none;
 			background: $white;
 			background-image: url('../images/icon-bag.svg');
@@ -128,6 +133,12 @@
 	&.columns-3 {
 		li {
 			width: 33.3333%!important;
+			@include media-breakpoint-down(md) {
+				width: 50%!important;
+			}
+			@include media-breakpoint-down(sm) {
+				width: 100%!important;
+			}
 		}
 	}
 }
@@ -151,5 +162,11 @@
 				background: none!important;
 			}
 		}
+	}
+}
+
+body.gift-boxes {
+	.gifts_only {
+		display: block!important;
 	}
 }

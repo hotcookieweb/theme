@@ -46,10 +46,7 @@
     </a>
 
     <div class="cart">
-      <a href="<?php echo wc_get_cart_url(); ?>" title="<?php _e( 'View your shopping cart' ); ?>">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.9502C14.0344 1.9502 15.7039 3.61967 15.7039 5.65404L15.6539 6.33481L19.3119 6.38148L19.3576 7.06713L20.0884 20.2208L20.0842 21.0502L3.86597 20.9973L3.91163 20.221L4.64243 7.06658L4.738 6.33481L8.29617 6.38481V5.65404C8.29617 3.61967 9.96564 1.9502 12 1.9502ZM12 3.51173C10.8173 3.51173 9.85771 4.47132 9.85771 5.65404L9.80771 6.33481L14.1423 6.38481V5.65404C14.1423 4.47132 13.1827 3.51173 12 3.51173ZM6.15531 7.89635L5.46877 19.4887L18.4813 19.5414L17.8918 7.89635L15.7039 7.84635L15.6539 10.0887L14.1423 10.0387L14.1923 7.89635L9.85771 7.84635L9.80771 10.0887L8.29617 10.0387L8.34617 7.89635H6.15531Z" fill="#9B0D12"/>
-        </svg>
+      <a href="<?php echo wc_get_cart_url(); ?>" title="<?php _e( 'View your shopping cart' ); ?>" class="webshop-cart">
         <span>
           <?php echo sprintf ( _n( '%d', '%d', WC()->cart->get_cart_contents_count() ), WC()->cart->get_cart_contents_count() ); ?>
         </span>
