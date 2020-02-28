@@ -4,8 +4,6 @@
  */
 ?>
 <?php get_template_part('templates/components/page', 'banner'); ?>
-	<?php if( get_field('display') == 'show' ) { get_template_part('templates/components/products', 'header'); } ?>
-</div> <!-- Closing the banner -->
 
 <div class="container">
 	<?php if( get_field('display_sidebar') == 'show' ) { get_template_part('templates/components/sidebar', 'primary'); } ?>

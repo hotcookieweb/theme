@@ -9,7 +9,6 @@
 			<?php if( get_field('display_address') == 'show' ) { ?>
 				<div class="content-small">
 			<?php } ?>
-				<h1><?php the_title(); ?></h1>
 				<?php the_content(); ?>
 				<?php get_template_part('templates/components/products', 'list'); ?>
 			<?php if( get_field('display_address') == 'show' ) { ?>

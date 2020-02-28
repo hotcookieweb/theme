@@ -63,7 +63,7 @@
 	float: right;
 	position: relative;
 	z-index: 5;
-	background: #26c332;
+	background: $black;
 	@include font-link-18;
 	color: $white;
 	border: 0;

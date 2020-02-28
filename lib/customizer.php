@@ -156,7 +156,7 @@ function short_des_product() {
     the_content();
     echo '</div>';
 }
-add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\short_des_product', 40 );
+add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\short_des_product', 6 );
 
 /**
  * Changes the redirect URL for the Return To Shop button in the cart.

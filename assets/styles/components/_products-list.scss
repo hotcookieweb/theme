@@ -44,6 +44,7 @@
 				text-align: center;
 				@include font-h1;
 				color: $color-primary-1;
+				font-size: 1.5rem!important;
 			}
 			p {
 				text-align: center;
@@ -169,4 +170,13 @@ body.gift-boxes {
 	.gifts_only {
 		display: block!important;
 	}
+}
+
+p.price {
+	color: $black!important;
+	font-size: 1.5rem!important;
+}
+
+.woocommerce-loop-product__title {
+	font-size: 1.75rem!important;
 }
