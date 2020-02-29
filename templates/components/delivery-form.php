@@ -33,9 +33,9 @@
 	      query["delivery"] = [];
 
 	      if (wls_zips.includes(zip)) {
-	        query["delivery"].push("pickup");
+	        query["delivery"].push("local");
 	      } else {
-	        query["delivery"].push("anywhere");
+	        query["delivery"].push("national");
 	      }
 
 	      query = "" + serialize(query);
