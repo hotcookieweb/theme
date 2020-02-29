@@ -29,3 +29,10 @@ unset($file, $filepath);
 
 /* assume billing address is shipping address unless customer checks different */
 add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false');
+
+function maintenance_mode() {
+
+      if ( !current_user_can( 'edit_themes' ) || !is_user_logged_in() ) {wp_die("Sorry, we're baking some updates. They'll be out of the oven soon!");}
+
+}
+// add_action('get_header', 'maintenance_mode');
