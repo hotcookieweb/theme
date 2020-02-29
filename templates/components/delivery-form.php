@@ -33,7 +33,7 @@
 	      query["delivery"] = [];
 
 	      if (wls_zips.includes(zip)) {
-	        query["delivery"].push("local");
+	        query["delivery"].push("local-sf");
 	      } else {
 	        query["delivery"].push("national");
 	      }
