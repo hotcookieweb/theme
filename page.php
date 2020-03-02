@@ -6,15 +6,8 @@
 		<?php if( get_field('display_sidebar') == 'show' ) { get_template_part('templates/components/sidebar', 'secondary'); } ?>
 
 		<?php if( get_field('display_sidebar') == 'show' ) { ?><div class="content"><?php } ?>
-			<?php if( get_field('display_address') == 'show' ) { ?>
-				<div class="content-small">
-			<?php } ?>
 				<?php the_content(); ?>
 				<?php get_template_part('templates/components/products', 'list'); ?>
-			<?php if( get_field('display_address') == 'show' ) { ?>
-				</div>
-				<?php get_template_part('templates/components/sidebar', 'contact'); ?>
-			<?php } ?>
 		<?php if( get_field('display_sidebar') == 'show' ) { ?></div><?php } ?>
 
 <?php endwhile; ?>
