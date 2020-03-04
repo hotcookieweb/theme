@@ -1,45 +1,45 @@
 
-	<input autocomplete="off" class="frontpage-input" maxlength="5" id="wls-address-input" placeholder="Enter your 5 Digit ZIP Code (e.g 94114)" type="text" pattern="[0-9]{5}" value="">
-	<button class="icon-search" href="#" id="wls-submit" title="HotCookie Search">Search</button>
+	<input autocomplete="off" class="frontpage-input" maxlength="5" id="hc-address-input" placeholder="Enter your 5 Digit ZIP Code (e.g 94114)" type="text" pattern="[0-9]{5}" value="">
+	<button class="icon-search" href="#" id="hc-submit" title="HotCookie Search">Search</button>
 
 	<script>
-	    var wls_zips = ["94102", "94103", "94104", "94107", "94108", "94109", "94110", "94112", "94114", "94115",
-	               "94116", "94117", "94118", "94122", "94123", "94127", "94131", "94134", "94143", "94158",
-	               "94005", "94014", "94105", "94111", "94121", "94124", "94129", "94132", "94133", "94188",
-	               "94005", "94014", "94105", "94111", "94121", "94124", "94129", "94132", "94133", "94188"];
 
-	    var wls_submit = document.getElementById("wls-submit");
+	var hc_submit = document.getElementById("hc-submit");
 
-	    var wls_input = document.getElementById("wls-address-input");
+	var hc_input = document.getElementById("hc-address-input");
 
-	    serialize = function(obj) {
-	      var str = [];
-	      for (var p in obj)
-	        if (obj.hasOwnProperty(p)) {
-	          str.push(encodeURIComponent(p) + "/" + encodeURIComponent(obj[p]));
-	        }
-	      return str.join("&");
-	    }
+	serialize = function(obj) {
+		var str = [];
+		for (var p in obj)
+		if (obj.hasOwnProperty(p)) {
+			str.push(encodeURIComponent(p) + "/" + encodeURIComponent(obj[p]));
+		}
+		return str.join("&");
+	}
 
-	    wls_input.addEventListener("keyup", function(e) {
-	      if (e.keyCode == 13) {
-	        wls_submit.click();
-	      }
-	    });
+	hc_input.addEventListener("keyup", function(e) {
+		if (e.keyCode == 13) {
+			hc_submit.click();
+		}
+	});
 
-	    wls_submit.addEventListener("click", function() {
-	      var zip = document.getElementById("wls-address-input").value;
-	      var query = [];
-	      query["delivery"] = [];
+	hc_submit.addEventListener("click", function() {
+		var zipCodePattern = /^\d{5}$/;
+		var zipcode = document.getElementById("hc-address-input").value;
+		var url = "home";
+		if (zipCodePattern.test(zipcode)) {
+			var castro_zips = ["94122","94116","94132","94117","94114","94131","94127","94112","94134","94110","94124"];
+			var polk_zips = ["94129","94123","94115","94109","94133","94111","94104","94105","94108","94102","94103","94107","94121","94118"];
 
-	      if (wls_zips.includes(zip)) {
-	        query["delivery"].push("local-sf");
-	      } else {
-	        query["delivery"].push("national");
-	      }
-
-	      query = "" + serialize(query);
-
-	      window.location.href = query;
-	    });
+			if (castro_zips.includes(zipcode)) {
+				url = "delvery/castro-sf";
+			} else if (polk_zips.includes(zipcode)) {
+				url = "delivery/polk-sf";
+			} else {
+				url = "delivery/national";
+			}
+			url += "?zipcode=" + zipcode;
+		}
+		window.location.href = url;
+	});
 	</script>

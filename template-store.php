@@ -3,6 +3,9 @@
  * Template Name: Template Store
  */
 ?>
+
+<?php get_template_part('templates/components/delivery', 'save'); ?>
+
 <?php get_template_part('templates/components/page', 'banner'); ?>
 
 <div class="container">
