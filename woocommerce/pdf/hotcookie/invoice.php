@@ -12,10 +12,6 @@
 		}
 		?>
 		</td>
-		<td class="shop-info">
-			<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
-			<div class="shop-address"><?php $this->shop_address(); ?></div>
-		</td>
 	</tr>
 </table>
 

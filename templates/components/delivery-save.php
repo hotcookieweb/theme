@@ -6,6 +6,7 @@
 $zipcode = sanitize_text_field( $_GET["zipcode"] );
 
 if ($zipcode) {
+
 	$wc_customer = WC()->customer;
 	$wc_customer->set_billing_postcode( $zipcode );
 	$wc_customer->set_shipping_postcode ( $zipcode );
