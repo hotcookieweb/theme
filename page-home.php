@@ -1,6 +1,14 @@
-<?php get_template_part('templates/components/page', 'banner'); ?>
-
 <?php while (have_posts()) : the_post(); ?>
+	<div class="banner"
+		<?php if ($image = get_the_post_thumbnail_url()) {?> style="background-image:url('<?php echo $image; ?>')" <?php } ?>>
+
+			<div class="container">
+					<h4><?php the_field('header_content_above');?></h4>
+					<h1><?php the_field('header_title'); ?></h1>
+					<?php get_template_part('templates/components/delivery', 'form'); ?>
+					<h2><?php the_field('header_content_below'); ?></h2>
+			</div>
+	</div>
 	<?php if( have_rows('services') ): ?>
 	  <div class="frontpage-services">
 	    <ul class="container">

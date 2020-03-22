@@ -10,6 +10,9 @@
 	     -o-background-size: cover;
 	        background-size: cover;
 	background-position: center;
+	@include media-breakpoint-down(sm) {
+		height: 376px;
+	}
 	.container {
 		padding-top: 64px;
 		h1 {
@@ -22,12 +25,13 @@
 			}
 		}
 		p {
-			@include font-16;
+			@include font-h4;
 			color: $white;
 			width: 100%;
 			text-align: center;
 			@include media-breakpoint-down(md) {
 				width: 100%;
+				@include font-h6;
 			}
 		}
 	}
