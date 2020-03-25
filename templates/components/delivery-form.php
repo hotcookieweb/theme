@@ -1,5 +1,5 @@
 
-	<input autocomplete="off" class="frontpage-input" maxlength="5" id="hc-address-input" placeholder="Enter your 5 Digit ZIP Code (e.g 94114)" type="text" pattern="[0-9]{5}" value="">
+	<input autocomplete="off" class="frontpage-input" maxlength="5" id="hc-address-input" placeholder="Enter destination ZIP (e.g 94114)" type="text" pattern="[0-9]{5}" value="">
 	<button class="icon-search" href="#" id="hc-submit" title="HotCookie Search">Search</button>
 
 	<script>
