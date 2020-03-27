@@ -28,7 +28,7 @@ foreach ($sage_includes as $file) {
 unset($file, $filepath);
 
 /* assume billing address is shipping address unless customer checks different */
-add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false');
+add_filter( 'woocommerce_ship_to_different_address_checked', '__return_true');
 
 function maintenance_mode() {
 
