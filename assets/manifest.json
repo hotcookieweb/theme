@@ -1,24 +1,18 @@
 {
   "dependencies": {
     "main.js": {
-      "files": [
-        "scripts/main.js"
-      ],
+      "files": ["scripts/main.js"],
       "main": true
     },
     "main.css": {
-      "files": [
-        "styles/main.scss"
-      ],
+      "files": ["styles/main.scss"],
       "main": true
     },
     "customizer.js": {
-      "files": [
-        "scripts/customizer.js"
-      ]
+      "files": ["scripts/customizer.js"]
     }
   },
   "config": {
-    "devUrl": "https://hotcookiebakery.test"
+    "devUrl": "https://hotcookie.local"
   }
 }
