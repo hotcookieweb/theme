@@ -42,9 +42,8 @@
         <?php
         $category = get_the_category();
         $firstCategory = $category[0]->cat_name;
-        if ($category) { ?>
+        ?>
             / <a href="<?= esc_url(home_url('/category')) ?>/<?php echo $category[0]->slug ?>" title="<?php echo $firstCategory ?>"><?php echo $firstCategory ?></a>
-        <? } ?>
     <?php endwhile; ?>
 
     / <?php wp_title(''); ?></h1>
