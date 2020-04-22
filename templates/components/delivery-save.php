@@ -3,15 +3,35 @@
 * If zipcode was passed as an argument,
 * save in customer session data
 */
-$zipcode = sanitize_text_field( $_GET["zipcode"] );
 
+global $wp;
+
+$zipcode = sanitize_text_field( $_GET["zipcode"] );
+$page = $wp->request;
+$parent = explode ("/", $page)[0];
 if ($zipcode) {
-	WC()->customer->set_shipping_postcode ( $zipcode );
-	WC()->customer->set_shipping_state( zipToState($zipcode));
-	WC()->customer->set_shipping_country( 'US');
-	WC()->customer->set_shipping_city('');
-	WC()->customer->set_shipping_address_1('');
-	WC()->customer->set_shipping_address_2('');
+	if ($parent != 'charity') {
+		WC()->customer->set_shipping_postcode ( $zipcode );
+		WC()->customer->set_shipping_state( zipToState($zipcode));
+		WC()->customer->set_shipping_country( 'US');
+		WC()->customer->set_shipping_city('');
+		WC()->customer->set_shipping_address_1('');
+		WC()->customer->set_shipping_address_2('');
+		WC()->customer->set_shipping_first_name('');
+		WC()->customer->set_shipping_last_name('');
+		WC()->customer->set_shipping_company('');
+	}
+	else {
+		$postid = $page->ID; // info of hospital page
+		WC()->customer->set_shipping_postcode ( $zipcode );
+		WC()->customer->set_shipping_state(get_field('charity_state',$postid));
+		WC()->customer->set_shipping_country('US',$postid);
+		WC()->customer->set_shipping_city(get_field('charity_city',$postid));
+		WC()->customer->set_shipping_address_1(get_field('charity_address',$postid));
+		WC()->customer->set_shipping_address_2('');
+		WC()->customer->set_shipping_first_name(get_field('charity_first_name',$postid));
+		WC()->customer->set_shipping_last_name(get_field('charity_last_name',$postid));
+	}
 }
 
 function zipToState($zipcode)
