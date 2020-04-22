@@ -66,3 +66,43 @@ function add_coupon_to_cart( ) {
       echo '<script>  coupon_code.value="' . $coupon_code . '"</script>';
    }
 }
+
+/**
+ * Redirect to shop after login.
+ *
+ * @param $redirect
+ * @param $user
+ *
+ * @return false|string
+ */
+function iconic_login_redirect( $redirect, $user) {
+    $redirect_page_id = url_to_postid( $redirect );
+    $checkout_page_id = wc_get_page_id( 'checkout' );
+
+    if( $redirect_page_id == $checkout_page_id ) {
+        return $redirect;
+    }
+
+    if ( WC()->cart->get_cart_contents_count() > 0 ) {
+      return wc_get_page_permalink( 'cart' );
+    }
+    else {
+      return wc_get_page_permalink( 'home' );
+    }
+}
+
+add_filter( 'woocommerce_login_redirect', 'iconic_login_redirect', 10, 2);
+
+/**
+ * Redirect after registration.
+ *
+ * @param $redirect
+ *
+ * @return string
+ */
+function iconic_register_redirect( $redirect ) {
+
+    return wc_get_page_permalink( 'home' );
+}
+
+// add_filter( 'woocommerce_registration_redirect', 'iconic_register_redirect' );
