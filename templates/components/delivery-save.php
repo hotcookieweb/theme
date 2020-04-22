@@ -22,7 +22,8 @@ if ($zipcode) {
 		WC()->customer->set_shipping_company('');
 	}
 	else {
-		$postid = $page->ID; // info of hospital page
+		$postid = url_to_postid($page); // info of hospital page
+		WC()->customer->set_shipping_company(get_field('header_title',$postid));
 		WC()->customer->set_shipping_postcode ( $zipcode );
 		WC()->customer->set_shipping_state(get_field('charity_state',$postid));
 		WC()->customer->set_shipping_country('US',$postid);
