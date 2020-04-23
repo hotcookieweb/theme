@@ -152,9 +152,9 @@ function rename_coupon_label($err, $err_code=null, $something=null){
 
 
 function short_des_product() {
-//	echo '<div class="gifts_only">';
+	  echo '<div class="gifts_only">';
     the_content();
-//    echo '</div>';
+    echo '</div>';
 }
 add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\short_des_product', 6 );
 
