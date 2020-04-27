@@ -151,12 +151,11 @@ function rename_coupon_label($err, $err_code=null, $something=null){
 }
 
 
-function short_des_product() {
-	  echo '<div class="gifts_only">';
-    the_content();
-    echo '</div>';
+function hc_shop_content() {
+	  if( get_field('display_content_on_shop_page') == 'show' )
+      the_content();
 }
-add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\short_des_product', 6 );
+add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop_content', 6 );
 
 /**
  * Changes the redirect URL for the Return To Shop button in the cart.

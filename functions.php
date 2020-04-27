@@ -45,7 +45,6 @@ function create_wc_session() {
   if (isset(WC()->session)) {
     if (!WC()->session->has_session()) {
       WC()->session->set_customer_session_cookie(true);
-      WC()->customer->set_shipping_postcode ( "94114" );
     }
   }
 }

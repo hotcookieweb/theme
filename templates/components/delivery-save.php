@@ -7,6 +7,7 @@
 global $wp;
 
 $zipcode = sanitize_text_field( $_GET["zipcode"] );
+$charity = sanitize_text_field( $_GET["zipcode"] );
 $page = $wp->request;
 $parent = explode ("/", $page)[0];
 if ($zipcode) {
@@ -20,19 +21,14 @@ if ($zipcode) {
 		WC()->customer->set_shipping_first_name('');
 		WC()->customer->set_shipping_last_name('');
 		WC()->customer->set_shipping_company('');
+		update_user_meta(WC()->customer->ID, 'shipping_phone', '');
+		update_user_meta(WC()->customer->ID, 'shipping_email', '');
 	}
-	else {
-		$postid = url_to_postid($page); // info of hospital page
-		WC()->customer->set_shipping_company(get_field('header_title',$postid));
-		WC()->customer->set_shipping_postcode ( $zipcode );
-		WC()->customer->set_shipping_state(get_field('charity_state',$postid));
-		WC()->customer->set_shipping_country('US',$postid);
-		WC()->customer->set_shipping_city(get_field('charity_city',$postid));
-		WC()->customer->set_shipping_address_1(get_field('charity_address',$postid));
-		WC()->customer->set_shipping_address_2('');
-		WC()->customer->set_shipping_first_name(get_field('charity_first_name',$postid));
-		WC()->customer->set_shipping_last_name(get_field('charity_last_name',$postid));
-	}
+}
+
+if ($parent == 'charity') {
+	$postid = url_to_postid($page); // info of charity page
+  WC()->session->set( 'charity_pageid', $postid ); // Save the charity_pageid in session
 }
 
 function zipToState($zipcode)
