@@ -11,9 +11,6 @@
 		@include media-breakpoint-down(sm) {
 			width: 100%!important;
 		}
-		.gifts_only {
-			display: none;
-		}
 		a {
 			float: left;
 			width: 100%;
@@ -163,12 +160,6 @@
 				background: none!important;
 			}
 		}
-	}
-}
-
-body.gift-boxes {
-	.gifts_only {
-		display: block!important;
 	}
 }
 
