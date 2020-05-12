@@ -105,3 +105,11 @@ function iconic_register_redirect( $redirect ) {
 }
 
 // add_filter( 'woocommerce_registration_redirect', 'iconic_register_redirect' );
+add_filter('woocommerce_product_related_posts_relate_by_category', 'hc_related_by_category');
+function hc_related_by_category($product_id) {
+  return(false);
+}
+add_filter('woocommerce_product_related_posts_relate_by_tag','hc_related_by_tag');
+function hc_related_by_tag($product_id) {
+  return(true);
+}
