@@ -37,13 +37,13 @@
 <?php } else { ?>
     <div class="blog-toolbar">
         <div class="container">
-        <h1><a href="<?= esc_url(home_url('/blog')) ?>" title="Blog">Blog</a> 
+        <h1><a href="<?= esc_url(home_url('/blog')) ?>" title="Blog">Blog</a>
     <?php while (have_posts()): the_post(); ?>
         <?php
         $category = get_the_category();
         $firstCategory = $category[0]->cat_name;
         ?>
-            / <a href="<?= esc_url(home_url('/category')) ?>/<?php echo $category[0]->slug ?>" title="<?php echo $firstCategory ?>"><?php echo $firstCategory ?></a>
+            / <a href="<?= esc_url(home_url('/blog/category')) ?>/<?php echo $category[0]->slug ?>" title="<?php echo $firstCategory ?>"><?php echo $firstCategory ?></a>
     <?php endwhile; ?>
 
     / <?php wp_title(''); ?></h1>
