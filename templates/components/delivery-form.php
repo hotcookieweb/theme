@@ -32,11 +32,11 @@
 			var polk_zips = ["94129","94123","94115","94109","94133","94111","94104","94105","94108","94102","94103","94107","94121","94118","94158","94101"];
 
 			if (castro_zips.includes(zipcode)) {
-				url = "delvery/castro-sf";
+				url = "delivery/castro-sf/";
 			} else if (polk_zips.includes(zipcode)) {
-				url = "delivery/polk-sf";
+				url = "delivery/polk-sf/";
 			} else {
-				url = "delivery/national";
+				url = "delivery/national/";
 			}
 			url += "?zipcode=" + zipcode;
 		}
