@@ -25,23 +25,66 @@
 	    <?php endwhile; ?>
 	    </ul>
 	  </div>
-	  <?php else : ?>
 	<?php endif; ?>
 
 	<?php if( have_rows('services') ): ?>
-	    <ul class="mobile-slider">
-	    <?php while ( have_rows('services') ) : the_row(); ?>
-	      <li>
-	        <a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
-	          <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
-	          <h2><?php the_sub_field('title'); ?></h2>
-	          <p><?php the_sub_field('content'); ?></p>
-	          <p class="link">Check it out</p>
-	        </a>
-	      </li>
-	    <?php endwhile; ?>
-	    </ul>
-	<?php else : ?>
+    <ul class="mobile-slider">
+    <?php while ( have_rows('services') ) : the_row(); ?>
+      <li>
+        <a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
+          <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
+          <h2><?php the_sub_field('title'); ?></h2>
+          <p><?php the_sub_field('content'); ?></p>
+          <p class="link">Check it out</p>
+        </a>
+      </li>
+    <?php endwhile; ?>
+    </ul>
 	<?php endif; ?>
 
+	<?php
+	$args = array( 'posts_per_page' => 1,
+									'post_status' => 'publish', // Show only the published posts
+									'category_name' => 'announcements'
+								);
+	$the_query = new WP_Query( $args );
+	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
+	<div class="frontpage-blog">
+		<ul class="container">
+      <li>
+				<a href="<?php the_permalink(); ?>">
+					<h1><?php the_title(); ?></h1>
+					<?php if (has_post_thumbnail()) {
+		      	the_post_thumbnail();
+		    	} ?>
+					<p>
+						<?php the_content(); ?>
+					</p>
+				 </a>
+			</li>
+    <?php endwhile; ?>
+		</ul>
+	</div>
+
+	<?php
+	$args = array( 'posts_per_page' => 1,
+									'post_status' => 'publish', // Show only the published posts
+									'category_name' => 'announcements'
+								);
+	$the_query = new WP_Query( $args );
+	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
+	<ul class="mobile-slider">
+		<li>
+			<a href="<?php the_permalink();?>" title="<?php the_title();?>">
+				<h2 class="entry-title"><?php the_title(); ?></h2>
+				<?php if (has_post_thumbnail()) {
+					the_post_thumbnail();
+				} ?>
+				<div class="entry-summary">
+					<?php the_excerpt(); ?>
+				</div>
+			</a>
+		</li>
+    <?php endwhile; ?>
+	</ul>
 <?php endwhile; ?>

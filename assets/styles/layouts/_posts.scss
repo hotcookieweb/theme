@@ -2,6 +2,7 @@
   float: left;
   width: 100%;
   padding-top: 76px;
+
   .blog-toolbar {
     float: left;
     width: 100%;
@@ -12,6 +13,9 @@
       float: left;
       padding-top: 12px;
       @include font-h4;
+      @include media-breakpoint-down(sm) {
+        @include font-h5;
+      }
       color: $white;
       a {
         color: $white;
@@ -25,6 +29,33 @@
       a {
         padding: 6px 12px;
       }
+      @include media-breakpoint-down(sm) {
+        .btn {
+            padding: 8px 8px!important;
+            font-size: 12px!important;
+            font-weight: 700!important;
+            line-height: 18px!important;
+        }
+      }
+    }
+  }
+  .nav-toolbar {
+    float: left;
+    width: 100%;
+    background: $color-primary-1;
+    margin-top: -12px;
+    padding-bottom: 12px;
+    h1 {
+      float: left;
+      padding-top: 12px;
+      @include font-h5;
+      @include media-breakpoint-down(sm) {
+        @include font-h6;
+      }
+      color: $white;
+      a {
+        color: $white;
+      }
     }
   }
   .post {
@@ -34,12 +65,19 @@
     img.wp-post-image {
       float: left;
       width: 100%;
+      height: auto;
       margin-bottom: 32px;
+      @include media-breakpoint-down(sm) {
+        margin-bottom: 12px;
+      }
     }
     h1,
     h2 {
       margin-top: 32px;
       @include font-h1;
+      @include media-breakpoint-down(sm) {
+        @include font-h2;
+      }
       a {
         color: $black;
       }
@@ -121,10 +159,11 @@
   #respond {
     float: left;
     width: 100%;
-    padding: 32px 0px 32px 91px;
+    padding: 0px 10px 0px 10px;
     h3 {
       padding-left: 32px;
       @include font-h2;
+
     }
     #cancel-comment-reply-link {
       @include button-default;
@@ -133,11 +172,34 @@
       margin-bottom: 16px;
     }
   }
+  /* Highlight active form field */
+
+  #respond input[type=text], textarea {
+  -webkit-transition: all 0.30s ease-in-out;
+  -moz-transition: all 0.30s ease-in-out;
+  -ms-transition: all 0.30s ease-in-out;
+  -o-transition: all 0.30s ease-in-out;
+  outline: none;
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid #DDDDDD;
+  }
+
+
+  #respond input[type=text]:focus,
+  input[type=email]:focus,
+  input[type=url]:focus,
+  textarea:focus {
+  box-shadow: 0 0 5px $color-primary-1;
+  margin: 5px 1px 3px 0px;
+  border: 2px solid $color-primary-1;
+  }
+
   .comment-form {
     float: left;
     width: 100%;
-    padding: 32px;
-    margin: 32px 0 0 0;
+    padding: 16px;
+    margin: 16px 0 0 0;
     background-color: #f5f5f5;
     border-radius: 6px;
   }
