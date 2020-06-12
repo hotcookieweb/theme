@@ -45,14 +45,14 @@
 	<?php
 	$args = array( 'posts_per_page' => 1,
 									'post_status' => 'publish', // Show only the published posts
-									'category_name' => 'announcements'
+									'category_name' => 'Announcements'
 								);
 	$the_query = new WP_Query( $args );
 	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 	<div class="frontpage-blog">
 		<ul class="container">
       <li>
-				<a href="<?php the_permalink(); ?>">
+				<a href="<?php the_permalink(); ?>" title="<?php the_title();?>">
 					<h1><?php the_title(); ?></h1>
 					<?php if (has_post_thumbnail()) {
 		      	the_post_thumbnail();
@@ -60,7 +60,7 @@
 					<p>
 						<?php the_content(); ?>
 					</p>
-				 </a>
+				</a>
 			</li>
     <?php endwhile; ?>
 		</ul>
@@ -69,7 +69,7 @@
 	<?php
 	$args = array( 'posts_per_page' => 1,
 									'post_status' => 'publish', // Show only the published posts
-									'category_name' => 'announcements'
+									'category_name' => 'Announcements'
 								);
 	$the_query = new WP_Query( $args );
 	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>

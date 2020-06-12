@@ -206,6 +206,8 @@ ul.mobile-slider {
 	@include media-breakpoint-down(sm) {
 		display: none;
 	}
+	position: relative;
+	z-index: 0;
 	ul {
 		background: $white;
 		padding: 0;
