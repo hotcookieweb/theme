@@ -35,9 +35,9 @@
           <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
           <h2><?php the_sub_field('title'); ?></h2>
           <p><?php the_sub_field('content'); ?></p>
-          <p class="link">Check it out</p>
         </a>
       </li>
+			<hr>
     <?php endwhile; ?>
     </ul>
 	<?php endif; ?>
@@ -48,19 +48,24 @@
 									'category_name' => 'Announcements'
 								);
 	$the_query = new WP_Query( $args );
-	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
+	while ( $the_query->have_posts() ) : $the_query->the_post();?>
 	<div class="frontpage-blog">
 		<ul class="container">
-      <li>
-				<a href="<?php the_permalink(); ?>" title="<?php the_title();?>">
-					<h1><?php the_title(); ?></h1>
+			<li>
+				<a href="<?php the_field('featured_image_url'); ?>">
 					<?php if (has_post_thumbnail()) {
-		      	the_post_thumbnail();
-		    	} ?>
-					<p>
-						<?php the_content(); ?>
-					</p>
+						the_post_thumbnail();
+					} ?>
 				</a>
+				<article class="container">
+					<h1>
+							<?php the_title(); ?>
+					</h1>
+					<?php the_content(); ?>
+					<a href="<?php the_permalink();?>" title="<?php the_title();?>" class="link">
+						Hit us up with your thoughts
+					</a>
+				</article>
 			</li>
     <?php endwhile; ?>
 		</ul>
@@ -75,15 +80,18 @@
 	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 	<ul class="mobile-slider">
 		<li>
-			<a href="<?php the_permalink();?>" title="<?php the_title();?>">
-				<h2 class="entry-title"><?php the_title(); ?></h2>
+			<h1><?php the_title(); ?></h1>
+			<a href="<?php the_field('featured_image_url'); ?>">
 				<?php if (has_post_thumbnail()) {
 					the_post_thumbnail();
 				} ?>
-				<div class="entry-summary">
-					<?php the_excerpt(); ?>
-				</div>
 			</a>
+			<article class="entry-summary">
+					<?php the_content(); ?>
+					<a href="<?php the_permalink();?>" title="<?php the_title();?>" class="link">
+						Hit us up with your thoughts
+					</a>
+			</article>
 		</li>
     <?php endwhile; ?>
 	</ul>
