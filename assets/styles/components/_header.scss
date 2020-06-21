@@ -5,12 +5,13 @@
   z-index: 10;
   width: 100%;
   transition: all 0.5s ease;
+  -webkit-box-shadow: 0px 0px 24px -16px $black;
+  -moz-box-shadow: 0px 0px 24px -16px $black;
+  box-shadow: 0px 0px 24px -16px $black;
   @include media-breakpoint-down(sm) {
     display: none;
   }
-  &.change {
-    background: $color-primary-1;
-  }
+
   .brand {
     width: 305px;
     height: 62px;
@@ -42,6 +43,10 @@
       height: 0;
       padding-top: 45px;
       overflow: hidden;
+      transition: all 0.25s ease;
+      &:hover {
+        transform: scale(1.05);
+      }
     }
   }
   .nav-primary {
@@ -61,6 +66,11 @@
         text-decoration: none;
       }
     }
+    .hamburger {
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
   }
   .webshop-nav {
     float: right;
@@ -71,7 +81,7 @@
       background-image: url("../images/icon-bag.svg");
       background-repeat: no-repeat;
       background-position: 8px 4px;
-      background-color: $white;
+      background-color: #D9D9D9;
       padding-top: 8px;
       padding-left: 32px;
       padding-right: 8px;
@@ -81,42 +91,16 @@
       -moz-border-radius: 8px;
       border-radius: 8px;
       color: $color-primary-2;
-      opacity: 0.85;
       transition: all 0.25s ease;
-      &.pulse:before {
-        float: left;
-        position: absolute;
-        content: "";
-        width: 16px;
-        height: 32px;
-        margin-top: -8px;
-        margin-left: -23px;
-        background: $white;
-        animation: pulse 2s ease 0s 1;
-        opacity: 0;
-      }
-
-      @keyframes pulse {
-        0% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0;
-        }
-      }
-
-      span {
-        opacity: 0.5;
-      }
       &:hover {
         text-decoration: none;
-        opacity: 1;
         transform: scale(1.05);
+        background-color: $white;
       }
     }
     a.webshop-login {
       float: right;
-      background-color: $white;
+      background-color: #D9D9D9;
       background-image: url("../images/icon-user.svg");
       -webkit-background-size: 16px;
       -o-background-size: 16px;
@@ -132,11 +116,10 @@
       -webkit-border-radius: 6px;
       -moz-border-radius: 6px;
       border-radius: 6px;
-      opacity: 0.85;
       &:hover {
         text-decoration: none;
         transform: scale(1.05);
-        opacity: 1;
+        background-color: $white;
       }
     }
   }
@@ -146,40 +129,25 @@
     position: fixed;
     top: -100%;
     bottom: 0;
-    width: 100%;
-    height: 100%;
+    width: 200px;
+    height: 480px;
     z-index: 5;
-    background: $color-primary-1;
-    text-align: center;
+    background: #D9D9D9;
+    text-align: left;
     transition: all 0.25s ease;
+    -webkit-border-radius: 16px;
+    -moz-border-radius: 16px;
+    border-radius: 16px;
+    -webkit-box-shadow: 0px 0px 24px -16px $black;
+    -moz-box-shadow: 0px 0px 24px -16px $black;
+    box-shadow: 0px 0px 24px -16px $black;
     &.active {
       top: 77px;
     }
-    .quick-nav {
-      width: 90%;
-      margin-top: 32px;
-      margin-bottom: 32px;
-      margin-left: 5%;
-      margin-right: 5%;
-      h2 {
-        color: $white;
-        margin-bottom: 32px;
-      }
-      ul {
-        border: 4px solid #ffffff;
-        li {
-          float: left;
-          width: 33.3333%;
-          a {
-            float: left;
-            width: 100%;
-          }
-          &:nth-child(2) {
-            border-left: 4px solid $white;
-            border-right: 4px solid $white;
-          }
-        }
-      }
+    &:hover {
+      text-decoration: none;
+      transform: scale(1.05);
+      background-color: $white;
     }
     ul {
       float: left;
@@ -196,8 +164,8 @@
           float: left;
           width: 100%;
           padding: 16px 8px;
+          color: $color-primary-2;
           @include font-h3;
-          color: $white;
         }
         ul {
           li {
@@ -251,13 +219,15 @@
   position: fixed;
   z-index: 9999 !important;
   width: 100%;
-  background-color: $white;
-  border-bottom: 1px solid #cccccc;
+  background-color: $black;
+  -webkit-box-shadow: 0px 0px 24px -16px $black;
+  -moz-box-shadow: 0px 0px 24px -16px $black;
+  box-shadow: 0px 0px 24px -16px $black;
   @include media-breakpoint-down(sm) {
     display: block;
   }
   .brand {
-    background-image: url("../images/logo-hotcookie-colored.svg");
+    background-image: url("../images/logo-hotcookie.svg");
     background-position: center center;
     -webkit-background-size: 200px auto;
     -o-background-size: 200px auto;
@@ -270,6 +240,7 @@
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
+    transition: all 0.25s ease;
   }
   .hamburger {
     float: left;
@@ -278,7 +249,7 @@
     left: 0px;
     width: 60px;
     height: 60px;
-    background: #fff;
+    background: $black;
     svg {
       height: 60px;
       width: 50%;
@@ -291,40 +262,26 @@
     position: fixed;
     top: -100%;
     bottom: 0;
-    width: 100%;
-    height: 100%;
+    width: 200px;
+    height: 480px;
     z-index: 5;
-    background: $color-primary-1;
-    text-align: center;
+    background: #D9D9D9;
+    color: $color-primary-2;
+    text-align: left;
     transition: all 0.25s ease;
+    -webkit-border-radius: 16px;
+    -moz-border-radius: 16px;
+    border-radius: 16px;
+    -webkit-box-shadow: 0px 0px 24px -16px $black;
+    -moz-box-shadow: 0px 0px 24px -16px $black;
+    box-shadow: 0px 0px 24px -16px $black;
+    &:hover {
+      text-decoration: none;
+      transform: scale(1.05);
+      background-color: $white;
+    }
     &.active {
       top: 61px;
-    }
-    .quick-nav {
-      width: 90%;
-      margin-top: 32px;
-      margin-bottom: 32px;
-      margin-left: 5%;
-      margin-right: 5%;
-      h2 {
-        color: $white;
-        margin-bottom: 32px;
-      }
-      ul {
-        border: 4px solid #ffffff;
-        li {
-          float: left;
-          width: 33.3333%;
-          a {
-            float: left;
-            width: 100%;
-          }
-          &:nth-child(2) {
-            border-left: 4px solid $white;
-            border-right: 4px solid $white;
-          }
-        }
-      }
     }
     ul {
       float: left;
@@ -341,8 +298,8 @@
           float: left;
           width: 100%;
           padding: 16px 8px;
+          color: $color-primary-2;
           @include font-h3;
-          color: $white;
         }
         ul {
           li {
@@ -367,7 +324,7 @@
       float: left;
       width: 100%;
       height: 100%;
-      background: url("../images/icon-carts.svg") no-repeat top right;
+      background: url("../images/icon-cart.svg") no-repeat top right;
       background-size: auto 100%;
       text-indent: -9999px;
       span {
