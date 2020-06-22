@@ -130,7 +130,7 @@
     top: -100%;
     bottom: 0;
     width: 200px;
-    height: 480px;
+    height: 450px;
     z-index: 5;
     background: #D9D9D9;
     text-align: left;
@@ -163,7 +163,7 @@
         a {
           float: left;
           width: 100%;
-          padding: 16px 8px;
+          padding: 8px 8px;
           color: $color-primary-2;
           @include font-h3;
         }
@@ -263,7 +263,7 @@
     top: -100%;
     bottom: 0;
     width: 200px;
-    height: 480px;
+    height: 450px;
     z-index: 5;
     background: $white;
     color: $color-primary-2;
@@ -275,11 +275,6 @@
     -webkit-box-shadow: 0px 0px 24px -16px $black;
     -moz-box-shadow: 0px 0px 24px -16px $black;
     box-shadow: 0px 0px 24px -16px $black;
-    &:hover {
-      text-decoration: none;
-      transform: scale(1.05);
-      background-color: $white;
-    }
     &.active {
       top: 61px;
     }
@@ -297,7 +292,7 @@
         a {
           float: left;
           width: 100%;
-          padding: 16px 8px;
+          padding: 8px 8px;
           color: $color-primary-2;
           @include font-h3;
         }
