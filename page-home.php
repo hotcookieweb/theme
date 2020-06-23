@@ -62,7 +62,7 @@
 							<?php the_title(); ?>
 					</h1>
 					<?php the_content(); ?>
-					<a href="<?php the_permalink();?>" title="<?php the_title();?>" class="link">
+					<a href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
 						Hit us up with your thoughts
 					</a>
 				</article>
@@ -88,7 +88,7 @@
 			</a>
 			<article class="entry-summary">
 					<?php the_content(); ?>
-					<a href="<?php the_permalink();?>" title="<?php the_title();?>" class="link">
+					<a href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
 						Hit us up with your thoughts
 					</a>
 			</article>
