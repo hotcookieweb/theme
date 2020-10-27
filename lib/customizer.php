@@ -105,51 +105,8 @@ function cfwc_display_custom_field() {
 }
 add_action( 'woocommerce_before_add_to_cart_button', __NAMESPACE__ . '\\cfwc_display_custom_field' );
 
-
-
-
-
 //remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
 //add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
-
-
-add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
-add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_rename_coupon_field_on_cart', 10, 3 );
-add_filter('woocommerce_coupon_error', __NAMESPACE__ . '\\rename_coupon_label', 10, 3);
-add_filter('woocommerce_coupon_message', __NAMESPACE__ . '\\rename_coupon_label', 10, 3);
-add_filter('woocommerce_cart_totals_coupon_label', __NAMESPACE__ . '\\rename_coupon_label',10, 1);
-add_filter( 'woocommerce_checkout_coupon_message', __NAMESPACE__ . '\\woocommerce_rename_coupon_message_on_checkout' );
-
-
-function woocommerce_rename_coupon_field_on_cart( $translated_text, $text, $text_domain ) {
-	// bail if not modifying frontend woocommerce text
-	if ( is_admin() || 'woocommerce' !== $text_domain ) {
-		return $translated_text;
-	}
-	if ( 'Coupon:' === $text ) {
-		$translated_text = 'Promo Code:';
-	}
-	if ('Coupon has been removed.' === $text){
-		$translated_text = 'Promo code has been removed.';
-	}
-	if ( 'Apply coupon' === $text ) {
-		$translated_text = 'Apply Promo';
-	}
-	if ( 'Coupon code' === $text ) {
-		$translated_text = 'Promo Code';
-
-	}
-	return $translated_text;
-}
-// rename the "Have a Coupon?" message on the checkout page
-function woocommerce_rename_coupon_message_on_checkout() {
-	return 'Have an Promo Code?' . ' ' . __( 'Click here to enter your code', 'woocommerce' ) . '';
-}
-function rename_coupon_label($err, $err_code=null, $something=null){
-	$err = str_ireplace("Coupon","Promo Code ",$err);
-	return $err;
-}
-
 
 function hc_shop_content() {
 	  if( get_field('display_content_on_shop_page') == 'show' )
@@ -181,9 +138,6 @@ add_filter( 'woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupon
 
 function woocommerce_change_text($translated, $text, $domain) {
   switch ( $translated ) {
-    case 'If you have a coupon code, please apply it below.':
-      $translated= __( 'If you have a promo code, please apply it below.', 'woocommerce' );
-      break;
     case 'Invoice':
       $translated= __( 'Receipt', 'woocommerce' );
       break;
