@@ -35,7 +35,7 @@ function maintenance_mode() {
 }
 
 /* assume billing address is shipping address unless customer checks different */
-add_filter( 'woocommerce_ship_to_different_address_checked', '__return_true');
+add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false');
 
 // always start a woocommerce session when first page loads
 add_action( 'woocommerce_init', 'create_wc_session');
