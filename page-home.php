@@ -3,10 +3,10 @@
 		<?php if ($image = get_the_post_thumbnail_url()) {?> style="background-image:url('<?php echo $image; ?>')" <?php } ?>>
 
 			<div class="container">
-					<h4><?php the_field('header_content_above');?></h4>
-					<h1><?php the_field('header_title'); ?></h1>
+					<?php the_field('header_content_above');?>
+					<?php the_field('header_title'); ?>
 					<?php get_template_part('templates/components/delivery', 'form'); ?>
-					<h2><?php the_field('header_content_below'); ?></h2>
+					<?php the_field('header_content_below'); ?>
 			</div>
 	</div>
 	<?php if( have_rows('services') ): ?>
