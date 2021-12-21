@@ -11,8 +11,8 @@
  * the readme will list any important changes.
  *
  * @see https://docs.woocommerce.com/document/template-structure/
- * @package WooCommerce/Templates/Emails
- * @version 3.9.0
+ * @package WooCommerce\Templates\Emails
+ * @version 5.6.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,10 +41,15 @@ $shipping   = $order->get_formatted_shipping_address();
 		<?php if ( ! wc_ship_to_billing_address_only() && $order->needs_shipping_address() && $shipping ) : ?>
 			<td style="text-align:<?php echo esc_attr( $text_align ); ?>; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; padding:0;" valign="top" width="50%">
 				<h2><?php esc_html_e( 'Shipping address', 'woocommerce' ); ?></h2>
-				<address class="address"><?php echo wp_kses_post( $shipping ); ?>
-				<!-- change to standard template -->
-				<?php do_action( 'woocommerce_email_details_after_shipping_address', $order, false); ?>
-				<!-- change to standard template -->
+
+				<address class="address">
+					<?php echo wp_kses_post( $shipping ); ?>
+					<?php if ( $order->get_shipping_phone() ) : ?>
+						<br /><?php echo wc_make_phone_clickable( $order->get_shipping_phone() ); ?>
+					<?php endif; ?>
+					<!-- change to standard template -->
+					<?php do_action( 'woocommerce_email_details_after_shipping_address', $order, false); ?>
+					<!-- change to standard template -->
 				</address>
 			</td>
 		<?php endif; ?>
