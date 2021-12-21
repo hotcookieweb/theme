@@ -89,7 +89,7 @@
 							$pay_method = $card_type . " " . $card_digits;
 						}
 					?>
-					<td><?php $this->payment_method(); ?></td>
+					<td><?php echo $pay_method; ?></td>
 				</tr>
 				<!-- changed -->
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
