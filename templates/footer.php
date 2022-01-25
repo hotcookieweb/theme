@@ -36,7 +36,7 @@
   </div>
   <div class="copyright">
     <div class="container">
-      <p>© 2019 Hot Cookie. All right reserved.</p>
+      <p>© 2022 Hot Cookie. All right reserved.</p>
     </div>
   </div>
 </div>
