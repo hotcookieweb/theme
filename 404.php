@@ -1,7 +1,8 @@
-<?php get_template_part('templates/components/page', 'banner'); ?>
+<?php get_template_part('templates/components/page', 'header'); ?>
 
 <div class="container 404">
 	<center>
+		<br>
 		<br>
 		<br>
 		<h2><?php _e( 'Oops, lost our cookies', 'hotcookie' ); ?></h2>

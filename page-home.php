@@ -67,9 +67,9 @@
 					</a>
 				</article>
 			</li>
-    <?php endwhile; ?>
 		</ul>
 	</div>
+	<?php endwhile; ?>
 
 	<?php
 	$args = array( 'posts_per_page' => 1,
@@ -93,6 +93,7 @@
 					</a>
 			</article>
 		</li>
-    <?php endwhile; ?>
 	</ul>
+	<hr>
+	<?php endwhile; ?>
 <?php endwhile; ?>
