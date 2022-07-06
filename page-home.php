@@ -43,7 +43,7 @@
 	<?php endif; ?>
 
 	<?php
-	$args = array( 'posts_per_page' => 1,
+	$args = array( 'posts_per_page' => 3,
 									'post_status' => 'publish', // Show only the published posts
 									'category_name' => 'Announcements'
 								);
@@ -72,28 +72,30 @@
 	<?php endwhile; ?>
 
 	<?php
-	$args = array( 'posts_per_page' => 1,
+	$args = array( 'posts_per_page' => 3,
 									'post_status' => 'publish', // Show only the published posts
 									'category_name' => 'Announcements'
 								);
 	$the_query = new WP_Query( $args );
-	while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
+	?>
 	<ul class="mobile-slider">
-		<li>
-			<h1><?php the_title(); ?></h1>
-			<a href="<?php the_field('featured_image_url'); ?>">
-				<?php if (has_post_thumbnail()) {
-					the_post_thumbnail();
-				} ?>
-			</a>
-			<article class="entry-summary">
-					<?php the_content(); ?>
-					<a href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
-						Hit us up with your thoughts
-					</a>
-			</article>
-		</li>
+		<?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
+			<li>
+				<h1><?php the_title(); ?></h1>
+				<a href="<?php the_field('featured_image_url'); ?>">
+					<?php if (has_post_thumbnail()) {
+						the_post_thumbnail();
+					} ?>
+				</a>
+				<article class="entry-summary">
+						<?php the_content(); ?>
+						<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
+							Hit us up with your thoughts</a>
+				</article>
+			</li>
+			<?php if (($the_query->current_post + 1) != $the_query->post_count): ?>
+						<hr>
+			<?php endif ?>
+		<?php endwhile; ?>
 	</ul>
-	<hr>
-	<?php endwhile; ?>
 <?php endwhile; ?>

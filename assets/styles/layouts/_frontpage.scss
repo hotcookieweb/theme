@@ -79,7 +79,7 @@
 .frontpage-services {
 	float: left;
 	width: 100%;
-	margin-bottom: 32px;
+	margin-bottom: -32px;
 	@include media-breakpoint-down(sm) {
 		display: none;
 	}
@@ -188,6 +188,7 @@ ul.mobile-slider {
 		}
 		hr {
 		}
+
 	}
 }
 
@@ -203,6 +204,7 @@ ul.mobile-slider {
 		background: $white;
 		padding: 0;
 		margin-bottom: -32px;
+		margin-top: 64px;
 		-webkit-border-radius: 16px;
 		-moz-border-radius: 16px;
 		border-radius: 16px;
@@ -261,6 +263,8 @@ ul.mobile-slider {
 					color: black;
 					@include font-16;
 					transition: all 0.25s ease;
+				}
+				a {
 				}
 			}
 			.link {
