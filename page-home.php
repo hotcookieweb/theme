@@ -54,7 +54,7 @@
 			<li>
 				<a href="<?php the_field('featured_image_url'); ?>">
 					<?php if (has_post_thumbnail()) {
-						the_post_thumbnail();
+						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
 					} ?>
 				</a>
 				<article class="container">
@@ -84,7 +84,7 @@
 				<h1><?php the_title(); ?></h1>
 				<a href="<?php the_field('featured_image_url'); ?>">
 					<?php if (has_post_thumbnail()) {
-						the_post_thumbnail();
+						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
 					} ?>
 				</a>
 				<article class="entry-summary">

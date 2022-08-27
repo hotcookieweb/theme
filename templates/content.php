@@ -1,6 +1,6 @@
 <article <?php post_class(); ?>>
   <?php if (has_post_thumbnail()) {
-    the_post_thumbnail();
+    the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
   } ?>
   <header>
     <h2 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>

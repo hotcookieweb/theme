@@ -45,11 +45,13 @@ function create_wc_session() {
   if (isset(WC()->session)) {
     if (!WC()->session->has_session()) {
       WC()->session->set_customer_session_cookie(true);
-      WC()->customer->set_shipping_postcode ( '94114' );
-      WC()->customer->set_shipping_state( 'CA');
+      WC()->customer->set_shipping_country('US');
+      WC()->customer->set_shipping_postcode ( '92262' );
+      WC()->customer->set_shipping_state( '');
       WC()->customer->set_shipping_city('');
-      WC()->customer->set_billing_postcode ( '94114' );
-      WC()->customer->set_billing_state( 'CA');
+      WC()->customer->set_billing_country('US');
+      WC()->customer->set_billing_postcode ( '' );
+      WC()->customer->set_billing_state( '');
       WC()->customer->set_billing_city('');
     }
   }

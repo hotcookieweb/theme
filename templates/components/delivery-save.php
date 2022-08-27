@@ -1,35 +1,20 @@
 <?php
 /*
-* If zipcode was passed as an argument,
 * save in customer session data
 */
-
+$zipcode=$args['zipcode'];
 global $wp;
-
-$zipcode = sanitize_text_field( $_GET["zipcode"] );
-$charity = sanitize_text_field( $_GET["zipcode"] );
-$page = $wp->request;
-$parent = explode ("/", $page)[0];
-if ($zipcode) {
-	if ($parent != 'charity') {
-		WC()->customer->set_shipping_postcode ( $zipcode );
-		WC()->customer->set_shipping_state( zipToState($zipcode));
-		WC()->customer->set_shipping_country( 'US');
-		WC()->customer->set_shipping_city('');
-		WC()->customer->set_shipping_address_1('');
-		WC()->customer->set_shipping_address_2('');
-		WC()->customer->set_shipping_first_name('');
-		WC()->customer->set_shipping_last_name('');
-		WC()->customer->set_shipping_company('');
-		WC()->customer->set_shipping_phone('');
-		update_user_meta(WC()->customer->ID, 'shipping_email', '');
-	}
-}
-
-if ($parent == 'charity') {
-	$postid = url_to_postid($page); // info of charity page
-  WC()->session->set( 'charity_pageid', $postid ); // Save the charity_pageid in session
-}
+WC()->customer->set_shipping_postcode ( $zipcode );
+WC()->customer->set_shipping_state( zipToState($zipcode));
+WC()->customer->set_shipping_country( 'US');
+WC()->customer->set_shipping_city('');
+WC()->customer->set_shipping_address_1('');
+WC()->customer->set_shipping_address_2('');
+WC()->customer->set_shipping_first_name('');
+WC()->customer->set_shipping_last_name('');
+WC()->customer->set_shipping_company('');
+WC()->customer->set_shipping_phone('');
+update_user_meta(WC()->customer->ID, 'shipping_email', '');
 
 function zipToState($zipcode)
 {

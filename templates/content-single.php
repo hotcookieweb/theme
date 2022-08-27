@@ -3,7 +3,7 @@
   <article <?php post_class(); ?>>
     <div class="entry-content container">
       <?php if (has_post_thumbnail()) {
-        the_post_thumbnail();
+        the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
       } ?>
       <br>
       <h1 class="entry-title"><?php the_title(); ?></h1>

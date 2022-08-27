@@ -7,6 +7,7 @@
 
 		<?php if( get_field('display_sidebar') == 'show' ) { ?><div class="content"><?php } ?>
 				<?php the_content(); ?>
+				<?php echo "test" ?>
 				<?php get_template_part('templates/components/products', 'list'); ?>
 		<?php if( get_field('display_sidebar') == 'show' ) { ?></div><?php } ?>
 
