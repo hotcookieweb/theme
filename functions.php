@@ -34,9 +34,6 @@ function maintenance_mode() {
 
 }
 
-/* assume billing address is shipping address unless customer checks different */
-add_filter( 'woocommerce_ship_to_different_address_checked', '__return_false');
-
 // always start a woocommerce session when first page loads
 add_action( 'woocommerce_init', 'create_wc_session');
 function create_wc_session() {
@@ -45,11 +42,11 @@ function create_wc_session() {
   if (isset(WC()->session)) {
     if (!WC()->session->has_session()) {
       WC()->session->set_customer_session_cookie(true);
-      WC()->customer->set_shipping_country('US');
-      WC()->customer->set_shipping_postcode ( '92262' );
+      WC()->customer->set_shipping_country('');
+      WC()->customer->set_shipping_postcode ( '' );
       WC()->customer->set_shipping_state( '');
       WC()->customer->set_shipping_city('');
-      WC()->customer->set_billing_country('US');
+      WC()->customer->set_billing_country('');
       WC()->customer->set_billing_postcode ( '' );
       WC()->customer->set_billing_state( '');
       WC()->customer->set_billing_city('');
