@@ -51,10 +51,10 @@
   <div class=nav-toolbar>
     <div class=container>
       <h1 class="prev-link" style="float: left;">
-        <?php echo get_previous_posts_link('« Older Posts');?>
+        <?php echo get_previous_posts_link('Newer Posts »');?>
       </h1>
       <h1 class="next-link" style="float: right;">
-        <?php echo get_next_posts_link('Newer Posts »');?>
+        <?php echo get_next_posts_link('« Older Posts');?>
       </h1>
     </div>
   </div>
