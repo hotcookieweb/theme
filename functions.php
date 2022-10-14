@@ -122,3 +122,12 @@ function login_errors(){
   return 'Invalid login';
 }
 add_filter( 'login_errors', 'login_errors' );
+
+
+function hotcookie_admin_notices() {
+  if (!(get_current_user_id() == 2)) {  /* Only Tony Roug sees admin notices */
+       echo '<style>.notice { display: none !important;} </style>';
+  }
+}
+add_action('admin_enqueue_scripts', 'hotcookie_admin_notices');
+add_action('login_enqueue_scripts', 'hotcookie_admin_notices');
