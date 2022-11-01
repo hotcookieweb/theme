@@ -7,9 +7,11 @@
 			<?php }
 		}
 		else {
-			if ($image = get_the_post_thumbnail_url()) { ?>
-				style="background-image:url('<?php echo $image; ?>')"
+			if (empty($image)) {
+				if ($image = get_the_post_thumbnail_url()) { ?>
+					style="background-image:url('<?php echo $image; ?>')"
 			<?php }
+			}
 		} ?>
 		>
 		<div class="container">
