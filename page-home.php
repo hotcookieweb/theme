@@ -2,7 +2,7 @@
 	<div class="banner"
 		<?php
 		if ( wp_is_mobile() ) {
-			if ($image = the_field( 'featured_image_mobile' )) { ?>
+			if ($image = get_field( 'featured_image_mobile' )) { ?>
 				style="background-image:url('<?php echo $image; ?>')"
 			<?php }
 		}
