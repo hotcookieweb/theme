@@ -1,17 +1,17 @@
 <?php while (have_posts()) : the_post(); ?>
 	<div class="banner"
 		<?php
+		$image = FALSE;
 		if ( wp_is_mobile() ) {
 			if ($image = get_field( 'featured_image_mobile' )) { ?>
 				style="background-image:url('<?php echo $image; ?>')"
 			<?php }
+			var_dump('small:', $image);
 		}
-		else {
-			if (empty($image)) {
-				if ($image = get_the_post_thumbnail_url()) { ?>
-					style="background-image:url('<?php echo $image; ?>')"
-			<?php }
-			}
+		if ($image == FALSE) {
+			if ($image = get_the_post_thumbnail_url()) { ?>
+				style="background-image:url('<?php echo $image; ?>')"
+		<?php }
 		} ?>
 		>
 		<div class="container">
