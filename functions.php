@@ -73,30 +73,21 @@ function add_coupon_to_cart( ) {
 }
 
 /**
- * Redirect to shop after login.
+ * Redirect to page login was request
  *
  * @param $redirect
  * @param $user
  *
  * @return false|string
  */
-function iconic_login_redirect( $redirect, $user) {
-    $redirect_page_id = url_to_postid( $redirect );
-    $checkout_page_id = wc_get_page_id( 'checkout' );
+ add_filter('woocommerce_login_redirect', 'wc_login_redirect', 99 );
 
-    if( $redirect_page_id == $checkout_page_id ) {
-        return $redirect;
-    }
+ function wc_login_redirect () {
+     echo "<script type='text/javascript'>
+     history.go(-2);
+     </script>";
+ }
 
-    if ( WC()->cart->get_cart_contents_count() > 0 ) {
-      return wc_get_page_permalink( 'cart' );
-    }
-    else {
-      return wc_get_page_permalink( 'home' );
-    }
-}
-
-add_filter( 'woocommerce_login_redirect', 'iconic_login_redirect', 10, 2);
 
 /**
  * Redirect after registration.

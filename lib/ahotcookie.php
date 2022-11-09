@@ -118,12 +118,67 @@ function a_hotcookie_upload_prefilter( $errors ) {
 }
 
 add_filter("gform_upload_path", "change_upload_path", 10, 2);
-function change_upload_path($path_info, $form_id){
- if ($form_id = '5') { //a hotcookie
-	 $user_id = get_current_user_id();
-	 $folder = 'a-hothookie-files/';
-   $path_info['path'] = WP_CONTENT_DIR . '/uploads/' . $folder . $user_id;
-   $path_info['url'] = WP_CONTENT_URL . '/uploads/' . $folder . $user_id;
+function change_upload_path($path_info, $form_id) {
+	if ($form_id != '6') { //a hotcookie
 	 return $path_info;
- }
+	}
+	$user_id = get_current_user_id();
+	$folder = 'a-hothookie-files';
+	$path_info['path'] = WP_CONTENT_DIR . '/uploads/' . $folder . '/' . $user_id . '/';
+	$path_info['url'] = WP_CONTENT_URL . '/uploads/' . $folder . '/' . $user_id . '/';
+	return $path_info;
+}
+
+add_filter( 'gform_after_submission', 'set_post_content', 10, 2 );
+function set_post_content( $entry, $form ) {
+  if ($entry['form_id'] != '6') { //a hotcookie
+		return;
+  }
+	$url = str_replace(array('\\','[',']','"'),'',(string)$entry[1]); // gravity forms does a wierd thing to the url
+	$title = $entry[4];
+
+	$parsed_url = parse_url( $url );
+	if (empty($parsed_url['path'])) {
+			return 'path';
+	}
+	$file = ABSPATH . ltrim( $parsed_url['path'], '/');
+	$file_name        = basename( $file );
+	$file_type        = wp_check_filetype( $file_name, null );
+	$attachment_title = sanitize_file_name( pathinfo( $file_name, PATHINFO_FILENAME ) );
+
+	$post_info = array(
+		'guid'           => $url,
+		'post_mime_type' => $file_type['type'],
+		'post_title'     => $attachment_title,
+		'post_content'   => $title,
+		'post_status'    => 'public',
+	);
+
+	add_filter('upload_dir', 'a_hotcookie_user_dir');
+	// Create the attachment.
+	$attach_id = wp_insert_attachment( $post_info, $file, $parent_id );
+
+	// Include image.php.
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	// Generate the attachment metadata.
+	$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+	// Assign metadata to attachment.
+	wp_update_attachment_metadata( $attach_id, $attach_data );
+
+	remove_filter( 'upload_dir', 'a_hotcookie_user_dir' );
+
+	return $attach_id;
+}
+
+function a_hotcookie_user_dir( $arr ) {
+	$subdir = get_current_user_id();
+	$folder = '/a-hothookie-files';
+	$basedir = WP_CONTENT_DIR . '/uploads' . $folder . '/';
+	$baseurl = WP_CONTENT_URL . '/uploads' . $folder . '/';
+	return array(
+		'path'    => $basedir . $subdir,
+		'url'     => $baseurl . $subdir,
+		'subdir'  => $folder . '/' . $subdir,
+	);
 }
