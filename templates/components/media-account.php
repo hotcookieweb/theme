@@ -18,6 +18,9 @@ require_once ABSPATH . 'wp-admin/includes/media.php';
 		<div id="content" class="site-content" role="main">
 			<div class="entry-content">
 				<div class="media-upload">
+					<style>
+						.gform_heading { padding-bottom:20px !important; }
+					</style>
 					<?php gravity_form( "You're A Hot Cookie!", true, true ); ?>
 				</div>
 			</div>
