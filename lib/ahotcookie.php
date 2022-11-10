@@ -150,13 +150,14 @@ function set_post_content( $entry, $form ) {
 		'guid'           => $url,
 		'post_mime_type' => $file_type['type'],
 		'post_title'     => $attachment_title,
-		'post_content'   => $title,
-		'post_status'    => 'public',
+		'post_excerpt'   => $title,
+		'post_status'    => 'pending',
+		'post_category' => get_term_by( 'slug', 'a-hotcookie', 'category' ), //a-hotcookie-category
 	);
 
 	add_filter('upload_dir', 'a_hotcookie_user_dir');
 	// Create the attachment.
-	$attach_id = wp_insert_attachment( $post_info, $file, $parent_id );
+	$attach_id = wp_insert_attachment( $post_info, $file, get_current_user_id() );
 
 	// Include image.php.
 	require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -165,6 +166,8 @@ function set_post_content( $entry, $form ) {
 	$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
 	// Assign metadata to attachment.
 	wp_update_attachment_metadata( $attach_id, $attach_data );
+
+//	wp_set_post_categories( int $post_ID, int[]|int $post_categories = array(), bool $append = false ): array|false|WP_Error
 
 	remove_filter( 'upload_dir', 'a_hotcookie_user_dir' );
 
