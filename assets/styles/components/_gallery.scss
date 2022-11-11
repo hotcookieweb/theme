@@ -1,0 +1,33 @@
+.media-frame {
+  .gallery {
+    margin: auto;
+    width: 100%;
+    float: none;
+  }
+  .gallery-item {
+    display: inline-block !important;
+    text-align: center !important;
+  }
+  .gallery-image {
+    margin: 1.5% !important;
+    text-align: center !important;
+    position: relative;
+  }
+  .gallery-thumbnail {
+    display: block;
+  }
+  .gallery-icon {
+    position: absolute;
+    bottom:0;
+    left:0;
+  }
+  .gallery-caption {
+    text-align: center !important;
+  }
+}
+figure {
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 40px;
+  margin-inline-end: 40px;
+}
