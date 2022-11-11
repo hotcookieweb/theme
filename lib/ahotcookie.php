@@ -134,8 +134,9 @@ function set_post_content( $entry, $form ) {
   if ($entry['form_id'] != '6') { //a hotcookie
 		return;
   }
-	$url = str_replace(array('\\','[',']','"'),'',(string)$entry[1]); // gravity forms does a wierd thing to the url
-	$title = $entry[4];
+
+	$url = $entry[6]; // gravity forms URL
+	$title = $entry[4]; // gravity forms caption
 
 	$parsed_url = parse_url( $url );
 	if (empty($parsed_url['path'])) {
