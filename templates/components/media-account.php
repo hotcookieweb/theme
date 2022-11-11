@@ -15,7 +15,7 @@ if (isset($_GET['ahcdelete'])) {
 	$image_id=($_GET['ahcdelete']);
 
 	global $current_user;
-	wp_mail('web@hotcookie.com', 'user deleted image', 'user login:' . '"' . $current_user->user_login . "image:" . wp_get_attachment_image_url($image_id) . '"');
+	wp_mail('web@hotcookie.com', 'user deleted image', 'user login: ' . $current_user->user_login . '/nimage: ' . wp_get_attachment_image_url($image_id));
 	wp_update_post([ 'ID' => $image_id, 'post_parent' => '0']);
 }
 ?>
@@ -32,7 +32,7 @@ if (isset($_GET['ahcdelete'])) {
 				</div>
 			</div>
 			<div class="media-frame">
-				<h2>Your Uploaded Hot Cookie Images</h2>
+				<h3>Your Uploaded Hot Cookie Images</h3>
 				<?php $the_query = new WP_Query( array( 'author' => get_current_user_id(), 'post_type' => 'attachment', 'post_status' => 'public', 'orderby' => 'post_date' )); ?>
 				<div class='gallery galleryid-9 gallery-columns-4 gallery-size-thumbnail'>
 				<?php if ( $the_query->have_posts() ) { ?>
