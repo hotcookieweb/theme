@@ -15,7 +15,7 @@ if (isset($_GET['ahcdelete'])) {
 	$image_id=($_GET['ahcdelete']);
 
 	global $current_user;
-	wp_mail('info@hotcookie.com', 'user deleted image', 'user login:' . '"' . $current_user->user_login . "image:" . wp_get_attachment_image_url($image_id) . '"');
+	wp_mail('web@hotcookie.com', 'user deleted image', 'user login:' . '"' . $current_user->user_login . "image:" . wp_get_attachment_image_url($image_id) . '"');
 	wp_update_post([ 'ID' => $image_id, 'post_parent' => '0']);
 }
 ?>
