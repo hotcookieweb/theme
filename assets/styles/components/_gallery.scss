@@ -16,6 +16,14 @@
   .gallery-thumbnail {
     display: block;
   }
+  .gallery-scale {
+    width: auto;
+    height: auto;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    vertical-align: middle;
+  }
   .gallery-icon {
     position: absolute;
     bottom:0;

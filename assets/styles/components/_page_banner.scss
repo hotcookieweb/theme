@@ -1,7 +1,8 @@
 .page-banner {
 	float: left;
 	width: 100%;
-	height: 416px;
+	height: auto;
+	min-height: 416px;
 	background: $color-primary-1;
 	padding-top: 64px;
 	margin-bottom: 32px;
@@ -11,7 +12,8 @@
 	        background-size: cover;
 	background-position: center;
 	@include media-breakpoint-down(sm) {
-		height: 376px;
+		height: auto;
+		min-height: 376px;
 	}
 	.container {
 		padding-top: 64px;
@@ -35,13 +37,4 @@
 			}
 		}
 	}
-}
-/* a hotcookie policy page */
-.page-id-80740 .page-banner {
-		height: 520px;
-}
-
-/* a hotcookie policy page */
-.page-id-80925 .page-banner {
-		height: 520px;
 }
