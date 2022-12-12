@@ -123,3 +123,11 @@ function hotcookie_admin_notices() {
 }
 add_action('admin_enqueue_scripts', 'hotcookie_admin_notices');
 add_action('login_enqueue_scripts', 'hotcookie_admin_notices');
+
+function author_page_redirect() {
+  if ( is_author() ) {
+      wp_die('fuck you');
+  }
+}
+
+add_action( 'template_redirect', 'author_page_redirect' );
