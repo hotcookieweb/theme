@@ -126,7 +126,7 @@ add_action('login_enqueue_scripts', 'hotcookie_admin_notices');
 
 function author_page_redirect() {
   if ( is_author() ) {
-      wp_die('fuck you');
+    wp_redirect(site_url('/404'));
   }
 }
 
