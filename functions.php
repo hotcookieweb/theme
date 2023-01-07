@@ -80,26 +80,56 @@ function add_coupon_to_cart( ) {
  *
  * @return false|string
  */
- add_filter('woocommerce_login_redirect', 'wc_login_redirect', 99 );
-
- function wc_login_redirect () {
-     echo "<script type='text/javascript'>
-     history.go(-2);
-     </script>";
+ add_filter('woocommerce_login_redirect', 'wc_login_redirect', 99, 2 );
+ function wc_login_redirect ($redirect, $user) {
+   if (is_wp_error($user)) {
+     return($redirect);
+   }
+   if ( wc_user_has_role( $user,  'order_manager' )) {
+     $redirect = admin_url('admin.php?page=deliveries');
+   }
+   return ($redirect);
+ }
+ add_filter('login_redirect', 'wp_login_redirect', 99, 3 );
+ function wp_login_redirect ($redirect_to, $requested_redirect_to, $user) {
+    if (is_wp_error($user)) {
+      return($redirect_to);
+    }
+    if ( wc_user_has_role( $user,  'order_manager' )) {
+       return(admin_url('admin.php?page=order_manager'));
+    }
+    return($redirect_to);
  }
 
 
-/**
- * Redirect after registration.
- *
- * @param $redirect
- *
- * @return string
- */
-function iconic_register_redirect( $redirect ) {
+ /**
+  * @snippet       Redirect to Referrer @ WooCommerce My Account Login
+  * @how-to        Get CustomizeWoo.com FREE
+  * @author        Rodolfo Melogli, BusinessBloomer.com
+  * @testedwith    WooCommerce 5
+  * @donate $9     https://businessbloomer.com/bloomer-armada/
+  */
+ function bbloomer_actual_referrer() {
+    if ( ! wc_get_raw_referer() ) return;
+    if ( is_checkout() ) return;
+    echo '<input type="hidden" name="redirect" value="' . wp_validate_redirect( wc_get_raw_referer(), wc_get_page_permalink( 'myaccount' ) ) . '" />';
+ }
+ add_action( 'woocommerce_login_form_end', 'bbloomer_actual_referrer' );
 
-    return wc_get_page_permalink( 'home' );
-}
+ //For create account button:
+ add_action( 'woocommerce_register_form_end', 'bbloomer2_actual_referrer' );
+ function bbloomer2_actual_referrer() {
+    if ( ! wc_get_raw_referer() ) return;
+    if ( is_checkout() ) return;
+    echo '';
+ }
+
+ //add_action('after_setup_theme', 'remove_admin_bar'); does not work for backend
+ function remove_admin_bar() {
+   if (wc_user_has_role( wp_get_current_user(),  'order_manager' )) {
+     show_admin_bar(false);
+   }
+ }
 
 // add_filter( 'woocommerce_registration_redirect', 'iconic_register_redirect' );
 add_filter('woocommerce_product_related_posts_relate_by_category', 'hc_related_by_category');
