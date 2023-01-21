@@ -86,7 +86,7 @@ function add_coupon_to_cart( ) {
      return($redirect);
    }
    if ( wc_user_has_role( $user,  'order_manager' )) {
-     $redirect = admin_url('admin.php?page=deliveries');
+     $redirect = admin_url('?page=order-manager');
    }
    return ($redirect);
  }
@@ -96,7 +96,7 @@ function add_coupon_to_cart( ) {
       return($redirect_to);
     }
     if ( wc_user_has_role( $user,  'order_manager' )) {
-       return(admin_url('admin.php?page=order_manager'));
+       return(admin_url('?page=order-manager'));
     }
     return($redirect_to);
  }
