@@ -162,9 +162,11 @@ function heart_option_hack() {
   if ($product->get_slug() == 'heart-cookie-cake') { ?>
     <script>
       xxElement = document.getElementsByClassName("wc-pao-addons-container")[0];
-      xxElement.style.display = "none";
       xxElement.input = document.getElementById("addon-49833-enter-xxyy-text-e-g-jbar-0");
       selectElement = document.getElementById("pa_heart-cake-writing");
+      if (selectElement.value != 'xx-yy') {
+        xxElement.style.display = "none";
+      }
       selectElement.onchange = function () {
         if (selectElement.value == 'xx-yy') {
           xxElement.style.display = "";
