@@ -154,3 +154,26 @@ function woocommerce_change_text($translated, $text, $domain) {
   return $translated;
 }
 add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_change_text', 20, 3 );
+
+add_filter('woocommerce_after_single_product', __NAMESPACE__ . '\\heart_option_hack', 10);
+function heart_option_hack() {
+  global $product;
+
+  if ($product->get_slug() == 'heart-cookie-cake') { ?>
+    <script>
+      xxElement = document.getElementsByClassName("wc-pao-addons-container")[0];
+      xxElement.style.display = "none";
+      xxElement.input = document.getElementById("addon-49833-enter-xxyy-text-e-g-jbar-0");
+      selectElement = document.getElementById("pa_heart-cake-writing");
+      selectElement.onchange = function () {
+        if (selectElement.value == 'xx-yy') {
+          xxElement.style.display = "";
+        }
+        else {
+          xxElement.style.display = "none";
+          xxElement.input.value = "";
+        }
+      }
+    </script>
+  <?php }
+}
