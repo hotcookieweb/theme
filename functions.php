@@ -165,7 +165,7 @@ add_filter('login_errors', 'login_errors');
 
 function hotcookie_admin_notices()
 {
-    if (!(wc_user_has_role(wp_get_current_user(), 'administrator'))) { /* Only Super Admin sees admin notices */
+    if (!(wc_user_has_role(wp_get_current_user(), 'super_admin'))) { /* Only Super Admin sees admin notices */
         echo '<style>.notice { display: none !important;} </style>';
     }
 }
@@ -193,7 +193,7 @@ function remove_link_from_admin_bar($wp_admin_bar)
     $wp_admin_bar->remove_node('customize');
     $wp_admin_bar->remove_node('search');
     $wp_admin_bar->remove_node('view-store');
-    if (!(wc_user_has_role(wp_get_current_user(), 'administrator'))) { /* Only Tony Roug  */
+    if (!(wc_user_has_role(wp_get_current_user(), 'super_admin'))) { /* Only Tony Roug  */
         $wp_admin_bar->remove_node('cache-purge');
     }
 
