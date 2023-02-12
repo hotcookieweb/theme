@@ -165,7 +165,7 @@ add_filter('login_errors', 'login_errors');
 
 function hotcookie_admin_notices()
 {
-    if (!(wc_user_has_role(wp_get_current_user(), 'super_admin'))) { /* Only Super Admin sees admin notices */
+    if (!(wc_user_has_role(wp_get_current_user(), 'super_admin'))) { /* Only Admin sees admin notices */
         echo '<style>.notice { display: none !important;} </style>';
     }
 }
@@ -234,7 +234,7 @@ add_action('admin_init', function () {
 */
 
 function hotcookie_admin_menu() {
-    if (!wc_user_has_role(wp_get_current_user(), 'administrator')) { /* Only Tony Roug  */
+    if (!wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
         remove_menu_page('index.php');
         remove_menu_page('edit.php?post_type=cookielawinfo');
         remove_menu_page('wc-admin&path=/analytics/overview');
