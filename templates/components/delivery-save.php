@@ -14,7 +14,6 @@ WC()->customer->set_shipping_first_name('');
 WC()->customer->set_shipping_last_name('');
 WC()->customer->set_shipping_company('');
 WC()->customer->set_shipping_phone('');
-update_user_meta(WC()->customer->ID, 'shipping_email', '');
 
 function zipToState($zipcode)
 {
