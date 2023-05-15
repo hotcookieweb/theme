@@ -2,7 +2,6 @@
 <?php if( have_rows('logos', 'options') ): ?>
 	<div class="logos">
 		<div class="container">
-			<h5>A selection of our awesome costumers</h5>
 			<ul>
 		 	<?php while ( have_rows('logos', 'options') ) : the_row(); ?>
 				<li>
