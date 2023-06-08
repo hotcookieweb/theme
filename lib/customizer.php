@@ -179,3 +179,36 @@ function heart_option_hack() {
     </script>
   <?php }
 }
+
+add_filter('woocommerce_add_cart_item_data', __NAMESPACE__ . '\\product_description', 20, 2);
+function product_description( $cart_item_data, $product_id) {
+  if (get_field('description_packing', $product_id) == 'show') {
+    $cart_item_data['description_packing'] = wc_get_product($product_id)->get_description();
+  }
+  return($cart_item_data);
+}
+
+add_filter('woocommerce_get_item_data', __NAMESPACE__ . '\\product_description_get', 20, 2);
+function product_description_get($item_data, $cart_item_data) {
+  if( isset( $cart_item_data['description_packing'] ) ) {
+    $item_data[] = array(
+      'key' => 'contains',
+      'value' => wc_clean( $cart_item_data['description_packing'] )
+    );
+    }
+  return $item_data;
+}
+
+/**
+ * Add custom meta to order
+ */
+add_filter('woocommerce_checkout_create_order_line_item', __NAMESPACE__ . '\\product_description_meta', 20, 4);
+function product_description_meta($item, $cart_item_key, $values, $order) {
+  if (isset($values['description_packing'])) {
+    $item->add_meta_data(
+      'contains',
+      $values['description_packing'],
+      true
+    );
+  }
+}
