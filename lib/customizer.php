@@ -212,3 +212,40 @@ function product_description_meta($item, $cart_item_key, $values, $order) {
     );
   }
 }
+
+/**
+ * @snippet       New Products Table Column @ WooCommerce Admin
+ * @how-to        Get CustomizeWoo.com FREE
+ * @author        Rodolfo Melogli
+ * @compatible    WooCommerce 5
+ * @donate $9     https://businessbloomer.com/bloomer-armada/
+ */
+
+add_filter('manage_edit-product_columns', __NAMESPACE__ . '\\hc_add_stock_column', 9999);
+function hc_add_stock_column($columns) {
+  $new_columns = array();
+  // add new order status after processing
+  foreach ($columns as $key => $data) {
+    if ('product_tag' === $key) {
+      $new_columns['stock'] = 'Stock';
+    }
+    else {
+      $new_columns[$key] = $data;
+    }
+  }
+  return $new_columns;
+}
+
+add_action('manage_product_posts_custom_column', __NAMESPACE__ . '\\hc_add_stock_column_content', 10, 2);
+function hc_add_stock_column_content($column, $product_id) {
+  if ($column == 'stock') {
+    $product = wc_get_product($product_id);
+    echo ($product->is_in_stock() ? "In" : "Out");
+  }
+}
+
+add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\wc_product_list_css_overrides');
+function wc_product_list_css_overrides() {
+  wp_add_inline_style('woocommerce_admin_styles',
+    "table.wp-list-table .column-product_cat{ width: 25% !important; } table.wp-list-table .column-shipping_weight{ width: 7%; } table.wp-list-table .column-stock{ width: 6%; }");
+}
