@@ -255,3 +255,6 @@ function hotcookie_admin_menu() {
 }
 add_filter('admin_menu', 'hotcookie_admin_menu',999);
 
+add_filter('xmlrpc_methods', '__return_empty_array');
+
+

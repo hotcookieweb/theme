@@ -74,6 +74,9 @@
 							<?php the_title(); ?>
 					</h1>
 					<?php the_content(); ?>
+					<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
+					Hit us up with your thoughts</a>
+				</article>
 				</article>
 			</li>
 		</ul>
