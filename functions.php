@@ -253,7 +253,139 @@ function hotcookie_admin_menu() {
         remove_menu_page('postman');
     }
 }
-add_filter('admin_menu', 'hotcookie_admin_menu',999);
+add_filter('admin_menu', 'hotcookie_admin_menu', 999);
+
+function hc_add_link_to_admin_bar($admin_bar) {
+    $site_name = parse_url(get_home_url(), PHP_URL_HOST);
+    $admin_bar->remove_node('site-name');  // remove current site-name
+    if (is_admin()) { // admin view
+        $admin_bar->add_node (
+            array(
+                'id' => 'site-name',
+                'parent' => false,
+                'title' => $site_name,
+                'href' => home_url( '/' ),
+                'group' => false,
+                'meta' => array('class' => 'ab-item')
+            )
+        );
+        
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'view-site',
+                'title' => __('Visit Site'),
+                'href' => home_url('/'),
+            )
+        );
+    }
+    else { // home view
+        $admin_bar->add_node (
+            array(
+                'id' => 'site-name',
+                'parent' => false,
+                'title' => $site_name . ' admin',
+                'href' => admin_url('admin.php?page=order-manager'),
+                'group' => false,
+                'meta' => array('class' => 'ab-item-order-manager'),
+            )
+        );
+        $admin_bar->add_node (
+            array(
+                'id' => 'order-manager',
+                'parent' => 'site-name',
+                'title' => 'Order manager',
+                'href' => admin_url('admin.php?page=order-manager'),
+                'meta' => array('class' => 'ab-item-order-manager'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'woocommerce-orders',
+                'title' => 'Woocommerce orders',
+                'parent' => 'site-name',
+                'href' => admin_url('edit.php?post_type=shop_order'),
+            )
+        );
+        if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
+            $admin_bar->add_node(
+                array(
+                'id' => 'woocommerce-settings',
+                'title' => 'Woocommerce settings',
+                'parent' => 'site-name',
+                'href' => admin_url('admin.php?page=wc-settings'),
+                )
+            );
+        }
+        $admin_bar->add_node(
+            array(
+                'id' => 'products',
+                'title' => 'Products',
+                'parent' => 'site-name',
+                'href' => admin_url('edit.php?post_type=product'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'media',
+                'title' => 'Media',
+                'parent' => 'site-name',
+                'href' => admin_url('upload.php'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'posts',
+                'title' => 'Posts',
+                'parent' => 'site-name',
+                'href' => admin_url('edit.php'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'newsletter_main_index',
+                'title' => 'Newsletter',
+                'parent' => 'site-name',
+                'href' => admin_url('admin.php?page=newsletter_main_index'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'users',
+                'title' => 'Users',
+                'parent' => 'site-name',
+                'href' => admin_url('users.php'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'simple-history',
+                'title' => 'Simple history',
+                'parent' => 'site-name',
+                'href' => admin_url('index.php?page=simple_history_page'),
+            )
+        );
+        if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
+            $admin_bar->add_node(
+                array(
+                'id' => 'plugins',
+                'title' => 'Plugins',
+                'parent' => 'site-name',
+                'href' => admin_url('plugins.php'),
+                )
+            );
+            $admin_bar->add_node(
+                array(
+                    'id' => 'wp-migrate',
+                    'title' => 'WP Migrate',
+                    'parent' => 'site-name',
+                    'href' => admin_url('tools.php?page=wp-migrate-db-pro'),
+                )
+            );
+        }
+    }
+}
+add_action('admin_bar_menu', 'hc_add_link_to_admin_bar', 50);
 
 add_filter('xmlrpc_methods', '__return_empty_array');
 
