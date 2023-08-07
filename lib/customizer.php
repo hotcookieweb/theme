@@ -136,25 +136,6 @@ function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
 }
 add_filter( 'woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout' );
 
-function woocommerce_change_text($translated, $text, $domain) {
-  switch ( $translated ) {
-    case 'Invoice':
-      $translated= __( 'Receipt', 'woocommerce' );
-      break;
-    case 'PDF Invoice data':
-        $translated= __( 'PDF Receipt data', 'woocommerce' );
-        break;
-    case 'Invoice number:':
-        $translated= __( 'Invoice Number', 'woocommerce' );
-        break;
-      case 'Invoice date:':
-        $translated= __( 'Invoice Date', 'woocommerce' );
-        break;
-  }
-  return $translated;
-}
-add_filter( 'gettext', __NAMESPACE__ . '\\woocommerce_change_text', 20, 3 );
-
 add_filter('woocommerce_after_single_product', __NAMESPACE__ . '\\heart_option_hack', 10);
 function heart_option_hack() {
   global $product;
