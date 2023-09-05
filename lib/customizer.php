@@ -62,48 +62,31 @@ add_action( 'after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_supp
 add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
 function exetera_custom_product_tabs( $tabs ) {
     // Custom description callback.
-    $tabs['description']['callback'] = function() {
-      global $post, $product;
+    if (isset($tabs['description'])) {
+      $tabs['description']['callback'] = function() {
+        global $post, $product;
 
-		  echo '<div class="left"><h2>Additional Information</h2>';
-      // Display the heading and content of the Additional Information tab.
-		  do_action( 'woocommerce_product_additional_information', $product );
-      echo '</div>';
-
-      // Display the content of the Description tab of not empty
-      if (! empty($post->post_content)) {
-        echo '<div class="right"><h2>Description</h2>';
-
-        the_content();
-
+        echo '<div class="left"><h2>Additional Information</h2>';
+        // Display the heading and content of the Additional Information tab.
+        do_action( 'woocommerce_product_additional_information', $product );
         echo '</div>';
+
+        // Display the content of the Description tab of not empty
+        if (! empty($post->post_content)) {
+          echo '<div class="right"><h2>Description</h2>';
+
+          the_content();
+
+          echo '</div>';
+        };
       };
-    };
+    }
 
     // Remove the additional information tab.
     unset( $tabs['additional_information'] );
 
     return $tabs;
 }
-
-/**
- * Display custom field on the front end
- * @since 1.0.0
- */
-function cfwc_display_custom_field() {
- global $post;
- // Check for the custom field value
- $product = wc_get_product( $post->ID );
- $title = $product->get_meta( 'custom_text_field_title' );
- if( $title ) {
- // Only display our field if we've got a value for the field title
- printf(
- 'test',
- esc_html( $title )
- );
- }
-}
-add_action( 'woocommerce_before_add_to_cart_button', __NAMESPACE__ . '\\cfwc_display_custom_field' );
 
 //remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
 //add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
@@ -233,7 +216,7 @@ function wc_product_list_css_overrides() {
 
 function hc_maybe_redirect($url, $product) {
   $redirect = get_field('redirect_to_link');
-	if ( get_field('redirect_to_link') ) {
+	if ( $redirect ) {
     return $redirect;
   }
   return $url;
@@ -242,16 +225,9 @@ add_filter('woocommerce_product_add_to_cart_url', __NAMESPACE__ . '\hc_maybe_red
 
 function hc_maybe_redirect_button($text, $product) {
   $redirect = get_field('redirect_to_link');
-	if ( get_field('redirect_to_link') ) {
+	if ( $redirect ) {
     return 'Click to see';
   }
   return $text;
 }
 add_filter('woocommerce_product_add_to_cart_text', __NAMESPACE__ . '\hc_maybe_redirect_button', 10, 2);
-
-remove_action('woocommerce_before_cart','woocommerce_output_all_notices',100);
-add_action('woocommerce_after_cart','woocommerce_output_all_notices',100);
-
-remove_action('woocommerce_before_checkout_form_cart_notices', 'woocommerce_output_all_notices', 100);
-remove_action('woocommerce_before_checkout_form', 'woocommerce_output_all_notices', 100);
-add_action('woocommerce_after_checkout_form', 'woocommerce_output_all_notices',100);

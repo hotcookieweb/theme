@@ -274,9 +274,97 @@ function hc_add_link_to_admin_bar($admin_bar) {
             array(
                 'parent' => 'site-name',
                 'id' => 'view-site',
-                'title' => __('Visit Site'),
+                'title' => __('Home'),
                 'href' => home_url('/'),
             )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'gift-cookie',
+                'title' => __('Gift a Cookie'),
+                'href' => home_url('/gift-boxes/'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'make-special',
+                'title' => __('Make it Special'),
+                'href' => home_url('/special-orders/'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'from-store',
+                'title' => __('From our store'),
+                'href' => home_url('/our-store/'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
+                'id' => 'cookies',
+                'title' => __('cookies'),
+                'href' => home_url('/our-store/cookies'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
+                'id' => 'treats',
+                'title' => __('treats'),
+                'href' => home_url('/our-store/treats'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
+                'id' => 'famous',
+                'title' => __('famous'),
+                'href' => home_url('/our-store/famous'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
+                'id' => 'gear',
+                'title' => __('gear'),
+                'href' => home_url('/our-store/gear'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
+                'id' => 'drinks',
+                'title' => __('drinks'),
+                'href' => home_url('/our-store/drinks'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'let-cater',
+                'title' => __('Let us Cater'),
+                'href' => home_url('/catering/'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'our-blog',
+                'title' => __('Our Blog'),
+                'href' => home_url('/blog/'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'site-name',
+                'id' => 'my-account',
+                'title' => __('My Account'),
+                'href' => home_url('/account/'),
+            ),
         );
     }
     else { // home view
