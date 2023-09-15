@@ -20,82 +20,86 @@ function customize_preview_js() {
 }
 add_action('customize_preview_init', __NAMESPACE__ . '\\customize_preview_js');
 
-if( function_exists('acf_add_options_page') ) {
+if (function_exists('acf_add_options_page')) {
 
-	acf_add_options_page(array(
-		'page_title' 	=> 'Theme General Settings',
-		'menu_title'	=> 'Theme Settings',
-		'menu_slug' 	=> 'theme-general-settings',
-		'capability'	=> 'edit_posts',
-		'redirect'		=> false
-	));
+  acf_add_options_page(array(
+    'page_title' => 'Theme General Settings',
+    'menu_title' => 'Theme Settings',
+    'menu_slug' => 'theme-general-settings',
+    'capability' => 'edit_posts',
+    'redirect' => false,
+  ));
 
 }
 
-remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
-remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
-
+remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
+remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
 
 /**
  * Show cart contents / total Ajax
  */
-add_filter( 'woocommerce_add_to_cart_fragments', __NAMESPACE__ . '\\woocommerce_header_add_to_cart_fragment' );
+add_filter('woocommerce_add_to_cart_fragments', __NAMESPACE__ . '\\woocommerce_header_add_to_cart_fragment');
 
-function woocommerce_header_add_to_cart_fragment( $fragments ) {
-	global $woocommerce;
+function woocommerce_header_add_to_cart_fragment($fragments) {
+  global $woocommerce;
 
-	ob_start();
+  ob_start();
 
-	?>
-	<a class="webshop-cart pulse" href="<?php echo get_permalink( wc_get_page_id( 'cart' ) ); ?>" title="<?php _e( 'View your shopping cart' ); ?>">$ <?php echo WC()->cart->total ?> <span><?php echo sprintf ( _n( '%d item', '%d items', WC()->cart->get_cart_contents_count() ), WC()->cart->get_cart_contents_count() ); ?></span></a>
+  ?>
+	<a class="webshop-cart pulse" href="<?php echo get_permalink(wc_get_page_id('cart')); ?>" title="<?php _e('View your shopping cart');?>">$ <?php echo WC()->cart->total ?> <span><?php echo sprintf(_n('%d item', '%d items', WC()->cart->get_cart_contents_count()), WC()->cart->get_cart_contents_count()); ?></span></a>
 	<?php
-	$fragments['a.webshop-cart'] = ob_get_clean();
-	return $fragments;
+$fragments['a.webshop-cart'] = ob_get_clean();
+  return $fragments;
 }
 
 function mytheme_add_woocommerce_support() {
-    add_theme_support( 'woocommerce' );
+  add_theme_support('woocommerce');
 }
 
-add_action( 'after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support' );
+add_action('after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support');
 
-add_filter( 'woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98 );
-function exetera_custom_product_tabs( $tabs ) {
-    // Custom description callback.
-    if (isset($tabs['description'])) {
-      $tabs['description']['callback'] = function() {
-        global $post, $product;
+add_filter('woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98);
+function exetera_custom_product_tabs($tabs) {
+  // Custom description callback.
+  if (isset($tabs['additional_information'])) {
+    $tabs['additional_information']['callback'] = function () {
+      global $post, $product;
+      echo '<div class="left"><h2>Additional Information</h2>';
+      // Display the heading and content of the Additional Information tab.
+      do_action('woocommerce_product_additional_information', $product);
+      echo '</div>';
+    };
+  }
+  if (isset($tabs['description'])) {
+    $tabs['description']['callback'] = function () {
+      global $post, $product;
+      // Display the content of the Description tab of not empty
+      if (!empty($post->post_content)) {
+        echo '<div class="right"><h2>Description</h2>';
 
-        echo '<div class="left"><h2>Additional Information</h2>';
-        // Display the heading and content of the Additional Information tab.
-        do_action( 'woocommerce_product_additional_information', $product );
+        the_content();
+
         echo '</div>';
+      }
+      echo '<div class="left"><h2>Additional Information</h2>';
+      // Display the heading and content of the Additional Information tab.
+      do_action('woocommerce_product_additional_information', $product);
+      echo '</div>';
+    };
 
-        // Display the content of the Description tab of not empty
-        if (! empty($post->post_content)) {
-          echo '<div class="right"><h2>Description</h2>';
+    unset($tabs['additional_information']);
+  }
 
-          the_content();
-
-          echo '</div>';
-        };
-      };
-    }
-
-    // Remove the additional information tab.
-    unset( $tabs['additional_information'] );
-
-    return $tabs;
+  return $tabs;
 }
-
-//remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
-//add_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_coupon_form', 15 );
 
 function hc_shop_content() {
-	  if( get_field('display_content_on_shop_page') == 'show' )
-      the_content();
+  if (get_field('display_content_on_shop_page') == 'show') {
+    the_content();
+  }
+
 }
-add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop_content', 6 );
+add_action('woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop_content', 6);
 
 /**
  * Changes the redirect URL for the Return To Shop button in the cart.
@@ -103,27 +107,27 @@ add_action( 'woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop
  * @return string
  */
 function wc_empty_cart_redirect_url() {
-	return get_home_url();
+  return get_home_url();
 }
-add_filter( 'woocommerce_return_to_shop_redirect', __NAMESPACE__ . '\\wc_empty_cart_redirect_url' );
+add_filter('woocommerce_return_to_shop_redirect', __NAMESPACE__ . '\\wc_empty_cart_redirect_url');
 
 /**
-* WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
-*/
-function woocommerce_coupons_enabled_checkout( $coupons_enabled ) {
-    global $woocommerce;
-    if ( ! empty( $woocommerce->cart->applied_coupons ) ) {
-        return false;
-    }
-    return $coupons_enabled;
+ * WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
+ */
+function woocommerce_coupons_enabled_checkout($coupons_enabled) {
+  global $woocommerce;
+  if (!empty($woocommerce->cart->applied_coupons)) {
+    return false;
+  }
+  return $coupons_enabled;
 }
-add_filter( 'woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout' );
+add_filter('woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout');
 
 add_filter('woocommerce_after_single_product', __NAMESPACE__ . '\\heart_option_hack', 10);
 function heart_option_hack() {
   global $product;
 
-  if ($product->get_slug() == 'heart-cookie-cake') { ?>
+  if ($product->get_slug() == 'heart-cookie-cake') {?>
     <script>
       xxElement = document.getElementsByClassName("wc-pao-addons-container")[0];
       xxElement.input = document.getElementById("addon-49833-enter-xxyy-text-e-g-jbar-0");
@@ -145,21 +149,21 @@ function heart_option_hack() {
 }
 
 add_filter('woocommerce_add_cart_item_data', __NAMESPACE__ . '\\product_description', 20, 2);
-function product_description( $cart_item_data, $product_id) {
+function product_description($cart_item_data, $product_id) {
   if (get_field('description_packing', $product_id) == 'show') {
     $cart_item_data['description_packing'] = wc_get_product($product_id)->get_description();
   }
-  return($cart_item_data);
+  return ($cart_item_data);
 }
 
 add_filter('woocommerce_get_item_data', __NAMESPACE__ . '\\product_description_get', 20, 2);
 function product_description_get($item_data, $cart_item_data) {
-  if( isset( $cart_item_data['description_packing'] ) ) {
+  if (isset($cart_item_data['description_packing'])) {
     $item_data[] = array(
       'key' => 'contains',
-      'value' => wc_clean( $cart_item_data['description_packing'] )
+      'value' => wc_clean($cart_item_data['description_packing']),
     );
-    }
+  }
   return $item_data;
 }
 
@@ -192,8 +196,7 @@ function hc_add_stock_column($columns) {
   foreach ($columns as $key => $data) {
     if ('product_tag' === $key) {
       $new_columns['stock'] = 'Stock';
-    }
-    else {
+    } else {
       $new_columns[$key] = $data;
     }
   }
@@ -216,7 +219,7 @@ function wc_product_list_css_overrides() {
 
 function hc_maybe_redirect($url, $product) {
   $redirect = get_field('redirect_to_link');
-	if ( $redirect ) {
+  if (get_field('redirect_to_link')) {
     return $redirect;
   }
   return $url;
@@ -225,9 +228,10 @@ add_filter('woocommerce_product_add_to_cart_url', __NAMESPACE__ . '\hc_maybe_red
 
 function hc_maybe_redirect_button($text, $product) {
   $redirect = get_field('redirect_to_link');
-	if ( $redirect ) {
+  if (get_field('redirect_to_link')) {
     return 'Click to see';
   }
   return $text;
 }
 add_filter('woocommerce_product_add_to_cart_text', __NAMESPACE__ . '\hc_maybe_redirect_button', 10, 2);
+

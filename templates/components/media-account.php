@@ -28,7 +28,7 @@ if (isset($_GET['ahcdelete'])) {
 					<style>
 						.gform_heading { padding-bottom:20px !important; }
 					</style>
-					<?php gravity_form( "You're A Hot Cookie!", true, true ); ?>
+					<?php gravity_form( "Hey, Hot Cookie!", true, true ); ?>
 				</div>
 			</div>
 			<div class="media-frame">
