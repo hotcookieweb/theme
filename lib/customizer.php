@@ -73,7 +73,7 @@ function exetera_custom_product_tabs($tabs) {
   if (isset($tabs['description'])) {
     $tabs['description']['callback'] = function () {
       global $post, $product;
-      // Display the content of the Description tab of not empty
+      // Display the content of the Description tab if not empty
       if (!empty($post->post_content)) {
         echo '<div class="right"><h2>Description</h2>';
 
@@ -81,9 +81,38 @@ function exetera_custom_product_tabs($tabs) {
 
         echo '</div>';
       }
+
       echo '<div class="left"><h2>Additional Information</h2>';
-      // Display the heading and content of the Additional Information tab.
-      do_action('woocommerce_product_additional_information', $product);
+      /* subscription details */
+      if ( have_rows('months') ) {
+        $months = get_field('months');
+        ?>
+        <table cellspacing="0" cellpadding="0" border="5">
+          <?php 
+          foreach ($months as $index => $month) {
+            if ($index % 3 == 0) { ?>
+              <tr>
+            <?php } ?>
+              <td style="width:33%; vertical-align: top; padding: 5px;">
+                <?=$month['month_name']?>: <br>
+                <ol>
+                <?php if (is_array ($month['cookies'])) {
+                  foreach ($month['cookies'] as $cookie) { ?>
+                  <li><?= str_replace(' Cookie','',get_the_title($cookie['cookie_name']))?></li>
+                <?php } ?>
+                </ol>
+                <?php } ?>
+              </td>
+            <?php if (($index % 3) == (2 % 3)) { ?>
+              </tr>
+            <?php } ?>
+          <?php } ?>
+        </table>
+        <br>
+      <?php }
+      else {
+        do_action('woocommerce_product_additional_information', $product);
+      }
       echo '</div>';
     };
 

@@ -12,7 +12,7 @@
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
- * @version 7.7.0
+ * @version 7.8.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -95,7 +95,7 @@ if ( $show_downloads ) {
 					<td><?php echo wp_kses_post( nl2br( wptexturize( $order->get_customer_note() ) ) ); ?></td>
 				</tr>
 			<?php endif; ?>
-			*/ ?>
+			*/?>
 		</tfoot>
 	</table>
 
