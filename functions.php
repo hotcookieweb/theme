@@ -211,7 +211,8 @@ function hotcookie_custom_menu_order($menu_ord)
 
     return array(
         'order-manager',
-        'woocommerce', // woocommerce
+        'woocommerce', // woocommerce order nanager
+        'edit.php?post_type=shop_subscription', // subscriptioons
         'upload.php', // Media
         'edit.php?post_type=page', // pages
         'edit.php', // Posts
@@ -393,6 +394,14 @@ function hc_add_link_to_admin_bar($admin_bar) {
                 'title' => 'Woocommerce orders',
                 'parent' => 'site-name',
                 'href' => admin_url('edit.php?post_type=shop_order'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'woocommerce-subscriptions',
+                'title' => 'Woocommerce subscriptions',
+                'parent' => 'site-name',
+                'href' => admin_url('edit.php?post_type=shop_subscription'),
             )
         );
         if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
