@@ -98,7 +98,7 @@ function exetera_custom_product_tabs($tabs) {
                 <ol>
                 <?php if (is_array ($month['cookies'])) {
                   foreach ($month['cookies'] as $cookie) { ?>
-                  <li><?= str_replace(' Cookie','',get_the_title($cookie['cookie_name']))?></li>
+                  <li><?= preg_replace('/ Cookie$/','',get_the_title($cookie['cookie_name']))?></li>
                 <?php } ?>
                 </ol>
                 <?php } ?>
