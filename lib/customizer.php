@@ -94,11 +94,13 @@ function exetera_custom_product_tabs($tabs) {
               <tr>
             <?php } ?>
               <td style="width:33%; vertical-align: top; padding: 5px;">
-                <?=$month['month_name']?>: <br>
+                <strong><?=$month['month_name']?>:</strong> <br>
                 <ol>
                 <?php if (is_array ($month['cookies'])) {
                   foreach ($month['cookies'] as $cookie) { ?>
-                  <li><?= preg_replace('/ Cookie$/','',get_the_title($cookie['cookie_name']))?></li>
+                  <li><?= preg_replace('/ Cookie$/','',get_the_title($cookie['cookie_name'])) ?> 
+                      <?= empty($cookie['details']) ? '' : ' ' . $cookie['details']?>
+                  </li>
                 <?php } ?>
                 </ol>
                 <?php } ?>
