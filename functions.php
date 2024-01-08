@@ -486,4 +486,11 @@ add_action('admin_bar_menu', 'hc_add_link_to_admin_bar', 50);
 
 add_filter('xmlrpc_methods', '__return_empty_array');
 
-
+/**
+ * Disable messages about the mobile apps in WooCommerce emails.
+ * https://wordpress.org/support/topic/remove-process-your-orders-on-the-go-get-the-app/
+ */
+function mtp_disable_mobile_messaging( $mailer ) {
+    remove_action( 'woocommerce_email_footer', array( $mailer->emails['WC_Email_New_Order'], 'mobile_messaging' ), 9 );
+}
+add_action( 'woocommerce_email', 'mtp_disable_mobile_messaging' );
