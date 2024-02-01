@@ -494,3 +494,47 @@ function mtp_disable_mobile_messaging( $mailer ) {
     remove_action( 'woocommerce_email_footer', array( $mailer->emails['WC_Email_New_Order'], 'mobile_messaging' ), 9 );
 }
 add_action( 'woocommerce_email', 'mtp_disable_mobile_messaging' );
+
+/*
+ * Creating a column (it is also possible to remove some default ones)
+ */
+add_filter( 'manage_users_columns', 'rudr_modify_user_table' );
+function rudr_modify_user_table( $columns ) {
+	
+	// unset( $columns['posts'] ); // maybe you would like to remove default columns
+	$columns[ 'registration_date' ] = 'Registration date'; // add new
+	return $columns;
+
+}
+
+/*
+ * Fill our new column with registration dates of the users
+ */
+add_filter( 'manage_users_custom_column', 'rudr_modify_user_table_row', 10, 3 );
+function rudr_modify_user_table_row( $row_output, $column_id_attr, $user ) {
+	
+	$date_format = 'j M, Y H:i';
+
+	switch( $column_id_attr ) {
+		case 'registration_date' : {
+			return date( $date_format, strtotime( get_the_author_meta( 'registered', $user ) ) );
+			break;
+		}
+		default : {
+			break;
+		}
+	}
+
+	return $row_output;
+
+}
+
+/*
+ * Make our "Registration date" column sortable
+ */
+add_filter( 'manage_users_sortable_columns', 'rudr_make_registered_column_sortable' );
+function rudr_make_registered_column_sortable( $columns ) {
+	
+	return wp_parse_args( array( 'registration_date' => 'registered' ), $columns );
+	
+}
