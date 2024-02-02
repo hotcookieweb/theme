@@ -538,3 +538,12 @@ function rudr_make_registered_column_sortable( $columns ) {
 	return wp_parse_args( array( 'registration_date' => 'registered' ), $columns );
 	
 }
+
+/**
+* WooCommerce My Account Page Logout Redirect
+*/
+add_action( 'wp_logout', 'owp_redirect_after_logout' );
+function owp_redirect_after_logout() {
+         wp_redirect( home_url('/account/') );
+         exit();
+}
