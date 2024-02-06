@@ -92,7 +92,7 @@ function wc_login_redirect($redirect, $user)
     if (is_wp_error($user)) {
         return ($redirect);
     }
-    if (wc_user_has_role($user, 'order_manager')) {
+    if (!wc_user_has_role($user, 'customer')) {
         $redirect = admin_url('?page=order-manager');
     }
     return ($redirect);
@@ -103,7 +103,7 @@ function wp_login_redirect($redirect_to, $requested_redirect_to, $user)
     if (is_wp_error($user)) {
         return ($redirect_to);
     }
-    if (wc_user_has_role($user, 'order_manager')) {
+    if (!wc_user_has_role($user, 'customer')) {
         return (admin_url('?page=order-manager'));
     }
     return ($redirect_to);
