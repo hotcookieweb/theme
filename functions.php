@@ -538,23 +538,3 @@ function rudr_make_registered_column_sortable( $columns ) {
 	return wp_parse_args( array( 'registration_date' => 'registered' ), $columns );
 	
 }
-
-/**
-* WooCommerce My Account Page Logout Redirect
-*/
-add_action( 'wp_logout', 'owp_redirect_after_logout' );
-function owp_redirect_after_logout() {
-         wp_redirect( home_url('/account/') );
-         exit();
-}
-
-add_filter( 'logout_url', 'custom_logout_url' );
-function custom_logout_url( $default )
-{
-return str_replace( 'wp-login', 'hidden-login', $default );
-}
-add_filter( 'login_url', 'custom_login_url' );
-function custom_login_url( $default )
-{
-return str_replace( 'wp-login', 'hidden-login', $default );
-}
