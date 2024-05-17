@@ -172,7 +172,7 @@ function heart_option_hack() {
         }
         else {
           xxElement.style.display = "none";
-          xxElement.input.value = "";
+          xxElement.value = "";
         }
       }
     </script>
