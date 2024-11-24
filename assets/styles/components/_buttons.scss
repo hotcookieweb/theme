@@ -66,6 +66,14 @@ ul.socialmedia-red {
 				        background-size: 100%;
 			}
 		}
+		&.TikTok {
+			a {
+				background-image: url('../images/icon-tiktok-red.svg');
+				-webkit-background-size: 100%;
+				-o-background-size: 100%;
+				background-size: 110%;
+			}
+		}
 	}
 }
 
@@ -135,6 +143,14 @@ ul.socialmedia {
 				-webkit-background-size: 100%;
 				     -o-background-size: 100%;
 				        background-size: 100%;
+			}
+		}
+		&.TikTok {
+			a {
+				background-image: url('../images/icon-tiktok.svg');
+				-webkit-background-size: 100%;
+				-o-background-size: 100%;
+				background-size: 110%;
 			}
 		}
 	}

@@ -68,11 +68,11 @@ Sage uses [gulp](http://gulpjs.com/) as its build system and [Bower](http://bowe
 
 ### Install gulp and Bower
 
-Building the theme requires [node.js](http://nodejs.org/download/). We recommend you update to the latest version of npm: `npm install -g npm@latest`.
+lding the theme requires [node.js](http://nodejs.org/download/). Install node: 'nvm install 10' is compatible.
 
 From the command line:
-
-1. Install [gulp-cli](http://gulpjs.com) and [Bower](http://bower.io/) globally with `npm install -g gulp-cli bower`
+npm 
+1. Install [gulp-cli](http://gulpjs.com) and [Bower](http://bower.io/) globally
 2. Navigate to the theme directory, then run `npm install`
 3. Run `bower install`
 
