@@ -126,7 +126,7 @@ function exetera_custom_product_tabs($tabs) {
 
 function hc_shop_content() {
   if (get_field('display_content_on_shop_page') == 'show') {
-    the_content();
+    echo get_the_content(null, false, null);
   }
 
 }
