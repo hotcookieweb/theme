@@ -22,7 +22,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 the_title( '<h1 class="product_title entry-title">', '</h1>' );
 ?>
 <h3>
-<?php
-the_field('shop_title');
-?>
+<?= get_field('shop_title');?>
 </h3>

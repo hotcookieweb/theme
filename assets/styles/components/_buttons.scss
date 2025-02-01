@@ -74,6 +74,14 @@ ul.socialmedia-red {
 				background-size: 110%;
 			}
 		}
+		&.BlueSky {
+			a {
+				background-image: url('../images/icon-bluesky-red.svg');
+				-webkit-background-size: 100%;
+				-o-background-size: 100%;
+				background-size: 110%;
+			}
+		}
 	}
 }
 
@@ -148,6 +156,14 @@ ul.socialmedia {
 		&.TikTok {
 			a {
 				background-image: url('../images/icon-tiktok.svg');
+				-webkit-background-size: 100%;
+				-o-background-size: 100%;
+				background-size: 110%;
+			}
+		}
+		&.TikTok {
+			a {
+				background-image: url('../images/icon-bluesky.svg');
 				-webkit-background-size: 100%;
 				-o-background-size: 100%;
 				background-size: 110%;

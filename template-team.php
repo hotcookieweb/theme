@@ -10,7 +10,7 @@
 	<?php get_template_part('templates/components/sidebar', 'secondary'); ?>
 	<div class="content">
 		<?php while (have_posts()) : the_post(); ?>
-			<p><?php the_field('text'); ?></p>
+			<p><?= get_field('text'); ?></p>
 			<?php get_template_part('templates/components/team', 'list'); ?>
 		<?php endwhile; ?>
 	</div>

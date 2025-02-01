@@ -15,10 +15,10 @@
 		} ?>
 		>
 		<div class="container">
-				<?php the_field('header_content_above');?>
-				<?php the_field('header_title'); ?>
+				<?= get_field('header_content_above');?>
+				<?= get_field('header_title'); ?>
 				<?php get_template_part('templates/components/delivery', 'form'); ?>
-				<?php the_field('header_content_below'); ?>
+				<?= get_field('header_content_below'); ?>
 		</div>
 	</div>
 	<?php if( have_rows('services') ): ?>
@@ -64,7 +64,7 @@
 	<div class="frontpage-blog">
 		<ul class="container">
 			<li>
-				<a href="<?php the_field('featured_image_url'); ?>">
+				<a href="<?= get_field('featured_image_url'); ?>">
 					<?php if (has_post_thumbnail()) {
 						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
 					} ?>
@@ -94,7 +94,7 @@
 		<?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 			<li>
 				<h1><?php the_title(); ?></h1>
-				<a href="<?php the_field('featured_image_url'); ?>">
+				<a href="<?= get_field('featured_image_url'); ?>">
 					<?php if (has_post_thumbnail()) {
 						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
 					} ?>
