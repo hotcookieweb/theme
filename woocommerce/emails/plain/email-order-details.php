@@ -2,7 +2,7 @@
 /**
  * Order details table shown in emails.
  *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails/email-order-details.php.
+ * This template can be overridden by copying it to yourtheme/woocommerce/emails/plain/email-order-details.php.
  *
  * HOWEVER, on occasion WooCommerce will need to update template files and you
  * (the theme developer) will need to copy the new files to your theme to
@@ -10,74 +10,74 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @see https://docs.woocommerce.com/document/template-structure/
+ * @see https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 3.7.0
+ * @version 9.8.0
  */
+
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 defined( 'ABSPATH' ) || exit;
 
-$text_align = is_rtl() ? 'right' : 'left';
+$email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 
-do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
+if ( $email_improvements_enabled ) {
+	add_filter( 'woocommerce_order_shipping_to_display_shipped_via', '__return_false' );
+}
 
-<h2>
-	<?php
-	if ( $sent_to_admin ) {
-		$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '">';
-		$after  = '</a>';
+do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email );
+
+if ( $email_improvements_enabled ) {
+	/* translators: %1$s: Order ID. %2$s: Order date */
+	echo wp_kses_post( sprintf( esc_html__( 'Order #%1$s (%2$s)', 'woocommerce' ), $order->get_order_number(), wc_format_datetime( $order->get_date_created() ) ) ) . "\n";
+	echo "\n==========\n";
 	} else {
-		$before = '';
-		$after  = '';
-	}
-	/* translators: %s: Order ID. */
-	echo wp_kses_post( $before . sprintf( __( '[Order #%s]', 'woocommerce' ) . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ) );
-	?>
-</h2>
-
-<div style="margin-bottom: 40px;">
-	<table class="td" cellspacing="0" cellpadding="6" style="width: 100%; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;" border="1">
-		<thead>
-			<tr>
-				<th class="td" scope="col" style="text-align:<?php echo esc_attr( $text_align ); ?>;"><?php esc_html_e( 'Product', 'woocommerce' ); ?></th>
-				<th class="td" scope="col" style="text-align:<?php echo esc_attr( $text_align ); ?>;"><?php esc_html_e( 'Quantity', 'woocommerce' ); ?></th>
-				<th class="td" scope="col" style="text-align:<?php echo esc_attr( $text_align ); ?>;"><?php esc_html_e( 'Price', 'woocommerce' ); ?></th>
-			</tr>
-		</thead>
-		<tbody>
-			<?php
-			echo wc_get_email_order_items( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	/* translators: %1$s: Order ID. %2$s: Order date */
+	echo wp_kses_post( wc_strtoupper( sprintf( esc_html__( '[Order #%1$s] (%2$s)', 'woocommerce' ), $order->get_order_number(), wc_format_datetime( $order->get_date_created() ) ) ) ) . "\n";
+}
+echo "\n" . wc_get_email_order_items( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				$order,
 				array(
 					'show_sku'      => $sent_to_admin,
 					'show_image'    => false,
 					'image_size'    => array( 32, 32 ),
-					'plain_text'    => $plain_text,
+		'plain_text'    => true,
 					'sent_to_admin' => $sent_to_admin,
 				)
 			);
-			?>
-		</tbody>
-		<tfoot>
-			<?php
+
+echo "==========\n\n";
+
 			$item_totals = $order->get_order_item_totals();
 
 			if ( $item_totals ) {
-				$i = 0;
 				foreach ( $item_totals as $total ) {
-					$i++;
-					?>
-					<tr>
-						<th class="td" scope="row" colspan="2" style="text-align:<?php echo esc_attr( $text_align ); ?>; <?php echo ( 1 === $i ) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post( $total['label'] ); ?></th>
-						<td class="td" style="text-align:<?php echo esc_attr( $text_align ); ?>; <?php echo ( 1 === $i ) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post( $total['value'] ); ?></td>
-					</tr>
-					<?php
-				}
+		if ( $email_improvements_enabled ) {
+			$label = $total['label'];
+			if ( isset( $total['meta'] ) ) {
+				$label .= ' ' . $total['meta'];
 			}
-			// new code deleted
-			?>
-		</tfoot>
-	</table>
-</div>
+			echo wp_kses_post( str_pad( wp_kses_post( $label ), 40 ) );
+			echo ' ';
+			echo esc_html( str_pad( wp_kses( $total['value'], array() ), 20, ' ', STR_PAD_LEFT ) ) . "\n";
+		} else {
+			echo wp_kses_post( $total['label'] . "\t " . $total['value'] ) . "\n";
+		}
+	}
+}
+/* hotcookie: delete order note
+if ( $order->get_customer_note() ) {
+	if ( $email_improvements_enabled ) {
+		echo "\n" . esc_html__( 'Note:', 'woocommerce' ) . "\n" . wp_kses( wptexturize( $order->get_customer_note() ), array() ) . "\n";
+	} else {
+		echo esc_html__( 'Note:', 'woocommerce' ) . "\t " . wp_kses( wptexturize( $order->get_customer_note() ), array() ) . "\n";
+	}
+}
+*/
 
-<?php do_action( 'woocommerce_email_after_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
+if ( $sent_to_admin ) {
+	/* translators: %s: Order link. */
+	echo "\n" . sprintf( esc_html__( 'View order: %s', 'woocommerce' ), esc_url( $order->get_edit_order_url() ) ) . "\n";
+}
+
+do_action( 'woocommerce_email_after_order_table', $order, $sent_to_admin, $plain_text, $email );

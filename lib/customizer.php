@@ -220,25 +220,33 @@ function product_description_meta($item, $cart_item_key, $values, $order) {
  * @donate $9     https://businessbloomer.com/bloomer-armada/
  */
 
-add_filter('manage_edit-product_columns', __NAMESPACE__ . '\\hc_add_stock_column', 9999);
-function hc_add_stock_column($columns) {
+add_filter('manage_edit-product_columns', __NAMESPACE__ . '\\hc_edit_column', 9999);
+function hc_edit_column($columns) {
+    unset($columns['date']);
+    unset($columns['taxonomy-product_brand']);
+
   $new_columns = array();
   // add new order status after processing
   foreach ($columns as $key => $data) {
     if ('product_tag' === $key) {
       $new_columns['stock'] = 'Stock';
+      $new_columns['adate'] = '<span>1st avail<br>last avail</span';
     } else {
       $new_columns[$key] = $data;
     }
   }
+  error_log(print_r($new_columns, true));
   return $new_columns;
 }
 
-add_action('manage_product_posts_custom_column', __NAMESPACE__ . '\\hc_add_stock_column_content', 10, 2);
-function hc_add_stock_column_content($column, $product_id) {
+add_action('manage_product_posts_custom_column', __NAMESPACE__ . '\\hc_column_content', 10, 2);
+function hc_column_content($column, $product_id) {
   if ($column == 'stock') {
     $product = wc_get_product($product_id);
     echo ($product->is_in_stock() ? "In" : "Out");
+  }
+  if ($column == 'adate') {
+    echo get_field('first_date', $product_id) . '<br>' . $available_to = get_field('last_date', $product_id);
   }
 }
 
