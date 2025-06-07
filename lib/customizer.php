@@ -274,3 +274,12 @@ function hc_maybe_redirect_button($text, $product) {
 }
 add_filter('woocommerce_product_add_to_cart_text', __NAMESPACE__ . '\hc_maybe_redirect_button', 10, 2);
 
+/* filter for woocomerce order export to get meta version of shipping zone */
+add_filter('woe_fetch_order_row', function ($row, $order_id) {
+  $order = wc_get_order( $order_id );
+  $shipping_zone = $order->get_meta( 'shipping_zone' );
+  if (array_key_exists('shipping_zone', $row) && !empty($shipping_zone) ) {
+    $row['shipping_zone'] = $shipping_zone;
+  }
+  return $row;
+}, 10, 2);
