@@ -538,12 +538,10 @@ function rudr_make_registered_column_sortable( $columns ) {
 	return wp_parse_args( array( 'registration_date' => 'registered' ), $columns );
 	
 }
-function on_user_loggout($user_id)
+function on_user_logout($user_id)
 {
-       // { your code }
-       error_log(site_url('/account'));
-    wp_redirect(site_url('/account'));
-   
+    wp_redirect(home_url());
+    exit();
 }
 
-add_filter('wp_logout', 'on_user_loggout', 10, 1);
+add_filter('wp_logout', 'on_user_logout', 10, 1);
