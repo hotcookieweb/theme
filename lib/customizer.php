@@ -4,6 +4,8 @@ namespace Roots\Sage\Customizer;
 
 use Roots\Sage\Assets;
 
+require_once "alias-product-attributes.php";
+
 /**
  * Add postMessage support
  */
@@ -20,17 +22,17 @@ function customize_preview_js() {
 }
 add_action('customize_preview_init', __NAMESPACE__ . '\\customize_preview_js');
 
-if (function_exists('acf_add_options_page')) {
-
-  acf_add_options_page(array(
-    'page_title' => 'Theme General Settings',
-    'menu_title' => 'Theme Settings',
-    'menu_slug' => 'theme-general-settings',
-    'capability' => 'edit_posts',
-    'redirect' => false,
-  ));
-
-}
+add_action('init', function () {
+    if (function_exists('acf_add_options_page')) {
+        acf_add_options_page([
+            'page_title' => __('Theme Settings', 'your-text-domain'),
+            'menu_title' => __('Settings', 'your-text-domain'),
+            'menu_slug'  => 'theme-settings',
+            'capability' => 'edit_posts',
+            'redirect'   => false,
+        ]);
+    }
+});
 
 remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
 remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
