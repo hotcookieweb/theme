@@ -12,6 +12,7 @@ class A_HotCookie_Account_Endpoint {
 	 * Plugin actions.
 	 */
 	public function __construct() {
+
 		// Actions used to insert a new endpoint in the WordPress.
 		add_action( 'init', array( $this, 'add_endpoints' ) );
 		add_filter( 'woocommerce_get_query_vars', array( $this, 'get_query_vars' ), 0 );
@@ -90,7 +91,7 @@ class A_HotCookie_Account_Endpoint {
 	 * Endpoint HTML content.
 	 */
 	public function endpoint_content() {
- 		get_template_part('templates/components/media', 'account');;
+ 		get_template_part('templates/components/media', 'account');
 	}
 
 	/**
@@ -105,84 +106,353 @@ class A_HotCookie_Account_Endpoint {
 new A_HotCookie_Account_Endpoint();
 //register_activation_hook( __FILE__, array( 'FUE_Account_Endpoint', 'install' ) );
 
-
-add_filter( 'acf/upload_prefilter/name=a_hotcookie_files', 'a_hotcookie_upload_prefilter' );
-add_filter( 'acf/prepare_field/name=a_hotcookie_files', 'a_hotcookie_files_field_display' );
-
-function a_hotcookie_upload_prefilter( $errors ) {
-
-  add_filter( 'upload_dir', 'a_hotcookie_upload_directory' );
-
-  return $errors;
-
+function a_hotcookie_user_dir($arr) {
+    $subdir  = get_current_user_id();
+    $folder  = '/a-hothookie-files';
+    $basedir = WP_CONTENT_DIR . '/uploads' . $folder . '/';
+    $baseurl = WP_CONTENT_URL . '/uploads' . $folder . '/';
+    return [
+        'path'   => $basedir . $subdir,
+        'url'    => $baseurl . $subdir,
+        'subdir' => $folder . '/' . $subdir,
+    ];
 }
 
-add_filter("gform_upload_path", "change_upload_path", 10, 2);
-function change_upload_path($path_info, $form_id) {
-	if ($form_id != '6') { //a hotcookie
-	 return $path_info;
+add_filter('body_class', function ($classes) {
+if (is_page('customers-as-hot-as-our-cookies')) {
+	$classes[] = 'woocommerce';
+}
+return $classes;
+});
+
+add_shortcode('a_hotcookie_uploader', 'render_a_hotcookie_uploader');
+function render_a_hotcookie_uploader() {
+	$current_user = wp_get_current_user();
+	$is_logged_in = is_user_logged_in();
+	$user_email   = $is_logged_in ? esc_attr($current_user->user_email) : '';
+
+	ob_start();
+	?>
+		<h3>A Hot Cookie</h3>
+		<form id="hot-cookie-upload" class="woocommerce-EditAccountForm edit-account" enctype="multipart/form-data">
+		<?php if (! $is_logged_in): ?>
+			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="user_email">Email <span class="required" aria-hidden="true">*</span></label>
+			<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="user_email" id="user_email" required placeholder="Your email">
+			<div id="email-status"></div>
+			</p>
+		<?php else: ?>
+			<input type="hidden" name="user_email" value="<?php echo $user_email; ?>">
+		<?php endif; ?>
+
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="image_caption">Caption <span class="required" aria-hidden="true">*</span></label>
+			<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="image_caption" id="image_caption" maxlength="20" value="A Hot Cookie" required>
+			<span class="char-counter" data-counter-for="image_caption" aria-live="polite"></span>
+		</p>
+
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="upload_image">Upload Image <span class="required" aria-hidden="true">*</span></label>
+			<input type="file" class="woocommerce-Input input-text" name="upload_image" style="border: none;" id="upload_image" accept=".jpg,.gif,.png,.webp" required>
+			<span>Accepted file types: jpg, gif, png, webp. Max. file size: 20 MB.</span>
+		</p>
+
+		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+			<label for="consent_checkbox">
+			<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="consent_checkbox" id="consent_checkbox" required>
+			I agree to the <a href="/policies/a-hotcookie-policy/" target="_blank">Privacy Policy</a>
+			<span class="required" aria-hidden="true">*</span>
+			</label>
+		</p>
+
+		<input type="hidden" name="hot_cookie_nonce" value="<?php echo wp_create_nonce('hot_cookie_upload'); ?>">
+		<input type="hidden" name="action" value="hot_cookie_upload">
+		<input type="submit" class="btn" id="submit_button" value="Upload" style="display:none;">
+		<?php
+			if (isset($_GET['upload'])) { ?>
+    			<div class="woocommerce-message" role="alert"><?= $_GET['upload'] ?></div>
+		<?php } ?>
+		<br>
+		</form>
+
+		<script>
+		function validateFormFields() {
+			const caption   = document.getElementById('image_caption');
+			const file      = document.getElementById('upload_image');
+			const consent   = document.getElementById('consent_checkbox');
+			const submitBtn = document.getElementById('submit_button');
+
+			let emailValid = true;
+			const emailField = document.getElementById('user_email');
+			if (emailField) {
+				emailValid = emailField.checkValidity();
+			}
+
+			const isValid =
+				emailValid &&
+				caption.checkValidity() &&
+				file.files.length > 0 &&
+				consent.checked;
+
+			submitBtn.style.display = isValid ? 'inline-block' : 'none';
+		}
+
+		['input', 'change'].forEach(evt => {
+			document.getElementById('hot-cookie-upload').addEventListener(evt, validateFormFields);
+		});
+
+		document.getElementById('hot-cookie-upload').addEventListener('submit', function(e) {
+			e.preventDefault();
+			const form = e.target;
+			const formData = new FormData(form);
+			fetch('<?= admin_url("admin-ajax.php"); ?>', {
+				method: 'POST',
+				body: formData
+			})
+			.then(res => res.json())
+			.then(data => {
+			if (data.success) {
+				const url = new URL(window.location.href);
+				url.searchParams.set('upload', data.data.message); // ✅ correct path
+				window.location.href = url.toString();
+			} else {
+				alert('Upload error: ' + data.data.message);
+			}
+			});
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+			const counters = document.querySelectorAll(".char-counter");
+
+			counters.forEach(counter => {
+				const inputId = counter.getAttribute("data-counter-for");
+				const input = document.getElementById(inputId);
+
+				if (!input) return;
+
+				const update = () => {
+				const length = input.value.length;
+				const max = input.maxLength || 100;
+				counter.textContent = `${length} / ${max} characters`;
+				};
+
+				input.addEventListener("input", update);
+				update(); // initialize
+			});
+		});
+
+		</script>
+	<?php
+	return ob_get_clean();
+}
+  
+add_shortcode('a_hotcookie_images', 'render_a_hotcookie_images');
+function render_a_hotcookie_images() {
+	$current_user = wp_get_current_user();
+	$is_logged_in = is_user_logged_in();
+	$user_email   = $is_logged_in ? esc_attr($current_user->user_email) : '';
+
+	ob_start();
+	?>
+
+	<h3>Your Uploaded Hot Cookie Images</h3>
+	<?php
+		if (isset($_GET['ahcdelete'])) {
+			$image_id = intval($_GET['ahcdelete']);
+			$current_user = wp_get_current_user();
+
+			$attachment = get_post($image_id);
+			if ($attachment->post_author !== get_current_user_id()) {
+				echo '<div class="woocommerce-error" role="alert">Unauthorized deletion attempt.</div>';
+				return;
+			}
+
+			// Check if image is still tagged with 'a-hotcookie'
+			$terms = wp_get_object_terms($image_id, 'attachment_category', ['fields' => 'slugs']);
+			if (in_array('a-hotcookie', $terms)) {
+				// Remove original category
+				wp_remove_object_terms($image_id, 'a-hotcookie', 'attachment_category');
+
+				// Assign deleted category
+				wp_set_object_terms($image_id, 'a-hotcookie-deleted', 'attachment_category', true);
+
+				// Audit log
+				$message = "user login: {$current_user->user_login}" . PHP_EOL .
+						"image: " . wp_get_attachment_image_url($image_id);
+				wp_mail('web@hotcookie.com', 'User deleted image', $message);
+
+				echo '<div class="woocommerce-message" role="alert">Image deleted</div>';
+			}
+		}
+	?>
+	<?php if (is_user_logged_in()) { ?>
+		<div class="media-frame">
+			<?php
+			$args = [
+				'author'        => get_current_user_id(),
+				'post_type'     => 'attachment',
+				'post_status'   => 'inherit',
+				'orderby'       => 'post_date',
+				'posts_per_page'=> -1,
+				'tax_query'     => [
+					[
+						'taxonomy' => 'attachment_category',
+						'field'    => 'term_id',
+						'terms'    => 300,
+					],
+				],
+			];
+			$the_query = new WP_Query($args);
+			?>
+			<div class='gallery galleryid-9 gallery-columns-4 gallery-size-thumbnail'>
+			<?php if ($the_query->have_posts()) : ?>
+				<?php while ($the_query->have_posts()) : $the_query->the_post(); ?>
+					<?php
+					$id = get_the_ID();
+					if (wp_get_post_parent_id($id) == 0) continue;
+
+					$image_thumbnail = wp_get_attachment_image_src($id, 'thumbnail');
+					$image_large     = wp_get_attachment_image_src($id, '1536x1536');
+
+					if (!$image_thumbnail || !$image_large) continue;
+					?>
+					<div class='gallery-item' style='width:200px; height:200px;'>
+						<figure class='gallery-image'>
+							<a class="gallery-link" href="<?= esc_url($image_large[0]); ?>">
+								<img class="gallery-thumbnail" src="<?= esc_url($image_thumbnail[0]); ?>" alt="">
+							</a>
+						</figure>
+						<figcaption class="gallery-caption" style="display: flex; align-items: center; gap: 10px;">
+							<a href="<?= esc_url('?ahcdelete=' . $id); ?>" style="display: inline-block; padding-right: 10px;">
+							<img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Trash_font_awesome.svg"
+								width="20" height="20" style="display: block;" alt="Delete" title='Delete image'>
+							</a>
+							<?php $excerpt = get_post_field('post_excerpt', $id); ?>
+							<h4 style="margin: 0;">
+								<?= !empty($excerpt) ? esc_html($excerpt) : '&nbsp;'; ?>
+							</h4>
+						</figcaption>
+					</div>
+				<?php endwhile; ?>
+				<?php wp_reset_postdata(); ?>
+			<?php else : ?>
+				<p>No hot cookie images found.</p>
+			<?php endif; ?>
+			</div>
+		</div>
+	<?php } else {?>
+		<p>Log in to view your uploaded images.</p>
+	<?php }
+	return ob_get_clean();
+}
+
+add_action('wp_ajax_nopriv_hot_cookie_upload', 'hot_cookie_upload_handler');
+add_action('wp_ajax_hot_cookie_upload', 'hot_cookie_upload_handler');
+
+function hot_cookie_upload_handler()
+{
+    check_ajax_referer('hot_cookie_upload', 'hot_cookie_nonce');
+
+    $email   = sanitize_email($_POST['user_email']);
+    $caption = sanitize_text_field($_POST['image_caption']);
+    $consent = isset($_POST['consent_checkbox']);
+
+    if (! $consent) {
+        wp_send_json_error(['message' => 'Consent is required.']);
+    }
+
+	if (! is_email($email)) {
+		wp_send_json_error(['message' => 'Invalid email address.']);
 	}
-	$user_id = get_current_user_id();
-	$folder = 'a-hothookie-files';
-	$path_info['path'] = WP_CONTENT_DIR . '/uploads/' . $folder . '/' . $user_id . '/';
-	$path_info['url'] = WP_CONTENT_URL . '/uploads/' . $folder . '/' . $user_id . '/';
-	return $path_info;
-}
 
-add_filter( 'gform_after_submission', 'set_post_content', 10, 2 );
-function set_post_content( $entry, $form ) {
-  if ($entry['form_id'] != '6') { //a hotcookie
-		return;
-  }
+    // ✅ Create user silently if needed
+    $user_id = email_exists($email);
+    if (! $user_id) {
+        $random_password = wp_generate_password();
+        $user_id         = wp_create_user($email, $random_password, $email);
+        if (is_wp_error($user_id)) {
+            wp_send_json_error(['message' => 'User registration failed.']);
+        }
+    }
+	else {
+		$pending = get_posts([
+		'post_type'   => 'attachment',
+		'post_status' => 'inherit',
+		'author'      => $user_id,
+		'numberposts' => 1,
+		'tax_query'   => [[
+			'taxonomy' => 'attachment_category',
+			'field'    => 'slug',
+			'terms'    => 'a-hotcookie-pending',
+		]],
+		]);
 
-	$url = $entry[6]; // gravity forms URL
-	$title = $entry[4]; // gravity forms caption
-
-	$parsed_url = parse_url( $url );
-	if (empty($parsed_url['path'])) {
-			return 'path';
+		if (!empty($pending)) {
+		wp_send_json_error(['message' => 'You already have an upload pending review.']);
+		}
 	}
-	$file = ABSPATH . ltrim( $parsed_url['path'], '/');
-	$file_name        = basename( $file );
-	$file_type        = wp_check_filetype( $file_name, null );
-	$attachment_title = sanitize_file_name( pathinfo( $file_name, PATHINFO_FILENAME ) );
 
-	$post_info = array(
-		'guid'           => $url,
-		'post_mime_type' => $file_type['type'],
-		'post_title'     => $attachment_title,
-		'post_excerpt'   => $title,
-		'post_status'    => 'pending',
-		'post_category' => get_term_by( 'slug', 'a-hotcookie', 'category' ), //a-hotcookie-category
-	);
+    // ✅ Prepare upload directory
+    $custom_upload_dir = function ($dirs) use ($user_id) {
+        $folder         = '/a-hothookie-files';
+        $dirs['path']   = WP_CONTENT_DIR . '/uploads' . $folder . '/' . $user_id;
+        $dirs['url']    = WP_CONTENT_URL . '/uploads' . $folder . '/' . $user_id;
+        $dirs['subdir'] = $folder . '/' . $user_id;
+        return $dirs;
+    };
+    add_filter('upload_dir', $custom_upload_dir);
 
-	add_filter('upload_dir', 'a_hotcookie_user_dir');
-	// Create the attachment.
-	$attach_id = wp_insert_attachment( $post_info, $file, get_current_user_id() );
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    $upload = wp_handle_upload($_FILES['upload_image'], ['test_form' => false]);
 
-	// Include image.php.
-	require_once ABSPATH . 'wp-admin/includes/image.php';
+    remove_filter('upload_dir', $custom_upload_dir);
 
-	// Generate the attachment metadata.
-	$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
-	// Assign metadata to attachment.
-	wp_update_attachment_metadata( $attach_id, $attach_data );
+    if (isset($upload['error'])) {
+        wp_send_json_error(['message' => $upload['error']]);
+    }
 
-//	wp_set_post_categories( int $post_ID, int[]|int $post_categories = array(), bool $append = false ): array|false|WP_Error
+    $file_url  = $upload['url'];
+    $file_path = $upload['file'];
+    $file_type = wp_check_filetype($file_path);
 
-	remove_filter( 'upload_dir', 'a_hotcookie_user_dir' );
+    // ✅ Create attachment post
+    $attachment = [
+        'guid'           => $file_url,
+        'post_mime_type' => $file_type['type'],
+        'post_title'     => sanitize_file_name(pathinfo($file_path, PATHINFO_FILENAME)),
+        'post_excerpt'   => $caption,
+        'post_status'    => 'inherit',
+        'post_author'    => $user_id,
+    ];
 
-	return $attach_id;
+    $attach_id = wp_insert_attachment($attachment, $file_path);
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $attach_data = wp_generate_attachment_metadata($attach_id, $file_path);
+    wp_update_attachment_metadata($attach_id, $attach_data);
+
+    // ✅ Assign pending category
+    if (!term_exists('a-hotcookie-pending', 'attachment_category')) {
+        wp_insert_term('a-hotcookie-pending', 'attachment_category');
+    }
+    wp_set_object_terms($attach_id, 'a-hotcookie-pending', 'attachment_category');
+
+    // ✅ Populate ACF field
+    update_field('caption_field', $caption, $attach_id);
+
+    // ✅ Send email to admin
+    $image_url = wp_get_attachment_url($attach_id);
+    $headers   = ['Content-Type: text/plain; charset=UTF-8'];
+    $subject   = "Hot Cookie Upload from: " . $email;
+    $message   = "Image titled \"" . $caption . "\" has been uploaded:\n" . $image_url . "\n\nUser ID: {$user_id}";
+    wp_mail("info@hotcookie.com", $subject, $message, $headers);
+
+    wp_send_json_success(['message' => 'Upload complete']);
 }
 
-function a_hotcookie_user_dir( $arr ) {
-	$subdir = get_current_user_id();
-	$folder = '/a-hothookie-files';
-	$basedir = WP_CONTENT_DIR . '/uploads' . $folder . '/';
-	$baseurl = WP_CONTENT_URL . '/uploads' . $folder . '/';
-	return array(
-		'path'    => $basedir . $subdir,
-		'url'     => $baseurl . $subdir,
-		'subdir'  => $folder . '/' . $subdir,
-	);
-}
+add_action('template_redirect', function () {
+	if (isset($_GET['upload'])) {
+		wp_safe_redirect(remove_query_arg('upload'));
+		exit;
+	}
+});
+

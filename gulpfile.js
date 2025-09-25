@@ -1,3 +1,5 @@
+
+
 // ## Globals
 var argv         = require('minimist')(process.argv.slice(2));
 var autoprefixer = require('gulp-autoprefixer');
@@ -18,6 +20,7 @@ var rev          = require('gulp-rev');
 var sass         = require('gulp-sass');
 var sourcemaps   = require('gulp-sourcemaps');
 var uglify       = require('gulp-uglify');
+var stripComments = require('gulp-strip-comments');
 
 // See https://github.com/austinpray/asset-builder
 var manifest = require('asset-builder')('./assets/manifest.json');
@@ -185,9 +188,11 @@ var jsTasks = function(filename) {
 var processScripts = function(done) {
   var merged = merge();
   manifest.forEachDependency('js', function(dep) {
+    console.log('Processing JS:', dep.name);
     merged.add(
       gulp.src(dep.globs, {base: 'scripts'})
         .pipe(plumber({errorHandler: onError}))
+        .pipe(stripComments()) // ← Now correctly placed
         .pipe(jsTasks(dep.name))
     );
   });
@@ -296,3 +301,4 @@ gulp.task(
 // ### Gulp
 // `gulp` - Run a complete build. To compile for production run `gulp --production`.
 gulp.task('default', gulp.series('clean', 'build'));
+

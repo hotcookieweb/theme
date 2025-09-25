@@ -20,35 +20,34 @@
         </td>
     </tr>
     <?php
-        });
+    });
 
-        // === 2. On Save, Repopulate Terms from Selected Attribute ===
-        add_action('woocommerce_attribute_updated', function ($id, $data, $old_data) {
-            if (! empty($_POST['populate_from'])) {
-                $source_attr = sanitize_text_field($_POST['populate_from']);
-                $target_attr = $data['attribute_name'];
+    // === 2. On Save, Repopulate Terms from Selected Attribute ===
+    add_action('woocommerce_attribute_updated', function ($id, $data, $old_data) {
+        if (! empty($_POST['populate_from'])) {
+            $source_attr = sanitize_text_field($_POST['populate_from']);
+            $target_attr = $data['attribute_name'];
 
-                $source_tax = 'pa_' . $source_attr;
-                $target_tax = 'pa_' . $target_attr;
+            $source_tax = 'pa_' . $source_attr;
+            $target_tax = 'pa_' . $target_attr;
 
-                // Delete existing terms
-                $existing_terms = get_terms(['taxonomy' => $target_tax, 'hide_empty' => false]);
-                if (! is_wp_error($existing_terms)) {
-                    foreach ($existing_terms as $term) {
-                        wp_delete_term($term->term_id, $target_tax);
-                    }
+            // Delete existing terms
+            $existing_terms = get_terms(['taxonomy' => $target_tax, 'hide_empty' => false]);
+            if (! is_wp_error($existing_terms)) {
+                foreach ($existing_terms as $term) {
+                    wp_delete_term($term->term_id, $target_tax);
                 }
+            }
 
-                // Copy terms from source
-                $source_terms = get_terms(['taxonomy' => $source_tax, 'hide_empty' => false]);
-                if (! is_wp_error($source_terms)) {
-                    foreach ($source_terms as $term) {
-                        wp_insert_term($term->name, $target_tax, [
-                            'slug'        => $term->slug,
-                            'description' => $term->description,
-                        ]);
-                    }
+            // Copy terms from source
+            $source_terms = get_terms(['taxonomy' => $source_tax, 'hide_empty' => false]);
+            if (! is_wp_error($source_terms)) {
+                foreach ($source_terms as $term) {
+                    wp_insert_term($term->name, $target_tax, [
+                        'slug'        => $term->slug,
+                        'description' => $term->description,
+                    ]);
                 }
+            }
         }
     }, 10, 3);
-    
