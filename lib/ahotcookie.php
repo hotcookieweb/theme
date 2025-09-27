@@ -1,4 +1,11 @@
 <?php
+register_taxonomy('attachment_category', 'attachment', [
+    'label' => 'Attachment Categories',
+    'public' => true,
+    'rewrite' => true,
+    'hierarchical' => true,
+]);
+
 class A_HotCookie_Account_Endpoint {
 
 	/**
@@ -129,16 +136,18 @@ add_shortcode('a_hotcookie_uploader', 'render_a_hotcookie_uploader');
 function render_a_hotcookie_uploader() {
 	$current_user = wp_get_current_user();
 	$is_logged_in = is_user_logged_in();
-	$user_email   = $is_logged_in ? esc_attr($current_user->user_email) : '';
+	if ($is_logged_in) {
+		$user_email = esc_attr($current_user->user_email);
+	}
+	$upload_email = isset($_GET['upload_email']) ? esc_attr($_GET['upload_email']) : '';
 
 	ob_start();
 	?>
-		<h3>A Hot Cookie</h3>
 		<form id="hot-cookie-upload" class="woocommerce-EditAccountForm edit-account" enctype="multipart/form-data">
 		<?php if (! $is_logged_in): ?>
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 			<label for="user_email">Email <span class="required" aria-hidden="true">*</span></label>
-			<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="user_email" id="user_email" required placeholder="Your email">
+			<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="user_email" id="user_email" required placeholder="Your email" value="<?= $upload_email; ?>">
 			<div id="email-status"></div>
 			</p>
 		<?php else: ?>
@@ -207,6 +216,7 @@ function render_a_hotcookie_uploader() {
 			const formData = new FormData(form);
 			fetch('<?= admin_url("admin-ajax.php"); ?>', {
 				method: 'POST',
+				credentials: 'same-origin', // ✅ critical for cookie persistence
 				body: formData
 			})
 			.then(res => res.json())
@@ -216,7 +226,15 @@ function render_a_hotcookie_uploader() {
 				url.searchParams.set('upload', data.data.message); // ✅ correct path
 				window.location.href = url.toString();
 			} else {
-				alert('Upload error: ' + data.data.message);
+				if (data.data.email) {
+					const url = new URL(window.location.href);
+					url.searchParams.set('upload', data.data.message); // ✅ correct path
+					url.searchParams.set('upload_email', data.data.email);
+					window.location.href = url.toString();
+				}
+				else {
+					alert('Upload error: ' + data.data.message);
+				}
 			}
 			});
 		});
@@ -250,34 +268,55 @@ add_shortcode('a_hotcookie_images', 'render_a_hotcookie_images');
 function render_a_hotcookie_images() {
 	$current_user = wp_get_current_user();
 	$is_logged_in = is_user_logged_in();
-	$user_email   = $is_logged_in ? esc_attr($current_user->user_email) : '';
+	if ($is_logged_in) {
+		$user_email = esc_attr($current_user->user_email);
+		$user_id = $current_user->ID;
+	}
+	else {
+		if (isset($_GET['upload_email'])) {
+			$user_email = esc_attr($_GET['upload_email']);
+			$user = get_user_by('email', $user_email);
+			if ($user) {	
+				$user_id = $user->ID;
+			}
+			else {
+				$user_id = 0;
+			}
+		}
+		else {
+			$user_id = 0;
+		}
+	}
 
 	ob_start();
 	?>
 
-	<h3>Your Uploaded Hot Cookie Images</h3>
 	<?php
 		if (isset($_GET['ahcdelete'])) {
 			$image_id = intval($_GET['ahcdelete']);
-			$current_user = wp_get_current_user();
 
 			$attachment = get_post($image_id);
-			if ($attachment->post_author !== get_current_user_id()) {
-				echo '<div class="woocommerce-error" role="alert">Unauthorized deletion attempt.</div>';
-				return;
+			if ($attachment->post_author != $user_id) { ?>
+				<div class="woocommerce-error" role="alert">
+					<?= sprintf("Unauthorized deletion attempt post_author: %s current user id: %s", $attachment->post_author, $user_id) ?>
+					</div>';
+				<?php return;
 			}
 
 			// Check if image is still tagged with 'a-hotcookie'
 			$terms = wp_get_object_terms($image_id, 'attachment_category', ['fields' => 'slugs']);
-			if (in_array('a-hotcookie', $terms)) {
+			$common = array_intersect(['a-hotcookie','a-hotcookie-pending'], $terms);
+
+			if (!empty($common)) {
 				// Remove original category
-				wp_remove_object_terms($image_id, 'a-hotcookie', 'attachment_category');
+				$common = array_values($common);
+				wp_remove_object_terms($image_id, $common[0], 'attachment_category');
 
 				// Assign deleted category
 				wp_set_object_terms($image_id, 'a-hotcookie-deleted', 'attachment_category', true);
 
 				// Audit log
-				$message = "user login: {$current_user->user_login}" . PHP_EOL .
+				$message = "user login: {$user_email}" . PHP_EOL .
 						"image: " . wp_get_attachment_image_url($image_id);
 				wp_mail('web@hotcookie.com', 'User deleted image', $message);
 
@@ -285,11 +324,11 @@ function render_a_hotcookie_images() {
 			}
 		}
 	?>
-	<?php if (is_user_logged_in()) { ?>
+	<?php if ($user_id) { ?>
 		<div class="media-frame">
 			<?php
 			$args = [
-				'author'        => get_current_user_id(),
+				'author'        => $user_id,
 				'post_type'     => 'attachment',
 				'post_status'   => 'inherit',
 				'orderby'       => 'post_date',
@@ -297,8 +336,9 @@ function render_a_hotcookie_images() {
 				'tax_query'     => [
 					[
 						'taxonomy' => 'attachment_category',
-						'field'    => 'term_id',
-						'terms'    => 300,
+						'field'    => 'slug',
+						'terms'    => ['a-hotcookie', 'a-hotcookie-pending'],
+						'operator' => 'IN', // ✅ matches any of the terms
 					],
 				],
 			];
@@ -309,28 +349,49 @@ function render_a_hotcookie_images() {
 				<?php while ($the_query->have_posts()) : $the_query->the_post(); ?>
 					<?php
 					$id = get_the_ID();
-					if (wp_get_post_parent_id($id) == 0) continue;
-
 					$image_thumbnail = wp_get_attachment_image_src($id, 'thumbnail');
 					$image_large     = wp_get_attachment_image_src($id, '1536x1536');
 
 					if (!$image_thumbnail || !$image_large) continue;
 					?>
 					<div class='gallery-item' style='width:200px; height:200px;'>
+						<figcaption class="gallery-caption" style="display: flex; align-items: center; gap: 10px;">
+							<?php $excerpt = get_post_field('post_excerpt', $id); ?>
+							<h4 style="margin: 0;">
+								<?= !empty($excerpt) ? esc_html($excerpt) : '&nbsp;'; ?>
+							</h4>
+						</figcaption>
 						<figure class='gallery-image'>
 							<a class="gallery-link" href="<?= esc_url($image_large[0]); ?>">
 								<img class="gallery-thumbnail" src="<?= esc_url($image_thumbnail[0]); ?>" alt="">
 							</a>
 						</figure>
 						<figcaption class="gallery-caption" style="display: flex; align-items: center; gap: 10px;">
-							<a href="<?= esc_url('?ahcdelete=' . $id); ?>" style="display: inline-block; padding-right: 10px;">
+							<a href="<?= esc_url('?ahcdelete=' . $id . '&upload_email=' . $user_email); ?>" style="display: inline-block; padding-right: 10px;">
 							<img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Trash_font_awesome.svg"
 								width="20" height="20" style="display: block;" alt="Delete" title='Delete image'>
 							</a>
-							<?php $excerpt = get_post_field('post_excerpt', $id); ?>
-							<h4 style="margin: 0;">
-								<?= !empty($excerpt) ? esc_html($excerpt) : '&nbsp;'; ?>
-							</h4>
+							<?php $terms = wp_get_object_terms($id, 'attachment_category');
+							if (!is_wp_error($terms) && !empty($terms)) {
+								foreach ($terms as $term) {
+									switch ($term->slug) {
+									 	case 'a-hotcookie':
+											$excerpt = 'approved';
+									 		break; // take the first other term
+									 	case 'a-hotcookie-pending':
+											$excerpt = 'pending review';
+									 		break; // take the first other term
+										case 'a-hotcookie-deleted':
+											$excerpt = 'deleted';
+									 		break; // take the first other term
+									 	default:
+									 		$excerpt = $term->name;
+									} ?>
+									<h5 style="margin: 0; color: black;">
+										<?= !empty($excerpt) ? esc_html($excerpt) : '&nbsp;'; ?>
+									</h5>
+								<?php }
+							} ?>
 						</figcaption>
 					</div>
 				<?php endwhile; ?>
@@ -349,8 +410,7 @@ function render_a_hotcookie_images() {
 add_action('wp_ajax_nopriv_hot_cookie_upload', 'hot_cookie_upload_handler');
 add_action('wp_ajax_hot_cookie_upload', 'hot_cookie_upload_handler');
 
-function hot_cookie_upload_handler()
-{
+function hot_cookie_upload_handler() {
     check_ajax_referer('hot_cookie_upload', 'hot_cookie_nonce');
 
     $email   = sanitize_email($_POST['user_email']);
@@ -374,22 +434,21 @@ function hot_cookie_upload_handler()
             wp_send_json_error(['message' => 'User registration failed.']);
         }
     }
-	else {
-		$pending = get_posts([
-		'post_type'   => 'attachment',
-		'post_status' => 'inherit',
-		'author'      => $user_id,
-		'numberposts' => 1,
-		'tax_query'   => [[
-			'taxonomy' => 'attachment_category',
-			'field'    => 'slug',
-			'terms'    => 'a-hotcookie-pending',
-		]],
-		]);
 
-		if (!empty($pending)) {
-		wp_send_json_error(['message' => 'You already have an upload pending review.']);
-		}
+	$pending = get_posts([
+	'post_type'   => 'attachment',
+	'post_status' => 'inherit',
+	'author'      => $user_id,
+	'numberposts' => 1,
+	'tax_query'   => [[
+		'taxonomy' => 'attachment_category',
+		'field'    => 'slug',
+		'terms'    => 'a-hotcookie-pending',
+	]],
+	]);
+
+	if (!empty($pending)) {
+		wp_send_json_error(['message' => 'You already have an upload pending image/video review.', 'email' => $email]);
 	}
 
     // ✅ Prepare upload directory
