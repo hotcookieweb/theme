@@ -178,8 +178,8 @@ function render_a_hotcookie_uploader() {
 		<input type="hidden" name="action" value="hot_cookie_upload">
 		<input type="submit" class="btn" id="submit_button" value="Upload" style="display:none;">
 		<?php
-			if (isset($_GET['upload'])) { ?>
-    			<div class="woocommerce-message" role="alert"><?= $_GET['upload'] ?></div>
+			if (isset($_GET['upload_message'])) { ?>
+    			<div class="woocommerce-message" role="alert"><?= $_GET['upload_message'] ?></div>
 		<?php } ?>
 		<br>
 		</form>
@@ -207,7 +207,13 @@ function render_a_hotcookie_uploader() {
 		}
 
 		['input', 'change'].forEach(evt => {
-			document.getElementById('hot-cookie-upload').addEventListener(evt, validateFormFields);
+			document.getElementById('hot-cookie-upload').addEventListener(evt, function(e) {
+				validateFormFields(e);
+				const msg = document.querySelector('.woocommerce-message');
+				if (msg) {
+					msg.style.display = 'none';
+				}
+			});
 		});
 
 		document.getElementById('hot-cookie-upload').addEventListener('submit', function(e) {
@@ -216,26 +222,32 @@ function render_a_hotcookie_uploader() {
 			const formData = new FormData(form);
 			fetch('<?= admin_url("admin-ajax.php"); ?>', {
 				method: 'POST',
-				credentials: 'same-origin', // ✅ critical for cookie persistence
+				credentials: 'same-origin',
 				body: formData
 			})
 			.then(res => res.json())
 			.then(data => {
-			if (data.success) {
 				const url = new URL(window.location.href);
-				url.searchParams.set('upload', data.data.message); // ✅ correct path
+				// Clear all query params
+				url.searchParams.delete('upload_message');
+				url.searchParams.delete('upload_email');
+				url.searchParams.delete('ahcdelete');
+
+				if (data.success) {
+					if (data.data?.email) {
+						url.searchParams.set('upload_email', data.data.email);
+					}
+					url.searchParams.set('upload_message', data.data.message);
+				} else {
+					url.searchParams.set('upload_message', data.data?.message || 'Unknown error');
+					if (data.data?.email) {
+						url.searchParams.set('upload_email', data.data.email);
+					}
+				}
 				window.location.href = url.toString();
-			} else {
-				if (data.data.email) {
-					const url = new URL(window.location.href);
-					url.searchParams.set('upload', data.data.message); // ✅ correct path
-					url.searchParams.set('upload_email', data.data.email);
-					window.location.href = url.toString();
-				}
-				else {
-					alert('Upload error: ' + data.data.message);
-				}
-			}
+			})
+			.catch(err => {
+				console.error('Fetch failed:', err);
 			});
 		});
 
@@ -258,7 +270,9 @@ function render_a_hotcookie_uploader() {
 				update(); // initialize
 			});
 		});
-
+		window.addEventListener('error', function(e) {
+			console.error('Global JS error:', e.message, e.filename, e.lineno);
+		});
 		</script>
 	<?php
 	return ob_get_clean();
@@ -413,7 +427,7 @@ add_action('wp_ajax_hot_cookie_upload', 'hot_cookie_upload_handler');
 function hot_cookie_upload_handler() {
     check_ajax_referer('hot_cookie_upload', 'hot_cookie_nonce');
 
-    $email   = sanitize_email($_POST['user_email']);
+	$email   = sanitize_email($_POST['user_email']);
     $caption = sanitize_text_field($_POST['image_caption']);
     $consent = isset($_POST['consent_checkbox']);
 
@@ -448,7 +462,7 @@ function hot_cookie_upload_handler() {
 	]);
 
 	if (!empty($pending)) {
-		wp_send_json_error(['message' => 'You already have an upload pending image/video review.', 'email' => $email]);
+		wp_send_json_error(['message' => 'You already have an upload pending image review.', 'email' => $email]);
 	}
 
     // ✅ Prepare upload directory
@@ -505,13 +519,6 @@ function hot_cookie_upload_handler() {
     $message   = "Image titled \"" . $caption . "\" has been uploaded:\n" . $image_url . "\n\nUser ID: {$user_id}";
     wp_mail("info@hotcookie.com", $subject, $message, $headers);
 
-    wp_send_json_success(['message' => 'Upload complete']);
+    wp_send_json_success(['message' => 'Upload complete', 'email' => $email]);
 }
-
-add_action('template_redirect', function () {
-	if (isset($_GET['upload'])) {
-		wp_safe_redirect(remove_query_arg('upload'));
-		exit;
-	}
-});
 
