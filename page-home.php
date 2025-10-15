@@ -30,7 +30,6 @@
 	        <a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
 	          <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
 	          <h2><?php the_sub_field('title'); ?></h2>
-	          <p><?php the_sub_field('content'); ?></p>
 	        </a>
 	      </li>
 
@@ -49,7 +48,7 @@
           <p><?php the_sub_field('content'); ?></p>
         </a>
       </li>
-			<hr>
+	  <hr>
     <?php endwhile; ?>
     </ul>
 	<?php endif; ?>

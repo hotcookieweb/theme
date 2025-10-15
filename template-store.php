@@ -15,11 +15,7 @@ if ($parent == 'charity') {
 }
 
 get_template_part('templates/components/page', 'banner');
-
-$zipcode = isset($_GET["zipcode"]) ? sanitize_text_field($_GET["zipcode"]) : null;
-if (!empty($zipcode)) {
-	get_template_part('templates/components/delivery', 'save', ['zipcode'=>$zipcode]);
-} ?>
+?>
 
 <div class="container">
 	<?php if( get_field('display_sidebar') == 'show' ) { get_template_part('templates/components/sidebar', 'primary'); } ?>

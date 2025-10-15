@@ -5,6 +5,7 @@ namespace Roots\Sage\Customizer;
 use Roots\Sage\Assets;
 
 require_once "alias-product-attributes.php";
+require_once "delivery-save.php";
 
 /**
  * Add postMessage support
@@ -216,39 +217,46 @@ function product_description_meta($item, $cart_item_key, $values, $order) {
 
 /**
  * @snippet       New Products Table Column @ WooCommerce Admin
- * @how-to        Get CustomizeWoo.com FREE
- * @author        Rodolfo Melogli
- * @compatible    WooCommerce 5
- * @donate $9     https://businessbloomer.com/bloomer-armada/
  */
 
 add_filter('manage_edit-product_columns', __NAMESPACE__ . '\\hc_edit_column', 9999);
 function hc_edit_column($columns) {
     unset($columns['date']);
     unset($columns['taxonomy-product_brand']);
+    unset($columns['shipping_category']);
+    unset($columns['product_cat']);
+    unset($columns['product_tag']);
 
-  $new_columns = array();
+    $new_columns = array();
   // add new order status after processing
-  foreach ($columns as $key => $data) {
-    if ('product_tag' === $key) {
-      $new_columns['stock'] = 'Stock';
-      $new_columns['adate'] = '<span>1st avail<br>last avail</span';
-    } else {
-      $new_columns[$key] = $data;
+    foreach ($columns as $key => $data) {
+        if ($key === 'price') {
+            $new_columns[$key] = $data;
+            $new_columns['adate'] = '<span>1st avail<br>last avail</span>';
+            $new_columns['hc_shipping'] = '<span>Location<br>Lead Time<br>Method</span>';
+            $new_columns['hc_stock'] = 'Stock';
+            $new_columns['product_cat'] = 'Categories';
+        } else {
+            $new_columns[$key] = $data;
+        }
     }
-  }
-  error_log(print_r($new_columns, true));
-  return $new_columns;
+    return $new_columns;
 }
 
 add_action('manage_product_posts_custom_column', __NAMESPACE__ . '\\hc_column_content', 10, 2);
 function hc_column_content($column, $product_id) {
-  if ($column == 'stock') {
+  if ($column == 'hc_stock') {
     $product = wc_get_product($product_id);
     echo ($product->is_in_stock() ? "In" : "Out");
   }
   if ($column == 'adate') {
     echo get_field('first_date', $product_id) . '<br>' . $available_to = get_field('last_date', $product_id);
+  }
+  if ($column == 'hc_shipping') {
+    $locations = get_post_meta($product_id, '_custom_location', true);
+    $lead_time = get_post_meta($product_id, '_custom_lead_time', true);
+    $delivery_method = get_post_meta($product_id, '_custom_delivery_method', true);
+    echo (is_array($locations) ? implode(', ', $locations) : $locations) . '<br>' . $lead_time . '<br>' . $delivery_method;
   }
 }
 
@@ -285,3 +293,12 @@ add_filter('woe_fetch_order_row', function ($row, $order_id) {
   }
   return $row;
 }, 10, 2);
+
+// 1 Disable State
+//add_filter( 'woocommerce_shipping_calculator_enable_state', '__return_false' );
+
+// 2 Disable City
+//add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' );
+
+// 3 Disable Address
+
