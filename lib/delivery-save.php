@@ -8,14 +8,14 @@ function hc_save_delivery() {
 	$zipcode = sanitize_text_field($_POST['zipcode']);
 	if (!empty($zipcode)) {
 		if (!preg_match('/^\d{5}$/', $zipcode)) {
-			wp_send_json_error(['message' => 'Invalid ZIP, must be 5 digits']);
+			wp_send_json_error(['message' => 'Invalid ZIP, must be 5 digits.']);
 		}
 		$location = lookupLocationFromZip($zipcode);
-		if (empty($location['zip']) || empty($location['city'] || empty($location['state']))) { // Try our local file
+		if (empty($location['zip'])) { // Try our local file
 			error_log("ZIP {$zipcode} not found via Nominatim, trying local CSV");
 			$location = hc_ziplocal($zipcode);
 			if (empty($location)) {
-				wp_send_json_error(['message' => 'Could not determine location from ZIP']);
+				wp_send_json_error(['message' => 'Could not determine location from ZIP.']);
 			}
 		}
 	} else if (!empty($_POST['lat']) && !empty($_POST['lng'])) {
@@ -25,15 +25,31 @@ function hc_save_delivery() {
 		if (empty($location['zip'])) { // Try our local file
 			$location = lookupLocationFromIP();
 			if (empty($location) || empty($location['zip'])) {
-				wp_send_json_error(['message' => 'Could not determine ZIP from location']);
+				wp_send_json_error(['message' => 'Could not determine ZIP from location.']);
 			}
 		}
 	} else {
-		wp_send_json_error(['message' => 'No ZIP or location provided']);
+		$location = lookupLocationFromIP();
+		if (empty($location) || empty($location['zip'])) {
+			wp_send_json_error(['message' => 'Could not determine ZIP from location.']);
+		}
 	}
 
 	if (empty($location['state']))
 		$location['state'] = '';
+	else {
+		$states = WC()->countries->get_states('US');
+		$abbrs = array_keys($states);
+		$input = strtoupper(trim($location['state']));
+
+		if (in_array($input, $abbrs, true)) {
+			$location['state'] = $input;
+		} else {
+			$state_abbr = array_flip($states);
+			$normalized_name = ucwords(strtolower($location['state']));
+			$location['state'] = $state_abbr[$normalized_name] ?? $location['state'];
+		}
+	}
 	if (empty($location['country']))
 		$location['country'] = 'US';
 	if (empty($location['city'])) {
@@ -50,43 +66,39 @@ function hc_save_delivery() {
 	WC()->customer->set_shipping_company('');
 	WC()->customer->set_shipping_phone('');
 
-	$data_store = WC_Data_Store::load('shipping-zone');
-	$raw_zones = $data_store->get_zones();
-	$matched_zone = null;
-
-	foreach ($raw_zones as $raw_zone) {
-		$zone = new WC_Shipping_Zone($raw_zone);
-		$zone_locations = $zone->get_zone_locations();
-
-		foreach ($zone_locations as $loc) {
-			if ($loc->type === 'postcode' && wc_format_postcode($loc->code, $location['country']) === wc_format_postcode($location['zip'], $location['country'])) {
-				$matched_zone = $zone->get_zone_name();
-				break 2;
-			}
-			if ($loc->type === 'state' && $loc->code === $location['country'] . ':' . $location['state']) {
-				$matched_zone = $zone->get_zone_name();
-				break 2;
-			}
-			if ($loc->type === 'country' && $loc->code === $location['country']) {
-				$matched_zone = $zone->get_zone_name();
-				break 2;
-			}
-		}
-	}
-
-	if (!$matched_zone) {
-		$matched_zone = 'National';
-	}
-
-	WC()->session->set('delivery_zone', $matched_zone);
+	$store_title = hc_set_delivery_zone($location);
 	
 	wp_send_json_success([
-		'zone' => $matched_zone,
-		'zipcode' => $location['zip'],
+		'zip' => $location['zip'],
 		'state' => $location['state'],
-		'city' => $location['city']
+		'city' => $location['city'],
+		'title'	=> $store_title,
 	]);
 }
+
+function hc_set_delivery_zone($location) {
+	$package = array(
+		'destination' => array(
+			'country'  => $location['country'],
+			'state'    => $location['state'],
+			'postcode' => $location['zip'],
+			'city'     => $location['city'],
+			'address'  => '', // optional
+		),
+		'contents'        => array(),
+		'contents_cost'   => 0,
+		'applied_coupons' => array(),
+	);
+
+	$zone = WC_Shipping_Zones::get_zone_matching_package($package);
+	$matched_zone = $zone ? $zone->get_zone_name() : 'national';
+
+	WC()->session->set('delivery_zone', $matched_zone);
+	$store_title = '<a href="' . home_url('delivery/'.$matched_zone) . '">' . get_field('header_title',url_to_postid('delivery/'.$matched_zone)) . '</a>';
+	WC()->session->set('store_title', $store_title);	
+	return $store_title;
+}
+
 function lookupLocationFromLatLng($lat, $lng) {
     $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&addressdetails=1";
     $opts = ['http' => ['header' => "User-Agent: hotcookie.com"]];
@@ -136,7 +148,6 @@ function hc_ziplocal($zip) {
 	$headers = fgetcsv($handle); // read header row
 	if (!in_array('zipcode', $headers)) {
 		fclose($handle);
-		error_log('CSV Headers: ' . implode(', ', $headers));
 		throw new Exception("CSV missing 'zipcode' column");
 	}
 	while (($row = fgetcsv($handle)) !== false) {
@@ -152,6 +163,10 @@ function hc_ziplocal($zip) {
 
 function lookupLocationFromIP() {
 	$ip = $_SERVER['REMOTE_ADDR'];
+	if ($ip === '::1' || $ip === '127.0.0.1') {
+		$ip = '8.8.8.8'; // fallback for local dev
+	}
+
 	$apiKey = 'hot_cookie'; // e.g. ipapi.co, ipinfo.io, etc.
 	$url = "https://ipapi.co/{$ip}/json/";
 

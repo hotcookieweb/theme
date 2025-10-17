@@ -1,21 +1,55 @@
+<?php
+$placeholder_text = "Enter US destination ZIP or hit search for geo";
+$customer = WC()->customer;
+if ($customer && $customer instanceof WC_Customer) {
+	$zipcode = $customer->get_shipping_postcode();
+	
+	$zone    = WC()->session->get('delivery_zone');
+	$store_title = WC()->session->get('store_title');
+	if (empty($zone) || empty($store_title)) {
+		$store_title = hc_set_delivery_zone($location);
+	}
 
+	if (!empty($zipcode) && !empty($store_title)) {
+		$placeholder_text = "<strong>" . $zipcode . ": " . $store_title . "</strong>"; 
+	}
+	else {
+		$placeholder_text = "Enter US destination ZIP or hit search for geo";
+	}
+}
+?>
 <form id="hot-cookie-delivery" class="delivery-form">
 	<input type="hidden" name="hot_cookie_nonce" value="<?php echo wp_create_nonce('hot_cookie_delivery'); ?>">
 	<input type="hidden" name="action" value="hc_save_delivery">
-	<input autocomplete="off" class="frontpage-input" maxlength="5" id="hc-zip-input" name="zipcode" placeholder="US destination ZIP or search for geo" type="text" pattern="[0-9]{5}" value="">
+
+	<div class="hc-input-wrapper">
+		<label for="hc-zip-input" class="hc-placeholder"><?= $placeholder_text ?></label>
+		<input id="hc-zip-input" name="zipcode" class="frontpage-input" type="text">
+	</div>
+
 	<button class="icon-search" type="submit" id="hc-submit" value="Search" title="HotCookie Search">Search</button>
 </form>
-
-<style>
-.zip-error {
-	border: 2px solid red !important;
-	color: red;
-}
-</style>
 
 <script>
 const hc_form = document.querySelector(".delivery-form");
 const hc_input = document.getElementById("hc-zip-input");
+const placeholder = document.querySelector('.hc-placeholder');
+
+function updateLabelVisibility() {
+  const hasText = hc_input.value.trim().length > 0;
+  const isFocused = document.activeElement === hc_input;
+
+  // Hide label if input has text or is focused
+  placeholder.style.opacity = hasText || isFocused ? '0' : '1';
+  placeholder.style.pointerEvents = hasText || isFocused ? 'none' : 'auto';
+}
+
+hc_input.addEventListener('input', updateLabelVisibility);
+hc_input.addEventListener('focus', updateLabelVisibility);
+hc_input.addEventListener('blur', updateLabelVisibility);
+
+// Initial state
+updateLabelVisibility();
 
 hc_input.addEventListener("keyup", function(e) {
 	if (e.keyCode === 13) {
@@ -23,12 +57,6 @@ hc_input.addEventListener("keyup", function(e) {
 		hc_form.dispatchEvent(new Event("submit"));
 	}
 });
-
-hc_input.addEventListener("input", function () {
-	hc_input.classList.remove("zip-error");
-	hc_input.placeholder = "Enter US destination ZIP or hit search for geo";
-});
-
 
 hc_form.addEventListener("submit", function(e) {
 	e.preventDefault();
@@ -54,19 +82,22 @@ hc_form.addEventListener("submit", function(e) {
 		.then(res => res.json())
 		.then(data => {
 			if (data.success) {
-				hc_input.placeholder = `Store set to ${data.data.city}, ${data.data.state}`;
-				hc_input.classList.remove("zip-error");
+				placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.title} </strong>`;
 				hc_input.value = "";
+				placeholder.style.opacity = '1';
+				placeholder.style.pointerEvents = 'auto';
 			} else {
-				hc_input.placeholder = (data.data?.message || "Unknown error") + "Enter US destination ZIP or hit search for geo";
-				hc_input.classList.add("zip-error");
+				placeholder.textContent  = (data.data?.message || "Unknown error") + " Enter US destination ZIP or hit search for geo";
 				hc_input.value = "";
+				placeholder.style.opacity = '1';
+				placeholder.style.pointerEvents = 'auto';
 			}
 		})
 		.catch(err => {
-			hc_input.placeholder = "Error occurred: " + err;
-			hc_input.classList.add("zip-error");
+			placeholder.textContent = "Error occurred: " + err;
 			hc_input.value = "";
+			placeholder.style.opacity = '1';
+			placeholder.style.pointerEvents = 'auto';
 		});
 	}
 
@@ -79,10 +110,7 @@ hc_form.addEventListener("submit", function(e) {
 				submitForm(lat, lng);
 			},
 			function errorCallback(error) {
-				console.error("Geolocation error:", error);
-				hc_input.placeholder = "Get Geocode failed. Enter US destination ZIP";
-				hc_input.classList.add("zip-error");
-				hc_input.value = "";
+				submitForm(); // Fallback to IP lookup
 			}
 		);
 		return;
@@ -90,9 +118,10 @@ hc_form.addEventListener("submit", function(e) {
 
 	// If ZIP is invalid
 	if (!zipCodePattern.test(zipcode)) {
-		hc_input.placeholder = "Invalid ZIP. Enter US destination ZIP or search for geo";
-		hc_input.classList.add("zip-error");
+		placeholder.textContent = "Invalid ZIP. Enter US destination ZIP or search for geo";
 		hc_input.value = "";
+		placeholder.style.opacity = '1';
+		placeholder.style.pointerEvents = 'auto';
 		return;
 	}
 

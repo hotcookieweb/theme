@@ -1,22 +1,35 @@
-.frontpage-input {
-	background-image: url('../images/icon-home.svg');
-	-webkit-background-size: 24px;
-	     -o-background-size: 24px;
-	        background-size: 24px;
-	background-repeat: no-repeat;
-	background-position: 15px 15px;
-	padding: 16px 16px 16px 52px;
-	border: 0;
-	width: 70%;
-	margin: 0 15% 0 15%;
-	-webkit-border-radius: 6px;
-	-moz-border-radius: 6px;
-	border-radius: 6px;
-	@include media-breakpoint-down(sm) {
-		width: 100%;
-		margin: 0 0% 0 0%;
-	}
+.hc-input-wrapper {
+  position: relative;
+  width: 70%;
+  margin: 0 15%;
+  @include media-breakpoint-down(sm) {
+	width: 100%;
+	margin: 0 0% 0 0%;
+  }
 }
+
+.frontpage-input {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  position: relative;
+  z-index: 1;
+}
+
+.hc-placeholder {
+  position: absolute;
+  top: 16px; /* match input's padding-top */
+  left: 16px; /* match input's padding-left */
+  font-size: 1rem;
+  color: #000;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.2s ease;
+}
+
 .icon-search {
 	float: right;
 	position: relative;
