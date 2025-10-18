@@ -16,15 +16,13 @@
       </div>
     </div>
     <div class="contact">
-      <p>Follow us & Spread the word!</p>
+      <p><strong>Follow us & Spread the word!</strong></p>
       <?php if( have_rows('socialmedia', 'option') ): ?>
         <ul class="socialmedia">
           <?php while ( have_rows('socialmedia', 'option') ) : the_row(); ?>
 
               <li class="<?php the_sub_field('platform', 'option'); ?>">
-                <a href="<?php the_sub_field('url', 'option'); ?>">
-                  <?php the_sub_field('platform', 'option'); ?>
-                </a>
+                <a href="<?php the_sub_field('url', 'option'); ?>" aria-label="<?php the_sub_field('platform', 'option'); ?>"></a>
               </li>
 
           <?php endwhile; ?>
