@@ -3,18 +3,17 @@ $placeholder_text = "Enter US destination ZIP or hit search for geo";
 $customer = WC()->customer;
 if ($customer && $customer instanceof WC_Customer) {
 	$zipcode = $customer->get_shipping_postcode();
-	
-	$zone    = WC()->session->get('delivery_zone');
-	$store_title = WC()->session->get('store_title');
-	if (empty($zone) || empty($store_title)) {
-		$store_title = hc_set_delivery_zone($location);
+	$zone = WC()->session->get('delivery_zone');
+	if (empty($zone) && !empty($zipcode)) {
+		$zone = hc_set_delivery_zone(['zip' => $zipcode,
+									   'country' => $customer->get_shipping_country(),
+									   'state'   => $customer->get_shipping_state(),
+									   'city'    => $customer->get_shipping_city()
+									  ]);
 	}
 
-	if (!empty($zipcode) && !empty($store_title)) {
-		$placeholder_text = "<strong>" . $zipcode . ": " . $store_title . "</strong>"; 
-	}
-	else {
-		$placeholder_text = "Enter US destination ZIP or hit search for geo";
+	if (!empty($zipcode) && !empty($zone) && ($zone !== 'Rest of World')) {
+		$placeholder_text = "<strong>" . $zipcode . ": " . get_field('header_title',url_to_postid('delivery/' . $zone)) . "</strong>"; 
 	}
 }
 ?>

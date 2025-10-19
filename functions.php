@@ -47,7 +47,7 @@ function create_wc_session()
     if (isset(WC()->session)) {
         if (!WC()->session->has_session()) {
             WC()->session->set_customer_session_cookie(true);
-            WC()->customer->set_shipping_country('');
+            WC()->customer->set_shipping_country('US');
             WC()->customer->set_shipping_postcode('');
             WC()->customer->set_shipping_state('');
             WC()->customer->set_shipping_city('');
@@ -55,6 +55,7 @@ function create_wc_session()
             WC()->customer->set_billing_postcode('');
             WC()->customer->set_billing_state('');
             WC()->customer->set_billing_city('');
+            WC()->session->set('delivery_zone','');
         }
     }
 }

@@ -66,13 +66,14 @@ function hc_save_delivery() {
 	WC()->customer->set_shipping_company('');
 	WC()->customer->set_shipping_phone('');
 
-	$store_title = hc_set_delivery_zone($location);
+	$matched_zone = hc_set_delivery_zone($location);
 	
 	wp_send_json_success([
 		'zip' => $location['zip'],
 		'state' => $location['state'],
 		'city' => $location['city'],
-		'title'	=> $store_title,
+		'country' => $location['country'],
+		'title' => get_field('header_title',url_to_postid('delivery/' . $matched_zone))
 	]);
 }
 
@@ -94,9 +95,7 @@ function hc_set_delivery_zone($location) {
 	$matched_zone = $zone ? $zone->get_zone_name() : 'national';
 
 	WC()->session->set('delivery_zone', $matched_zone);
-	$store_title = '<a href="' . home_url('delivery/'.$matched_zone) . '">' . get_field('header_title',url_to_postid('delivery/'.$matched_zone)) . '</a>';
-	WC()->session->set('store_title', $store_title);	
-	return $store_title;
+	return $matched_zone;
 }
 
 function lookupLocationFromLatLng($lat, $lng) {
