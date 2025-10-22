@@ -1,5 +1,15 @@
 <?php
-$placeholder_text = "Enter US destination ZIP or hit search for geo";
+$data_store = WC_Data_Store::load('shipping-zone');
+$shipping_zones = $data_store->get_zones();
+foreach ($shipping_zones as $shipping_zone) {
+	$zone_data = new WC_Shipping_Zone($shipping_zone);
+	$zone_name = $zone_data->get_zone_name();
+	if ($zone_name !== 'Rest of World') {
+		$stores[$zone_name] = hc_get_store_data('header_title',$zone_name);
+	}
+}
+
+$placeholder_text = "Select store, enter US ZIP or hit search for geo";
 $customer = WC()->customer;
 if ($customer && $customer instanceof WC_Customer) {
 	$zipcode = $customer->get_shipping_postcode();
@@ -13,9 +23,10 @@ if ($customer && $customer instanceof WC_Customer) {
 	}
 
 	if (!empty($zipcode) && !empty($zone) && ($zone !== 'Rest of World')) {
-		$placeholder_text = "<strong>" . $zipcode . ": " . get_field('header_title',url_to_postid('delivery/' . $zone)) . "</strong>"; 
+		$placeholder_text = "<strong>" . $zipcode . ": " . hc_get_store_data('header_title',$zone) . "</strong>"; 
 	}
 }
+
 ?>
 <form id="hot-cookie-delivery" class="delivery-form">
 	<input type="hidden" name="hot_cookie_nonce" value="<?php echo wp_create_nonce('hot_cookie_delivery'); ?>">
@@ -23,7 +34,13 @@ if ($customer && $customer instanceof WC_Customer) {
 
 	<div class="hc-input-wrapper">
 		<label for="hc-zip-input" class="hc-placeholder"><?= $placeholder_text ?></label>
-		<input id="hc-zip-input" name="zipcode" class="frontpage-input" type="text">
+		<input list="stores-locations" id="hc-zip-input" name="zipcode" class="frontpage-input" type="text">
+		  <datalist id="stores-locations">
+			<?php foreach ($stores as $key => $value) {
+				$selected = ($key == $zone) ? 'selected' : '';?>
+				<option <?= $selected ?> class="store_local_option" data-zone="<?= $key ?>"><?= $value ?></option>
+			<?php } ?>
+		</datalist>
 	</div>
 
 	<button class="icon-search" type="submit" id="hc-submit" value="Search" title="HotCookie Search">Search</button>
@@ -50,6 +67,18 @@ hc_input.addEventListener('blur', updateLabelVisibility);
 // Initial state
 updateLabelVisibility();
 
+// Autosubmit on selection from datalist
+hc_input.addEventListener("change", () => {
+  const inputVal = hc_input.value.trim().toLowerCase();
+	hc_form.dispatchEvent(new Event("submit"));
+});
+
+// Manual search click triggers submit even if input is empty
+document.getElementById("hc-submit").addEventListener("click", e => {
+  e.preventDefault();
+  hc_form.dispatchEvent(new Event("submit"));
+});
+
 hc_input.addEventListener("keyup", function(e) {
 	if (e.keyCode === 13) {
 		e.preventDefault();
@@ -61,70 +90,83 @@ hc_form.addEventListener("submit", function(e) {
 	e.preventDefault();
 
 	const zipCodePattern = /^\d{5}$/;
-	const zipcode = hc_input.value;
+	const inputVal = hc_input.value.trim();
 
-	// Helper: Submit form with optional lat/lng
-	function submitForm(lat = null, lng = null) {
-		const formData = new FormData(hc_form);
-		if (lat && lng) {
-			formData.append("lat", lat);
-			formData.append("lng", lng);
+	// Build zoneMap from datalist at time of submit
+	const options = document.querySelectorAll("#stores-locations option");
+	const zoneMap = {};
+
+	options.forEach(opt => {
+		const label = opt.value.trim(); // This is the string shown to the user
+		const zoneKey = opt.dataset.zone?.trim(); // This is the canonical zone identifier
+		if (label && zoneKey) {
+			zoneMap[label] = zoneKey;
 		}
+	});
 
-		console.log([...formData.entries()]);
+  // Helper: Submit form with optional lat/lng and zoneMap
+  function submitForm(lat = null, lng = null) {
+    const formData = new FormData(hc_form);
 
-		fetch("<?= admin_url('admin-ajax.php'); ?>", {
-			method: "POST",
-			credentials: "same-origin",
-			body: formData
-		})
-		.then(res => res.json())
-		.then(data => {
-			if (data.success) {
-				placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.title} </strong>`;
-				hc_input.value = "";
-				placeholder.style.opacity = '1';
-				placeholder.style.pointerEvents = 'auto';
-			} else {
-				placeholder.textContent  = (data.data?.message || "Unknown error") + " Enter US destination ZIP or hit search for geo";
-				hc_input.value = "";
-				placeholder.style.opacity = '1';
-				placeholder.style.pointerEvents = 'auto';
-			}
-		})
-		.catch(err => {
-			placeholder.textContent = "Error occurred: " + err;
-			hc_input.value = "";
-			placeholder.style.opacity = '1';
-			placeholder.style.pointerEvents = 'auto';
-		});
-	}
+    // Determine resolution source
+    let resolutionSource = "geo";
+    if (zoneMap[inputVal]) {
+      resolutionSource = "zone";
+      formData.append("zone", zoneMap[inputVal]);
+    } else if (zipCodePattern.test(inputVal)) {
+      resolutionSource = "zip";
+      formData.append("zipcode", inputVal);
+    }
 
-	// If ZIP is empty, try geolocation
-	if (zipcode.length === 0) {
-		navigator.geolocation.getCurrentPosition(
-			function successCallback(position) {
-				const lat = position.coords.latitude;
-				const lng = position.coords.longitude;
-				submitForm(lat, lng);
-			},
-			function errorCallback(error) {
-				submitForm(); // Fallback to IP lookup
-			}
-		);
-		return;
-	}
+    formData.append("resolution_source", resolutionSource);
+    if (lat && lng) {
+      formData.append("lat", lat);
+      formData.append("lng", lng);
+    }
 
-	// If ZIP is invalid
-	if (!zipCodePattern.test(zipcode)) {
-		placeholder.textContent = "Invalid ZIP. Enter US destination ZIP or search for geo";
-		hc_input.value = "";
-		placeholder.style.opacity = '1';
-		placeholder.style.pointerEvents = 'auto';
-		return;
-	}
+    fetch("<?= admin_url('admin-ajax.php'); ?>", {
+      method: "POST",
+      credentials: "same-origin",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.title} </strong>`;
+      } else {
+        placeholder.textContent = (data.data?.message || "Unknown error") + " Select store, enter US ZIP or hit search for geo";
+      }
+      hc_input.value = "";
+      placeholder.style.opacity = '1';
+      placeholder.style.pointerEvents = 'auto';
+    })
+    .catch(err => {
+      placeholder.textContent = "Error occurred: " + err;
+      hc_input.value = "";
+      placeholder.style.opacity = '1';
+      placeholder.style.pointerEvents = 'auto';
+    });
+  }
 
-	// ZIP is valid, submit normally
-	submitForm();
+  // Trigger geo fallback if input is empty
+  if (inputVal.length === 0) {
+    navigator.geolocation.getCurrentPosition(
+      pos => submitForm(pos.coords.latitude, pos.coords.longitude),
+      err => submitForm()
+    );
+    return;
+  }
+
+  // If input is invalid ZIP and not a known zone
+  if (!zoneMap[inputVal] && !zipCodePattern.test(inputVal)) {
+    placeholder.textContent = "Invalid ZIP: Select store, enter US ZIP or hit search for geo";
+    hc_input.value = "";
+    placeholder.style.opacity = '1';
+    placeholder.style.pointerEvents = 'auto';
+    return;
+  }
+
+  // Valid zone or ZIP — submit normally
+  submitForm();
 });
 </script>

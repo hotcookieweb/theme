@@ -5,34 +5,62 @@ add_action('wp_ajax_nopriv_hc_save_delivery', 'hc_save_delivery');
 function hc_save_delivery() {
 	check_ajax_referer('hot_cookie_delivery', 'hot_cookie_nonce');
 
-	$zipcode = sanitize_text_field($_POST['zipcode']);
-	if (!empty($zipcode)) {
-		if (!preg_match('/^\d{5}$/', $zipcode)) {
-			wp_send_json_error(['message' => 'Invalid ZIP, must be 5 digits.']);
-		}
-		$location = lookupLocationFromZip($zipcode);
-		if (empty($location['zip'])) { // Try our local file
-			error_log("ZIP {$zipcode} not found via Nominatim, trying local CSV");
-			$location = hc_ziplocal($zipcode);
-			if (empty($location)) {
-				wp_send_json_error(['message' => 'Could not determine location from ZIP.']);
+	$resolutionSource = $_POST['resolution_source'] ?? 'unknown';
+	$zone = '';
+
+    switch ($resolutionSource) {
+	case 'zip':
+		$zipcode = sanitize_text_field($_POST['zipcode']);
+		if (!empty($zipcode)) {
+			if (!preg_match('/^\d{5}$/', $zipcode)) {
+				wp_send_json_error(['message' => 'Invalid ZIP.']);
+			}
+			$location = lookupLocationFromZip($zipcode);
+			if (empty($location['zip'])) { // Try our local file
+				error_log("ZIP {$zipcode} not found via Nominatim, trying local CSV");
+				$location = hc_ziplocal($zipcode);
+				if (empty($location)) {
+					wp_send_json_error(['message' => 'Invalid ZIP.']);
+				}
 			}
 		}
-	} else if (!empty($_POST['lat']) && !empty($_POST['lng'])) {
-		$lat = floatval($_POST['lat']);
-		$lng = floatval($_POST['lng']);
-		$location = lookupLocationFromLatLng($lat, $lng);
-		if (empty($location['zip'])) { // Try our local file
+		break;
+
+	case 'zone':
+		$zone = sanitize_text_field($_POST['zone']);
+		$locarray = explode(',',$store_address = hc_get_store_data('store_address', $zone));
+		$stateziparray = explode(' ',trim($locarray[2]) ?? '');
+		error_log(print_r($locarray, true).print_r($stateziparray, true));
+		if ((count($locarray) != 3) || (count($stateziparray) != 2)) {
+			wp_send_json_error(['message' => 'Store address error.']);
+		}
+		$location = [
+			'zip' => substr(trim($stateziparray[1]), 0, 5),
+			'state' => trim($stateziparray[0] ?? ''),
+			'city' => trim($locarray[1] ?? ''),
+			'country' => 'US'
+		];
+		break;
+
+	case 'geo':
+	default:
+		if (!empty($_POST['lat']) && !empty($_POST['lng'])) {
+			$lat = floatval($_POST['lat']);
+			$lng = floatval($_POST['lng']);
+			$location = lookupLocationFromLatLng($lat, $lng);
+			if (empty($location['zip'])) { // Try our local file
+				$location = lookupLocationFromIP();
+				if (empty($location) || empty($location['zip'])) {
+					wp_send_json_error(['message' => 'Could not get location.']);
+				}
+			}
+		} else {
 			$location = lookupLocationFromIP();
 			if (empty($location) || empty($location['zip'])) {
-				wp_send_json_error(['message' => 'Could not determine ZIP from location.']);
+				wp_send_json_error(['message' => 'Could not get location.']);
 			}
 		}
-	} else {
-		$location = lookupLocationFromIP();
-		if (empty($location) || empty($location['zip'])) {
-			wp_send_json_error(['message' => 'Could not determine ZIP from location.']);
-		}
+		break;
 	}
 
 	if (empty($location['state']))
@@ -66,18 +94,18 @@ function hc_save_delivery() {
 	WC()->customer->set_shipping_company('');
 	WC()->customer->set_shipping_phone('');
 
-	$matched_zone = hc_set_delivery_zone($location);
+	$matched_zone = hc_set_delivery_zone($location, $zone);
 	
 	wp_send_json_success([
 		'zip' => $location['zip'],
 		'state' => $location['state'],
 		'city' => $location['city'],
 		'country' => $location['country'],
-		'title' => get_field('header_title',url_to_postid('delivery/' . $matched_zone))
+		'title' => hc_get_store_data('header_title',$matched_zone)
 	]);
 }
 
-function hc_set_delivery_zone($location) {
+function hc_set_delivery_zone($location, $zone = '') {
 	$package = array(
 		'destination' => array(
 			'country'  => $location['country'],
@@ -91,8 +119,13 @@ function hc_set_delivery_zone($location) {
 		'applied_coupons' => array(),
 	);
 
-	$zone = WC_Shipping_Zones::get_zone_matching_package($package);
-	$matched_zone = $zone ? $zone->get_zone_name() : 'national';
+	if (empty($zone)) {
+		$zone = WC_Shipping_Zones::get_zone_matching_package($package);
+		$matched_zone = $zone ? $zone->get_zone_name() : 'national';
+	}
+	else {
+		$matched_zone = $zone;
+	}
 
 	WC()->session->set('delivery_zone', $matched_zone);
 	return $matched_zone;
@@ -192,5 +225,18 @@ function lookupLocationFromIP() {
 		];
 	}
 	return null;
+}
+
+function hc_get_store_data($field, $zone='') {
+	$post_id = url_to_postid('our-stores/'.$zone);
+	if ($post_id == 0) {
+		error_log("hc_get_store_data: could not find 'our-stores/$zone'");
+		$post_id = url_to_postid('our-stores/'.$zone);
+		if ($post_id == 0) {
+			error_log("hc_get_store_data: could not find 'delivery/$zone'");
+			return 'hc_get_store_data error';
+		}
+	}
+	return get_field($field, $post_id);
 }
 ?>
