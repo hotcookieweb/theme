@@ -38,6 +38,7 @@ function hc_save_delivery() {
 			'zip' => substr(trim($stateziparray[1]), 0, 5),
 			'state' => trim($stateziparray[0] ?? ''),
 			'city' => trim($locarray[1] ?? ''),
+			'address' => '',
 			'country' => 'US'
 		];
 		break;
@@ -101,6 +102,7 @@ function hc_save_delivery() {
 		'state' => $location['state'],
 		'city' => $location['city'],
 		'country' => $location['country'],
+		'address' => '',
 		'title' => hc_get_store_data('header_title',$matched_zone)
 	]);
 }
@@ -142,7 +144,8 @@ function lookupLocationFromLatLng($lat, $lng) {
         return [
             'city' => $data['address']['city'] ?? $data['address']['town'] ?? $data['address']['village'] ?? null,
             'state' => $data['address']['state'] ?? null,
-            'zip' => $data['address']['postcode'] ?? null
+            'zip' => $data['address']['postcode'] ?? null,
+			'address' => ''
         ];
     }
 
@@ -159,7 +162,8 @@ function lookupLocationFromZip($zip) {
         return [
             'city' => $data[0]['address']['city'] ?? $data[0]['address']['town'] ?? $data[0]['address']['village'] ?? null,
             'state' => $data[0]['address']['state'] ?? null,
-            'zip' => $data[0]['address']['postcode'] ?? $zip
+            'zip' => $data[0]['address']['postcode'] ?? $zip,
+			'address' => ''
         ];
     }
 
@@ -227,16 +231,12 @@ function lookupLocationFromIP() {
 	return null;
 }
 
-function hc_get_store_data($field, $zone='') {
-	$post_id = url_to_postid('our-stores/'.$zone);
-	if ($post_id == 0) {
-		error_log("hc_get_store_data: could not find 'our-stores/$zone'");
-		$post_id = url_to_postid('our-stores/'.$zone);
-		if ($post_id == 0) {
-			error_log("hc_get_store_data: could not find 'delivery/$zone'");
-			return 'hc_get_store_data error';
-		}
+function hc_get_store_data($field, $zone) {
+	$post = get_page_by_path('our-stores/' . $zone);
+	if (!$post || !isset($post->ID)) {
+		error_log("hc_get_store_data: could not find 'our-stores/" . $zone);
+		return 'hc_get_store_data error';
 	}
-	return get_field($field, $post_id);
+	return get_field($field, $post->ID);
 }
 ?>

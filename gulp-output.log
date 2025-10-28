@@ -1,0 +1,81 @@
+[18:37:59] Using gulpfile ~/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/gulpfile.js
+[18:37:59] Starting 'default'...
+[18:37:59] Starting 'clean'...
+[18:37:59] Finished 'clean' after 4.29 ms
+[18:37:59] Starting 'build'...
+[18:37:59] Starting 'styles'...
+[18:37:59] Starting 'wiredep'...
+[18:37:59] Finished 'wiredep' after 23 ms
+[18:37:59] Starting 'processStyles'...
+assets/styles/main.scss
+Error: Error: Unknown output style "nested".
+[31mError[39m in plugin "[36mgulp-sass[39m"
+Message:
+    assets/styles/main.scss
+Error: Error: Unknown output style "nested".
+Details:
+    formatted: Error: Error: Unknown output style "nested".
+    status: 3
+    messageFormatted: assets/styles/main.scss
+Error: Error: Unknown output style "nested".
+    messageOriginal: Error: Unknown output style "nested".
+    relativePath: assets/styles/main.scss
+
+[31mError[39m in plugin "[36mgulp-sass[39m"
+Message:
+    assets/styles/main.scss
+Error: Error: Unknown output style "nested".
+Details:
+    formatted: Error: Error: Unknown output style "nested".
+    status: 3
+    messageFormatted: assets/styles/main.scss
+Error: Error: Unknown output style "nested".
+    messageOriginal: Error: Unknown output style "nested".
+    relativePath: assets/styles/main.scss
+
+[18:37:59] Finished 'processStyles' after 13 ms
+[18:37:59] Finished 'styles' after 36 ms
+[18:37:59] Starting 'scripts'...
+[18:37:59] Starting 'jshint'...
+[18:37:59] Finished 'jshint' after 26 ms
+[18:37:59] Starting 'processScripts'...
+Processing JS: main.js
+Processing JS: customizer.js
+[18:38:00] Finished 'processScripts' after 353 ms
+[18:38:00] Finished 'scripts' after 379 ms
+[18:38:00] Starting 'fonts'...
+[18:38:00] Starting 'images'...
+[18:38:00] Finished 'fonts' after 61 ms
+[18:38:00] gulp-imagemin: ✔ X_logo_2023_original.svg (saved 47 B - 15.1%)
+[18:38:00] gulp-imagemin: ✔ icon-bag.svg (saved 4 B - 0.8%)
+[18:38:00] gulp-imagemin: ✔ icon-bluesky-red.svg (saved 71 B - 9.5%)
+[18:38:00] gulp-imagemin: ✔ icon-bluesky.svg (saved 71 B - 9.6%)
+[18:38:00] gulp-imagemin: ✔ icon-cart.svg (saved 1.56 kB - 51.4%)
+[18:38:00] gulp-imagemin: ✔ icon-carts.svg (saved 251 B - 32.2%)
+[18:38:00] gulp-imagemin: ✔ icon-facebook-red.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-facebook.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-home.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-instagram-red.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-instagram.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-pintrest-red.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-pintrest.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-plus-black.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-plus.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-snapchat-red.svg (saved 2 B - 0.3%)
+[18:38:00] gulp-imagemin: ✔ icon-snapchat.svg (saved 2 B - 0.3%)
+[18:38:00] gulp-imagemin: ✔ icon-tiktok-red.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-tiktok.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-tumblr-red.svg (saved 6 B - 1.3%)
+[18:38:00] gulp-imagemin: ✔ icon-tumblr.svg (saved 6 B - 1.3%)
+[18:38:00] gulp-imagemin: ✔ icon-twitter-red.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-twitter.svg (already optimized)
+[18:38:00] gulp-imagemin: ✔ icon-user.svg (saved 15 B - 2.7%)
+[18:38:00] gulp-imagemin: ✔ logo-SF.svg (saved 2.02 kB - 8.6%)
+[18:38:00] gulp-imagemin: ✔ logo-hotcookie-colored.svg (saved 14.9 kB - 53.4%)
+[18:38:00] gulp-imagemin: ✔ logo-hotcookie-slogan.svg (saved 14.9 kB - 53.4%)
+[18:38:00] gulp-imagemin: ✔ logo-hotcookie.svg (saved 2.17 kB - 33.8%)
+[18:38:00] gulp-imagemin: ✔ logo-palmsprings.svg (saved 2.56 kB - 5.5%)
+[18:38:00] gulp-imagemin: Minified 16 images (saved 38.5 kB - 27.3%)
+[18:38:00] Finished 'images' after 335 ms
+[18:38:00] Finished 'build' after 750 ms
+[18:38:00] Finished 'default' after 755 ms

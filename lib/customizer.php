@@ -301,4 +301,9 @@ add_filter('woe_fetch_order_row', function ($row, $order_id) {
 //add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' );
 
 // 3 Disable Address
+add_filter( 'woocommerce_formatted_address_replacements', function( $replacements, $args ) {
+  $replacements['{address_1}'] = '';
+  $replacements['{address_2}'] = '';
+  return $replacements;
+}, 10, 2 );
 

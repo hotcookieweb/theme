@@ -1,0 +1,139 @@
+npm verbose cli /Users/anton/.nvm/versions/node/v18.20.8/bin/node /Users/anton/.nvm/versions/node/v18.20.8/bin/npm
+npm info using npm@10.8.2
+npm info using node@v18.20.8
+npm verbose title npm install
+npm verbose argv "install" "--legacy-peer-deps" "--loglevel" "verbose"
+npm verbose logfile logs-max:10 dir:/Users/anton/.npm/_logs/2025-10-28T01_37_51_353Z-
+npm verbose logfile /Users/anton/.npm/_logs/2025-10-28T01_37_51_353Z-debug-0.log
+npm verbose shrinkwrap failed to load node_modules/.package-lock.json missing from lockfile: node_modules/gulp-imagemin/node_modules/imagemin-jpegtran
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-win32-x64
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-win32-ia32
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-win32-arm64
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-x64-musl
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-x64-glibc
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-arm64-musl
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-arm64-glibc
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-arm-musl
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-linux-arm-glibc
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-freebsd-x64
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-darwin-x64
+npm verbose reify failed optional dependency /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery/node_modules/@parcel/watcher-android-arm64
+npm http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 445ms
+npm http fetch GET 200 https://registry.npmjs.org/color-string 18ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/got 20ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/is-svg 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/http-cache-semantics 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/micromatch 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/lodash.pick 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/object-path 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/lodash.template 23ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/nth-check 23ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss 23ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/serve-static 25ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/axios 29ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/trim-newlines 28ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/braces 30ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/send 28ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/semver-regex 29ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/cross-spawn 33ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/js-yaml 32ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/localtunnel 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/execa 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/download 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/chokidar 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/color 0ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/fast-glob 4ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/anymatch 5ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/readdirp 4ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/findup-sync 5ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/matchdep 4ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/cacheable-request 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-svgo 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/svgo 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/accord 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-util 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/css-select 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/asset-builder 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-calc 21ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/autoprefixer 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-colormin 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-filter-plugins 22ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-convert-values 23ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-discard-duplicates 23ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-discard-empty 24ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-discard-comments 24ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-autoprefixer 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/cssnano 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-merge-longhand 25ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-merge-idents 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-discard-overridden 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-discard-unused 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-minify-params 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-minify-gradients 27ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-normalize-charset 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-minify-selectors 27ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-merge-rules 28ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-ordered-values 27ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-unique-selectors 26ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-minify-font-values 30ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-reduce-initial 28ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-normalize-url 29ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-reduce-idents 29ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-zindex 28ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/postcss-reduce-transforms 29ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/find-versions 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/browser-sync 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/meow 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/bin-check 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/exec-buffer 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/bin-build 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/bin-wrapper 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/glob-watcher 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/colormin 0ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/globby 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/liftoff 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-cli 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-less 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-flatten 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-changed 3ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-rev 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-cssnano 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/bin-version 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/lpad-align 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin-jpegtran 2ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin-optipng 3ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin-pngcrush 3ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin-gifsicle 3ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/optipng-bin 4ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/jpegtran-bin 4ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gifsicle 6ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/pngcrush-bin 5ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/imagemin-svgo 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/bin-version-check 1ms (cache hit)
+npm http fetch GET 200 https://registry.npmjs.org/gulp-imagemin 1ms (cache hit)
+
+added 1 package, removed 2 packages, and audited 1182 packages in 1s
+
+116 packages are looking for funding
+  run `npm fund` for details
+
+93 vulnerabilities (2 low, 42 moderate, 49 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+npm verbose cwd /Users/anton/Sites/hotcookielocal/wp-content/themes/hotcookiebakery
+npm verbose os Darwin 24.6.0
+npm verbose node v18.20.8
+npm verbose npm  v10.8.2
+npm verbose exit 0
+npm info ok
