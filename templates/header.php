@@ -97,6 +97,17 @@ set_query_var('zone', $zone);
         </span>
       </a>
     </div>
+    <div class="login">
+      <?php if (is_user_logged_in()) { ?>
+      <a href="<?php echo get_permalink(
+                      get_option('woocommerce_myaccount_page_id')
+                    ); ?>" title="My Account" class="webshop-login"></a>
+      <?php } else { ?>
+        <a href="<?php echo get_permalink(
+                        get_option('woocommerce_myaccount_page_id')
+                      ); ?>" title="Login" class="webshop-login"></a>
+      <?php } ?>
+    </div>
   </div>
   <div class="navigation">
     <?php if (has_nav_menu('mobile_navigation')):
