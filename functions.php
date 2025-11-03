@@ -391,8 +391,8 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node(
             array(
-                'id' => 'woocommerce-orders',
-                'title' => 'Woocommerce orders',
+                'id' => 'woocommerce-settings',
+                'title' => 'Woocommerce settings',
                 'parent' => 'site-name',
                 'href' => admin_url('edit.php?post_type=shop_order'),
             )
@@ -408,7 +408,7 @@ function hc_add_link_to_admin_bar($admin_bar) {
         if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
             $admin_bar->add_node(
                 array(
-                'id' => 'woocommerce-settings',
+                'id' => 'wc-settings',
                 'title' => 'Woocommerce settings',
                 'parent' => 'site-name',
                 'href' => admin_url('admin.php?page=wc-settings'),
@@ -435,6 +435,14 @@ function hc_add_link_to_admin_bar($admin_bar) {
             array(
                 'id' => 'posts',
                 'title' => 'Posts',
+                'parent' => 'site-name',
+                'href' => admin_url('edit.php'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'pages',
+                'title' => 'edit.php?post_type=page',
                 'parent' => 'site-name',
                 'href' => admin_url('edit.php'),
             )

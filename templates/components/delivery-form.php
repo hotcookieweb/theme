@@ -1,19 +1,10 @@
 <?php
-$data_store = WC_Data_Store::load('shipping-zone');
-$shipping_zones = $data_store->get_zones();
-foreach ($shipping_zones as $shipping_zone) {
-	$zone_data = new WC_Shipping_Zone($shipping_zone);
-	$zone_name = $zone_data->get_zone_name();
-	if ($zone_name !== 'Rest of World') {
-		$stores[$zone_name] = hc_get_store_data('header_title',$zone_name);
-	}
-}
-
+/* $stores array is passed in from header.php */
+/* $zone is passed in from header.php */
 $placeholder_text = "Select store, enter US ZIP or hit search for geo";
 $customer = WC()->customer;
 if ($customer && $customer instanceof WC_Customer) {
 	$zipcode = $customer->get_shipping_postcode();
-	$zone = WC()->session->get('delivery_zone');
 	if (empty($zone) && !empty($zipcode)) {
 		$zone = hc_set_delivery_zone(['zip' => $zipcode,
 									   'country' => $customer->get_shipping_country(),
@@ -36,7 +27,10 @@ if ($customer && $customer instanceof WC_Customer) {
 		<label for="hc-zip-input" class="hc-placeholder"><?= $placeholder_text ?></label>
 		<input list="stores-locations" id="hc-zip-input" name="zipcode" class="frontpage-input" type="text">
 		  <datalist id="stores-locations">
-			<?php foreach ($stores as $key => $value) {
+			<?php 
+      get_query_var('stores', $stores);
+      get_query_var('zone', $zone);
+      foreach ($stores as $key => $value) { /* $store and $zone set in header.php */
 				$selected = ($key == $zone) ? 'selected' : '';?>
 				<option <?= $selected ?> class="store_local_option" data-zone="<?= $key ?>"><?= $value ?></option>
 			<?php } ?>
@@ -133,6 +127,16 @@ hc_form.addEventListener("submit", function(e) {
     .then(data => {
       if (data.success) {
         placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.title} </strong>`;
+        document.querySelectorAll('a.delivery_zone').forEach(link => {
+          const currentHref = link.getAttribute('href');
+
+          if (data.data.zone && currentHref) {
+            const lastSlashIndex = currentHref.lastIndexOf('/');
+            const baseHref = currentHref.substring(0, lastSlashIndex);
+            const newHref = `${baseHref}/${data.data.zone}`;
+            link.setAttribute('href', newHref);
+          }
+        });
       } else {
         placeholder.textContent = (data.data?.message || "Unknown error") + " Select store, enter US ZIP or hit search for geo";
       }

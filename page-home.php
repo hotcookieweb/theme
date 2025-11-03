@@ -25,14 +25,17 @@
 	  <div class="frontpage-services">
 	    <ul class="container">
 	    <?php while ( have_rows('services') ) : the_row(); ?>
-
 	      <li>
-	        <a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
+			<?php if (get_sub_field('zone-to-link')) { ?>
+				<a class="delivery_zone"; href="<?= get_sub_field('link') . '/' . WC()->session->get('delivery_zone') ?>" title="<?php the_sub_field('title'); ?>">
+			<?php }
+			else { ?>
+				<a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
+			<?php } ?>
 	          <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
 	          <h2><?php the_sub_field('title'); ?></h2>
 	        </a>
 	      </li>
-
 	    <?php endwhile; ?>
 	    </ul>
 	  </div>
@@ -42,7 +45,12 @@
     <ul class="mobile-slider">
     <?php while ( have_rows('services') ) : the_row(); ?>
       <li>
-        <a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
+		<?php if (get_sub_field('zone-to-link')) { ?>
+			<a class="delivery_zone"; href="<?= get_sub_field('link') . "/" . WC()->session->get('delivery_zone') ?>" title="<?php the_sub_field('title'); ?>">
+		<?php }
+		else { ?>
+			<a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
+		<?php } ?>
           <img src="<?php the_sub_field('image'); ?>" alt="<?php the_sub_field('title'); ?>" />
           <h2><?php the_sub_field('title'); ?></h2>
           <p><?php the_sub_field('content'); ?></p>

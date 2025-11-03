@@ -1,6 +1,20 @@
 <?php
 add_action('wp_ajax_hc_save_delivery', 'hc_save_delivery');
 add_action('wp_ajax_nopriv_hc_save_delivery', 'hc_save_delivery');
+add_action('wp_ajax_hc_set_store', 'hc_set_store');
+add_action('wp_ajax_nopriv_hc_set_store', 'hc_set_store');
+
+function hc_set_store() {
+  if (!empty($_POST['zone'])) {
+    WC()->session->set('delivery_zone', sanitize_text_field($_POST['zone']));
+	wp_send_json_success(['zone' => sanitize_text_field($_POST['zone'])]);
+  }
+  else {
+	error_log("hc_set_store: no zone set in POST");
+	wp_send_json_error(['message' => 'No zone set in Post.']);
+  }
+}
+
 
 function hc_save_delivery() {
 	check_ajax_referer('hot_cookie_delivery', 'hot_cookie_nonce');
@@ -28,9 +42,10 @@ function hc_save_delivery() {
 
 	case 'zone':
 		$zone = sanitize_text_field($_POST['zone']);
-		$locarray = explode(',',$store_address = hc_get_store_data('store_address', $zone));
+		$locarray = explode(',',hc_get_store_data('store_address', $zone));
 		$stateziparray = explode(' ',trim($locarray[2]) ?? '');
-		error_log(print_r($locarray, true).print_r($stateziparray, true));
+		error_log(print_r($stateziparray,true));
+		error_log(print_r($locarray,true));
 		if ((count($locarray) != 3) || (count($stateziparray) != 2)) {
 			wp_send_json_error(['message' => 'Store address error.']);
 		}
@@ -103,6 +118,7 @@ function hc_save_delivery() {
 		'city' => $location['city'],
 		'country' => $location['country'],
 		'address' => '',
+		'zone' => $matched_zone,
 		'title' => hc_get_store_data('header_title',$matched_zone)
 	]);
 }
@@ -232,7 +248,7 @@ function lookupLocationFromIP() {
 }
 
 function hc_get_store_data($field, $zone) {
-	$post = get_page_by_path('our-stores/' . $zone);
+	$post = get_page_by_path('/our-stores/' . $zone);
 	if (!$post || !isset($post->ID)) {
 		error_log("hc_get_store_data: could not find 'our-stores/" . $zone);
 		return 'hc_get_store_data error';
