@@ -359,6 +359,10 @@
           color: $color-primary-2;
           text-decoration: none;
         }
+        a.current {
+          color: $color-primary-2;
+          font-weight: bold;
+        }
       }
     }
 

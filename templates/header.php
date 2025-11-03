@@ -25,9 +25,13 @@ set_query_var('zone', $zone);
           <span class="store-icon"></span>
           <span class="store-name"><?= (empty($zone) ? "Choose Store" : $stores[$zone]); ?></span>
           <ul class="store-dropdown">
-            <?php foreach ($stores as $key => $value) { ?>
-              <li><a href="#" data-zone="<?= $key ?>"><?= $value ?></a></li>
-            <?php } ?>
+          <?php foreach ($stores as $key => $value) { ?>
+            <li>
+              <?php if ($key != $zone) { ?>
+                <a href="#" data-zone="<?= $key ?>" ><?= $value ?></a>
+              <?php } ?>
+            </li>
+          <?php } ?>
           </ul>
         </div>
       </div>
@@ -78,7 +82,11 @@ set_query_var('zone', $zone);
         <span class="store-icon"></span>
         <ul class="store-dropdown">
           <?php foreach ($stores as $key => $value) { ?>
-            <li><a href="#" data-zone="<?= $key ?>"><?= $value ?></a></li>
+            <li>
+              <a href="#" data-zone="<?= $key ?>" class="<?= ($key === $zone) ? 'current' : '' ?>">
+                <?= $value ?>
+              </a>
+            </li>
           <?php } ?>
         </ul>
       </div>
