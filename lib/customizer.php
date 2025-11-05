@@ -294,6 +294,13 @@ add_filter('woe_fetch_order_row', function ($row, $order_id) {
   return $row;
 }, 10, 2);
 
+/* hack for news article */
+add_action('template_redirect', function () {
+  if ($_SERVER['REQUEST_URI'] === '/product-category/delivery/palm-springs/') {
+    wp_redirect(home_url('/our-stores/palm-springs/'), 301);
+    exit;
+  }
+});
 // 1 Disable State
 //add_filter( 'woocommerce_shipping_calculator_enable_state', '__return_false' );
 
