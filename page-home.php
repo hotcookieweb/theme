@@ -27,7 +27,7 @@
 	    <?php while ( have_rows('services') ) : the_row(); ?>
 	      <li>
 			<?php if (get_sub_field('zone-to-link')) { ?>
-				<a class="delivery_zone"; href="<?= get_sub_field('link') . '/' . WC()->session->get('delivery_zone') ?>" title="<?php the_sub_field('title'); ?>">
+				<a class="current_zone"; href="<?= get_sub_field('link') . '/' . WC()->session->get('current_zone') ?>" title="<?php the_sub_field('title'); ?>">
 			<?php }
 			else { ?>
 				<a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">
@@ -46,7 +46,7 @@
     <?php while ( have_rows('services') ) : the_row(); ?>
       <li>
 		<?php if (get_sub_field('zone-to-link')) { ?>
-			<a class="delivery_zone"; href="<?= get_sub_field('link') . "/" . WC()->session->get('delivery_zone') ?>" title="<?php the_sub_field('title'); ?>">
+			<a class="current_zone"; href="<?= get_sub_field('link') . "/" . WC()->session->get('current_zone') ?>" title="<?php the_sub_field('title'); ?>">
 		<?php }
 		else { ?>
 			<a href="<?php the_sub_field('link'); ?>" title="<?php the_sub_field('title'); ?>">

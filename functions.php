@@ -55,7 +55,7 @@ function create_wc_session()
             WC()->customer->set_billing_postcode('');
             WC()->customer->set_billing_state('');
             WC()->customer->set_billing_city('');
-            WC()->session->set('delivery_zone','');
+            WC()->session->set('current_zone','');
         }
     }
 }

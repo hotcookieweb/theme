@@ -133,6 +133,9 @@
               color: #fff;
             }
           }
+          a.zone-link {
+            display: none;
+          }
         }
       }
       &.active .store-dropdown {
@@ -362,6 +365,9 @@
         a.current {
           color: $color-primary-2;
           font-weight: bold;
+        }
+        a.zone-link {
+        font-weight: bold; // bold on mobile
         }
       }
     }

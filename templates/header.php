@@ -1,16 +1,16 @@
 <?php // stores array and zone used in delivery-form.php and product pages also
+global $hc_stores, $hc_zone;
 $data_store = WC_Data_Store::load('shipping-zone');
 $shipping_zones = $data_store->get_zones();
 foreach ($shipping_zones as $shipping_zone) {
   $zone_data = new WC_Shipping_Zone($shipping_zone);
   $zone_name = $zone_data->get_zone_name();
   if ($zone_name !== 'Rest of World') {
-    $stores[$zone_name] = hc_get_store_data('header_title', $zone_name);
+    $hc_stores[$zone_name] = hc_get_store_data('header_title', $zone_name);
   }
 }
-$zone = WC()->session->get('delivery_zone');
-set_query_var('stores', $stores);
-set_query_var('zone', $zone);
+$hc_zone = WC()->session->get('current_zone');
+
 ?>
 <div class="header">
   <div class="container">
@@ -23,13 +23,16 @@ set_query_var('zone', $zone);
       <div class="store-switcher">
         <div class="current-store">
           <span class="store-icon"></span>
-          <span class="store-name"><?= (empty($zone) ? "Choose Store" : $stores[$zone]); ?></span>
+          <span class="store-name"><?= (empty($hc_zone) ? "Choose Store" : $hc_stores[$hc_zone]); ?></span>
           <ul class="store-dropdown">
-          <?php foreach ($stores as $key => $value) { ?>
+          <?php foreach ($hc_stores as $key => $value) { ?>
             <li>
-              <?php if ($key != $zone) { ?>
+              <?php if ($key == $hc_zone) { ?>
+                <a href="#" data-zone="<?= $key ?>" class="zone-link"><?= $value ?></a>
+              <?php } 
+              else { ?>
                 <a href="#" data-zone="<?= $key ?>" ><?= $value ?></a>
-              <?php } ?>
+                <?php } ?>
             </li>
           <?php } ?>
           </ul>
@@ -81,9 +84,9 @@ set_query_var('zone', $zone);
       <div class="current-store">
         <span class="store-icon"></span>
         <ul class="store-dropdown">
-          <?php foreach ($stores as $key => $value) { ?>
+          <?php foreach ($hc_stores as $key => $value) { ?>
             <li>
-              <a href="#" data-zone="<?= $key ?>" class="<?= ($key === $zone) ? 'current' : '' ?>">
+              <a href="#" data-zone="<?= $key ?>" class="<?= ($key === $hc_zone) ? 'current' : '' ?>">
                 <?= $value ?>
               </a>
             </li>
@@ -190,23 +193,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const dropdown = switcher.querySelector('.store-dropdown');
 
     if (currentStore && storeIcon && dropdown) {
-      console.log('store switcher found');
-
       currentStore.addEventListener('click', function (e) {
-        console.log('current-store clicked');
         e.stopPropagation();
         switcher.classList.toggle('active');
       });
 
       storeIcon.addEventListener('click', function (e) {
-        console.log('store icon clicked');
         e.stopPropagation();
         switcher.classList.toggle('active');
       });
 
       document.addEventListener('click', function (e) {
         if (!switcher.contains(e.target)) {
-          console.log('store switcher closed');
           switcher.classList.remove('active');
         }
       });
@@ -249,4 +247,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+function hcupdateStoreSwitcher(zone) {
+  const storeNameEl = document.querySelector('.store-name');
+  const dropdownLinks = document.querySelectorAll('.store-dropdown a');
+
+  let label = 'Choose Store';
+
+  dropdownLinks.forEach(link => {
+    const linkZone = link.getAttribute('data-zone');
+    const linkLabel = link.textContent.trim();
+
+    if (linkZone === zone) {
+      label = linkLabel;
+      link.classList.add('zone-link');   // mark selected
+    } else {
+      link.classList.remove('zone-link'); // clear others
+    }
+  });
+
+  if (storeNameEl) {
+    storeNameEl.textContent = label;
+  }
+}
+
+// Run on initial load
+document.addEventListener('DOMContentLoaded', hcUpdateZoneSwitcher);
+
+// Run after Woo fragments update (cart, checkout)
+jQuery(document.body).on('updated_cart_totals updated_checkout', hcUpdateZoneSwitcher);
 </script>

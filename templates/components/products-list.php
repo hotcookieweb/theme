@@ -1,11 +1,13 @@
-<?php if( get_field('product_category') ):
-	$category = get_field('product_category');
-	$sort_by = get_field('sort_by');
-	$columns = get_field('columns');
-	$limit = get_field_object('limit');
-	$limit_value = $limit['value'];
+<?php if (get_field('product_category')) {
+    $category = get_field('product_category');
+    $sort_by = get_field('sort_by');
+    $columns = get_field('columns');
+    $limit = get_field_object('limit');
+    $limit_value = isset($limit['value']) ? $limit['value'] : 12;
+	echo get_field('current_store');
+    $current_store = get_field('current_store') ? WC()->session->get('current_zone') : 'any-zone';
+    if (get_field('display_products') && !empty($category->slug)) {
+        echo do_shortcode('[products columns="' . esc_attr($columns) . '" category="' . esc_attr($category->slug) . '" orderby="' . esc_attr($sort_by) . '" cat_operator="AND" limit="' . esc_attr($limit_value) . '" paginate="true" current_store="' . esc_attr($current_store) . '"]');
+    }
+};
 
-
-	if( get_field('display_products') == 'show' ) { echo do_shortcode('[products columns="'. $columns .'" category="'. $category->slug .'" orderby="'. $sort_by .'" cat_operator="AND" limit="'. $limit_value .'" paginate="true"]'); }
-
-endif; ?>

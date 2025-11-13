@@ -1,22 +1,24 @@
 <?php
 /* $stores array is passed in from header.php */
-/* $zone is passed in from header.php */
+/* $hc_zone is passed in from header.php */
+global $hc_stores, $hc_zone;
 $placeholder_text = "Select store, enter US ZIP or hit search for geo";
 $customer = WC()->customer;
-if ($customer && $customer instanceof WC_Customer) {
+$zone = WC()->session->get('current_zone');
+if ($zone && $customer && $customer instanceof WC_Customer) {
 	$zipcode = $customer->get_shipping_postcode();
-	if (empty($zone) && !empty($zipcode)) {
-		$zone = hc_set_delivery_zone(['zip' => $zipcode,
-									   'country' => $customer->get_shipping_country(),
-									   'state'   => $customer->get_shipping_state(),
-									   'city'    => $customer->get_shipping_city()
-									  ]);
-	}
-
-	if (!empty($zipcode) && !empty($zone) && ($zone !== 'Rest of World')) {
-		$placeholder_text = "<strong>" . $zipcode . ": " . hc_get_store_data('header_title',$zone) . "</strong>"; 
-	}
+  $country = $customer->get_shipping_country();
+  $state = $customer->get_shipping_state();
+  $city = $customer->get_shipping_city();
 }
+
+if (!empty($zipcode) && !empty($city) && !empty ($state) && ($zone !== 'Rest of World')) {
+  $placeholder_text = "<strong>" . $zipcode . ": " . $city . ", " . $state . "</strong>"; 
+}
+else 	if (!empty($hc_zone) && ($hc_zone !== 'Rest of World')) {
+    $placeholder_text = "<strong>" . hc_get_store_data('header_title',$hc_zone) . "</strong>"; 
+}
+
 
 ?>
 <form id="hot-cookie-delivery" class="delivery-form">
@@ -28,10 +30,8 @@ if ($customer && $customer instanceof WC_Customer) {
 		<input list="stores-locations" id="hc-zip-input" name="zipcode" class="frontpage-input" type="text">
 		  <datalist id="stores-locations">
 			<?php 
-      get_query_var('stores', $stores);
-      get_query_var('zone', $zone);
-      foreach ($stores as $key => $value) { /* $store and $zone set in header.php */
-				$selected = ($key == $zone) ? 'selected' : '';?>
+      foreach ($hc_stores as $key => $value) { /* $store and $zone set in header.php */
+				$selected = ($key == $hc_zone) ? 'selected' : '';?>
 				<option <?= $selected ?> class="store_local_option" data-zone="<?= $key ?>"><?= $value ?></option>
 			<?php } ?>
 		</datalist>
@@ -126,8 +126,8 @@ hc_form.addEventListener("submit", function(e) {
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.title} </strong>`;
-        document.querySelectorAll('a.delivery_zone').forEach(link => {
+        placeholder.innerHTML = `<strong> ${data.data.zip}: ${data.data.city}, ${data.data.state}</strong>`;
+        document.querySelectorAll('a.current_zone').forEach(link => {
           const currentHref = link.getAttribute('href');
 
           if (data.data.zone && currentHref) {
@@ -137,6 +137,7 @@ hc_form.addEventListener("submit", function(e) {
             link.setAttribute('href', newHref);
           }
         });
+        hcupdateStoreSwitcher(data.data.zone);
       } else {
         placeholder.textContent = (data.data?.message || "Unknown error") + " Select store, enter US ZIP or hit search for geo";
       }

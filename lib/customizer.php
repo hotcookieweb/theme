@@ -7,6 +7,10 @@ use Roots\Sage\Assets;
 require_once "alias-product-attributes.php";
 require_once "delivery-save.php";
 
+
+remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
+remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
+
 /**
  * Add postMessage support
  */
@@ -30,19 +34,20 @@ add_action('init', function () {
             'menu_title' => __('Settings', 'your-text-domain'),
             'menu_slug'  => 'theme-settings',
             'capability' => 'edit_posts',
-            'redirect'   => false,
+            'redirect'   => false
         ]);
     }
 });
 
-remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
-remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
+add_action('after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support');
+function mytheme_add_woocommerce_support() {
+  add_theme_support('woocommerce');
+}
 
 /**
  * Show cart contents / total Ajax
  */
 add_filter('woocommerce_add_to_cart_fragments', __NAMESPACE__ . '\\woocommerce_header_add_to_cart_fragment');
-
 function woocommerce_header_add_to_cart_fragment($fragments) {
   global $woocommerce;
 
@@ -51,81 +56,10 @@ function woocommerce_header_add_to_cart_fragment($fragments) {
   ?>
 	<a class="webshop-cart pulse" href="<?php echo get_permalink(wc_get_page_id('cart')); ?>" title="<?php _e('View your shopping cart');?>">$ <?php echo WC()->cart->total ?> <span><?php echo sprintf(_n('%d item', '%d items', WC()->cart->get_cart_contents_count()), WC()->cart->get_cart_contents_count()); ?></span></a>
 	<?php
-$fragments['a.webshop-cart'] = ob_get_clean();
+  $fragments['a.webshop-cart'] = ob_get_clean();
   return $fragments;
 }
 
-function mytheme_add_woocommerce_support() {
-  add_theme_support('woocommerce');
-}
-
-add_action('after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support');
-
-add_filter('woocommerce_product_tabs', __NAMESPACE__ . '\\exetera_custom_product_tabs', 98);
-function exetera_custom_product_tabs($tabs) {
-  // Custom description callback.
-  if (isset($tabs['additional_information'])) {
-    $tabs['additional_information']['callback'] = function () {
-      global $post, $product;
-      echo '<div class="left"><h2>Additional Information</h2>';
-      // Display the heading and content of the Additional Information tab.
-      do_action('woocommerce_product_additional_information', $product);
-      echo '</div>';
-    };
-  }
-  if (isset($tabs['description'])) {
-    $tabs['description']['callback'] = function () {
-      global $post, $product;
-      // Display the content of the Description tab if not empty
-      if (!empty($post->post_content)) {
-        echo '<div class="right"><h2>Description</h2>';
-
-        the_content();
-
-        echo '</div>';
-      }
-
-      echo '<div class="left"><h2>Additional Information</h2>';
-      /* subscription details */
-      if ( have_rows('months') ) {
-        $months = get_field('months');
-        ?>
-        <table cellspacing="0" cellpadding="0" border="5">
-          <?php 
-          foreach ($months as $index => $month) {
-            if ($index % 3 == 0) { ?>
-              <tr>
-            <?php } ?>
-              <td style="width:33%; vertical-align: top; padding: 5px;">
-                <strong><?=$month['month_name']?>:</strong> <br>
-                <ol>
-                <?php if (is_array ($month['cookies'])) {
-                  foreach ($month['cookies'] as $cookie) { ?>
-                  <li><?= preg_replace('/ Cookie$/','',get_the_title($cookie['cookie_name'])) ?> 
-                      <?= empty($cookie['details']) ? '' : ' ' . $cookie['details']?>
-                  </li>
-                <?php } ?>
-                </ol>
-                <?php } ?>
-              </td>
-            <?php if (($index % 3) == (2 % 3)) { ?>
-              </tr>
-            <?php } ?>
-          <?php } ?>
-        </table>
-        <br>
-      <?php }
-      else {
-        do_action('woocommerce_product_additional_information', $product);
-      }
-      echo '</div>';
-    };
-
-    unset($tabs['additional_information']);
-  }
-
-  return $tabs;
-}
 
 function hc_shop_content() {
   if (get_field('display_content_on_shop_page') == 'show') {
@@ -250,7 +184,7 @@ function hc_column_content($column, $product_id) {
     echo ($product->is_in_stock() ? "In" : "Out");
   }
   if ($column == 'adate') {
-    echo get_field('first_date', $product_id) . '<br>' . $available_to = get_field('last_date', $product_id);
+    echo get_field('first_date', $product_id) . '<br>' .  get_field('last_date', $product_id);
   }
   if ($column == 'hc_shipping') {
     $locations = get_post_meta($product_id, '_custom_location', true);
@@ -300,9 +234,174 @@ add_action('template_redirect', function () {
     wp_redirect(home_url('/our-stores/palm-springs/'), 301);
     exit;
   }
+  if ($_SERVER['REQUEST_URI'] === '/delivery/palm-springs/') {
+    wp_redirect(home_url('/our-stores/palm-springs/'), 301);
+    exit;
+  }
+  if ($_SERVER['REQUEST_URI'] === '/delivery/castro-sf/') {
+    wp_redirect(home_url('/our-stores/castro-sf/'), 301);
+    exit;
+  }
+  if ($_SERVER['REQUEST_URI'] === '/delivery/polk-sf/') {
+    wp_redirect(home_url('/our-stores/polk-sf/'), 301);
+    exit;
+  }
+  if ($_SERVER['REQUEST_URI'] === '/delivery/national/') {
+    wp_redirect(home_url('/our-stores/national/'), 301);
+    exit;
+  }
 });
+
 // 1 Disable State
 //add_filter( 'woocommerce_shipping_calculator_enable_state', '__return_false' );
 
 // 2 Disable City
-//add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' );
+//add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' )
+
+add_filter('woocommerce_product_tabs',__NAMESPACE__ . '\\hc_custom_product_tabs', 98, 1);
+function hc_custom_product_tabs($tabs) {
+  $product = wc_get_product(get_the_ID());
+	// Custom description callback.
+  $tabs['availability'] = [
+        'title'    => __('Availability Information', 'woocommerce'),
+        'priority' => 50,
+        'callback' => function ($key, $tab) use ($product) {
+
+      echo '<h2 class="availability-heading">Availability Information</h2>';
+      echo '<table class="woocommerce-product-attributes shop_attributes">';
+      // 🔸 Delivery Type
+      $delivery_type = get_post_meta($product->get_id(), '_custom_delivery_method', true);
+      if (!empty($delivery_type)) {
+        $term = get_term_by('slug', $delivery_type, 'pa_delivery-type');
+        if ($term && !is_wp_error($term) && !empty($term->description)) {
+          echo '<tr class="woocommerce-product-attributes-item">';
+          echo '<th class="woocommerce-product-attributes-item__label" scope="row">Availability</th>';
+          echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
+          echo  '</tr>';
+        }
+      }
+
+      // 🔸 Lead Time
+      $lead_time = get_post_meta($product->get_id(), '_custom_lead_time', true);
+      if (!empty($lead_time)) {
+        $term = get_term_by('slug', $lead_time, 'pa_lead-time');
+        if ($term && !is_wp_error($term) && !empty($term->description)) {
+          echo '<tr class="woocommerce-product-attributes-item">';
+          echo '<th class="woocommerce-product-attributes-item__label" scope="row">Lead Time</td>';
+          echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
+          echo '</tr>';
+        }
+      }
+
+      // 🔸 Stores
+      $locations = get_post_meta($product->get_id(), '_custom_location', true);
+      global $hc_stores;
+      if (!empty($locations) && is_array($locations)) {
+        $store_labels = [];
+        foreach ($locations as $location) {
+          $store_labels[] = ($location === 'any-zone') ? 'All Stores' : ($hc_stores[$location] ?? $location);
+        }
+
+        if (!empty($store_labels)) {
+          foreach ($store_labels as $index => $store_label) {
+            echo '<tr class="woocommerce-product-attributes-item">';
+              // Only show <th> on the first row
+            if ($index === 0) {
+              echo '<th class="woocommerce-product-attributes-item__label" scope="row">Stores</th>';
+            } else {
+              echo '<th> </th>';
+            }
+            echo '<td class="woocommerce-product-attributes-item__value">';
+            echo esc_html($store_label);
+            echo '</td>';
+          }
+          echo '</tr>';
+        }
+      }
+
+      echo '</table>';
+    }
+  ];
+	
+	if (isset($tabs['description'])) {
+		$tabs['description']['callback'] = function ($key, $tab) use($product) {
+			global $post;
+			// Display the content of the Description tab if not empty
+			if (!empty($post->post_content)) {
+				the_content();
+			}
+      // Fallback to WooCommerce default
+      do_action('woocommerce_product_description', $product);
+		};
+	}
+
+	if (isset($tabs['additional_information'])) {
+		$tabs['additional_information']['callback'] = function ($key, $tab) use ($product) {
+			if (have_rows('months')) {
+				$months = get_field('months');
+				echo '<table cellspacing="0" cellpadding="0" border="5"><tbody>';
+				foreach ($months as $index => $month) {
+					if ($index % 3 === 0) echo '<tr>';
+					echo '<td style="width:33%; vertical-align: top; padding: 5px;">';
+					echo '<strong>' . esc_html($month['month_name']) . ':</strong><br><ol>';
+					if (!empty($month['cookies']) && is_array($month['cookies'])) {
+						foreach ($month['cookies'] as $cookie) {
+							$title = get_the_title($cookie['cookie_name']);
+							$title = preg_replace('/ Cookie$/', '', $title);
+							$details = !empty($cookie['details']) ? ' ' . $cookie['details'] : '';
+							echo '<li>' . esc_html($title . $details) . '</li>';
+						}
+					}
+					echo '</ol></td>';
+					if (($index + 1) % 3 === 0) echo '</tr>';
+				}
+				echo '</tbody></table><br>';
+			}
+      // Output WooCommerce default
+      do_action('woocommerce_product_additional_information', $product);
+		};
+	}
+	return $tabs;
+}
+
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
+add_filter('woocommerce_shortcode_products_query', __NAMESPACE__ . '\\hc_filter_products_by_store_meta', 10, 2);
+function hc_filter_products_by_store_meta($query_args, $atts) {
+	$store = isset($atts['current_store']) ? $atts['current_store'] : 'any-zone';
+	if ($store === 'any-zone') {
+		return $query_args; // no store set, skip filtering
+	}
+	$query_args['meta_query'] = [
+		'relation' => 'OR',
+		[
+			'key'     => '_custom_location',
+			'value'   => '"' . $store . '"',
+			'compare' => 'LIKE'
+		],
+	];
+
+	return $query_args;
+}
+
+// trigger shipping updates for users not logged in
+
+add_action('woocommerce_after_checkout_form', function(){
+    if (!is_user_logged_in()) : ?>
+        <script>
+        jQuery(function($){
+            // Always recalc when shipping postcode changes
+            $('#shipping_postcode').on('change input', function(){
+                $(document.body).trigger('update_checkout');
+            });
+
+            // Only recalc on billing postcode if shipping postcode is empty
+            $('#billing_postcode').on('change input', function(){
+                if ($('#shipping_postcode').length === 0 || $('#shipping_postcode').val() === '') {
+                    $(document.body).trigger('update_checkout');
+                }
+            });
+        });
+        </script>
+    <?php endif;
+});
