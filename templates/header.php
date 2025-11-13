@@ -271,6 +271,13 @@ function hcupdateStoreSwitcher(zone) {
   }
 }
 
+function hcUpdateZoneSwitcher() {
+  const zone = document.getElementById('current_zone')?.value;
+  if (zone) {
+    hcupdateStoreSwitcher(zone);
+  }
+}
+
 // Run on initial load
 document.addEventListener('DOMContentLoaded', hcUpdateZoneSwitcher);
 
