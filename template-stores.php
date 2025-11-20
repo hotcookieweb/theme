@@ -17,5 +17,8 @@ get_template_part('templates/components/page', 'banner');
       </li>
     <?php endwhile; ?>
   </ul>
-<?php endif; ?>
+<?php endif;
+while ( have_posts() ) : the_post();
+    the_content();
+endwhile; ?>
 </div>

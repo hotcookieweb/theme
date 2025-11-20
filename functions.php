@@ -204,30 +204,29 @@ add_action('admin_bar_menu', 'remove_link_from_admin_bar', 999);
 
 // add a parent item to the WordPress admin toolbar
 
-function hotcookie_custom_menu_order($menu_ord)
-{
-    if (!$menu_ord) {
-        return true;
-    }
+// Enable custom ordering
+add_filter('custom_menu_order', function () {
+    return true;
+}, 10);
 
+// Return the custom order
+add_filter('menu_order', function ($menu_order) {
     return array(
         'order-manager',
-        'woocommerce', // woocommerce order nanager
-        'edit.php?post_type=shop_subscription', // subscriptioons
-        'upload.php', // Media
-        'edit.php?post_type=page', // pages
-        'edit.php', // Posts
-        'newsletter_main_index', // newsletter
-        'users.php',
-        'woocommerce-marketing',
-        'edit-comments.php',
-        'gf_edit_forms',
-        'separator-woocommerce', // First separator
-        'index.php',
+        'woocommerce',                          // WooCommerce
+        'edit.php?post_type=shop_subscription', // Subscriptions
+        'upload.php',                           // Media
+        'edit.php?post_type=page',              // Pages
+        'edit.php',                             // Posts
+        'newsletter_main_index',                // Newsletter
+        'users.php',                            // Users
+        'woocommerce-marketing',                // WooCommerce Marketing
+        'edit-comments.php',                    // Comments
+        'gf_edit_forms',                        // Gravity Forms
+        'separator-woocommerce',                // WooCommerce separator (if it exists)
+        'index.php',                            // Dashboard
     );
-}
-add_filter('custom_menu_order', 'hotcookie_custom_menu_order', 10, 1);
-add_filter('menu_order', 'hotcookie_custom_menu_order', 10, 1);
+}, 10, 1);
 
 /*
 add_action('admin_init', function () {
@@ -442,9 +441,9 @@ function hc_add_link_to_admin_bar($admin_bar) {
         $admin_bar->add_node(
             array(
                 'id' => 'pages',
-                'title' => 'edit.php?post_type=page',
+                'title' => 'Pages',
                 'parent' => 'site-name',
-                'href' => admin_url('edit.php'),
+                'href' => admin_url('edit.php?post_type=page'),
             )
         );
         $admin_bar->add_node(

@@ -4,19 +4,18 @@
 global $hc_stores, $hc_zone;
 $placeholder_text = "Select store, enter US ZIP or hit search for geo";
 $customer = WC()->customer;
-$zone = WC()->session->get('current_zone');
-if ($zone && $customer && $customer instanceof WC_Customer) {
+if ($customer && $customer instanceof WC_Customer) {
 	$zipcode = $customer->get_shipping_postcode();
   $country = $customer->get_shipping_country();
   $state = $customer->get_shipping_state();
   $city = $customer->get_shipping_city();
 }
 
-if (!empty($zipcode) && !empty($city) && !empty ($state) && ($zone !== 'Rest of World')) {
+if (!empty($zipcode) && !empty($city) && !empty ($state)) {
   $placeholder_text = "<strong>" . $zipcode . ": " . $city . ", " . $state . "</strong>"; 
 }
 else 	if (!empty($hc_zone) && ($hc_zone !== 'Rest of World')) {
-    $placeholder_text = "<strong>" . hc_get_store_data('header_title',$hc_zone) . "</strong>"; 
+    $placeholder_text = "<strong>" . hc_get_store_data('header_title',$hc_zone) . "</strong>";
 }
 
 
