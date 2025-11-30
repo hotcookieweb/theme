@@ -570,42 +570,112 @@ function my_bulk_edit_fields() {
     <?php
 }
 add_action( 'woocommerce_product_bulk_edit_save', function( $product ) {
-    if ( ! empty( $_REQUEST['bulk_sale_start_date'] ) ) {
-        $start_date = wc_clean( $_REQUEST['bulk_sale_start_date'] );
-        $product->set_date_on_sale_from( new WC_DateTime( $start_date ) );
+    $start_input = ! empty( $_REQUEST['bulk_sale_start_date'] ) ? wc_clean( $_REQUEST['bulk_sale_start_date'] ) : '';
+    $end_input   = ! empty( $_REQUEST['bulk_sale_end_date'] ) ? wc_clean( $_REQUEST['bulk_sale_end_date'] ) : '';
+
+    if ( ! $start_input && ! $end_input ) {
+        return;
     }
 
-    if ( ! empty( $_REQUEST['bulk_sale_end_date'] ) ) {
-        $end_date = wc_clean( $_REQUEST['bulk_sale_end_date'] );
-        $product->set_date_on_sale_to( new WC_DateTime( $end_date ) );
-    }
+    $tz = new DateTimeZone( wc_timezone_string() );
 
-    $product->save();
-});
+    $start_dt = $start_input ? new WC_DateTime( $start_input . ' 00:00:00', $tz ) : null;
+    $end_dt   = $end_input   ? new WC_DateTime( $end_input   . ' 23:59:59', $tz ) : null;
+
+    if ( $product->is_type( 'variable' ) ) {
+        foreach ( $product->get_children() as $variation_id ) {
+            $variation = wc_get_product( $variation_id );
+            if ( $start_dt ) {
+                $variation->set_date_on_sale_from( $start_dt );
+            }
+            if ( $end_dt ) {
+                $variation->set_date_on_sale_to( $end_dt );
+            }
+            $variation->save();
+        }
+        // clear cached price ranges
+        wc_delete_product_transients( $product->get_id() );
+    } else if ( $product->is_type( array( 'variable-subscription', 'subscription' ) ) ) {
+        $children = $product->is_type( 'variable-subscription' ) ? $product->get_children() : [ $product->get_id() ];
+        foreach ( $children as $child_id ) {
+            $child = wc_get_product( $child_id );
+            if ( $start_dt ) {
+                $child->set_date_on_sale_from( $start_dt );
+            }
+            if ( $end_dt ) {
+                $child->set_date_on_sale_to( $end_dt );
+            }
+            $child->save();
+        }
+        wc_delete_product_transients( $product->get_id() );
+    } else {
+        if ( $start_dt ) {
+            $product->set_date_on_sale_from( $start_dt );
+        }
+        if ( $end_dt ) {
+            $product->set_date_on_sale_to( $end_dt );
+        }
+        $product->save();
+    }
+}, 99 );
 
 add_filter( 'woocommerce_get_price_html', function( $price_html, $product ) {
-    $sale_price   = $product->get_sale_price();
-    $regular_price = $product->get_regular_price();
-    $start_date   = $product->get_date_on_sale_from();
-    $end_date     = $product->get_date_on_sale_to();
+    // Handle variable products: only show first variation
+    if ( $product->is_type( 'variable' ) ) {
+        $variations = $product->get_children();
+        if ( ! empty( $variations ) ) {
+            $variation = wc_get_product( $variations[0] ); // first variation only
 
-    // Only show if a sale price is set
+            $sale_price    = $variation->get_sale_price();
+            $regular_price = $variation->get_regular_price();
+            $start_date    = $variation->get_date_on_sale_from();
+            $end_date      = $variation->get_date_on_sale_to();
+
+            if ( $sale_price ) {
+                $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+
+                if ( is_admin() ) {
+                    if ( $start_date instanceof WC_DateTime ) {
+                        $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' ) . '<br>E' . $end_date->date( 'm/d/y' ) . '</small>';
+                    }
+                }
+            }
+        }
+        return $price_html;
+    } elseif ( $product->is_type( array( 'simple', 'subscription', 'subscription_variation' ) ) ) {
+        $sale_price    = $product->get_sale_price();
+        $regular_price = $product->get_regular_price();
+        $start_date    = $product->get_date_on_sale_from();
+        $end_date      = $product->get_date_on_sale_to();
+
+        if ( $sale_price ) {
+            $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+
+            if ( is_admin() ) {
+                if ( $start_date instanceof WC_DateTime ) {
+                    $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' );
+                    if ( $end_date instanceof WC_DateTime ) {
+                        $price_html .= '<br>E' . $end_date->date( 'm/d/y' );
+                    }
+                    $price_html .= '</small>';
+                }
+            }
+        }
+        return $price_html;
+    }
+
+    // Simple products (original logic)
+    $sale_price    = $product->get_sale_price();
+    $regular_price = $product->get_regular_price();
+    $start_date    = $product->get_date_on_sale_from();
+    $end_date      = $product->get_date_on_sale_to();
+
     if ( $sale_price ) {
         $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
 
-        if (is_admin()) {
-            // Append start date if scheduled
+        if ( is_admin() ) {
             if ( $start_date instanceof WC_DateTime ) {
-                $price_html .= '<br><small>'
-                    . sprintf( __( 'S%s', 'woocommerce' ), $start_date->date( 'm/d/y' ))
-                    . '</small>';
-            }
-
-            // Optionally append end date too
-            if ( $end_date instanceof WC_DateTime ) {
-                $price_html .= '<br><small>'
-                    . sprintf( __( 'E%s', 'woocommerce' ), $end_date->date( 'm/d/y' ))
-                    . '</small>';
+                $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' ) . '<br>' . 'E' . $end_date->date( 'm/d/y' ) . '</small>';
             }
         }
     }
