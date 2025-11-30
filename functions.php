@@ -620,64 +620,39 @@ add_action( 'woocommerce_product_bulk_edit_save', function( $product ) {
 }, 99 );
 
 add_filter( 'woocommerce_get_price_html', function( $price_html, $product ) {
-    // Handle variable products: only show first variation
-    if ( $product->is_type( 'variable' ) ) {
+    $regular_price = $product->get_regular_price();
+    $sale_price    = $product->get_sale_price();
+    $start_date    = $product->get_date_on_sale_from();
+    $end_date      = $product->get_date_on_sale_to();
+
+    // Handle variable + variable-subscription: use first variation
+    if ( $product->is_type( array( 'variable', 'variable-subscription' ) ) ) {
         $variations = $product->get_children();
         if ( ! empty( $variations ) ) {
-            $variation = wc_get_product( $variations[0] ); // first variation only
-
-            $sale_price    = $variation->get_sale_price();
+            $variation     = wc_get_product( $variations[0] );
             $regular_price = $variation->get_regular_price();
+            $sale_price    = $variation->get_sale_price();
             $start_date    = $variation->get_date_on_sale_from();
             $end_date      = $variation->get_date_on_sale_to();
-
-            if ( $sale_price ) {
-                $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
-
-                if ( is_admin() ) {
-                    if ( $start_date instanceof WC_DateTime ) {
-                        $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' ) . '<br>E' . $end_date->date( 'm/d/y' ) . '</small>';
-                    }
-                }
-            }
         }
-        return $price_html;
-    } elseif ( $product->is_type( array( 'simple', 'subscription', 'subscription_variation' ) ) ) {
-        $sale_price    = $product->get_sale_price();
-        $regular_price = $product->get_regular_price();
-        $start_date    = $product->get_date_on_sale_from();
-        $end_date      = $product->get_date_on_sale_to();
+    }
 
-        if ( $sale_price ) {
-            $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
-
-            if ( is_admin() ) {
-                if ( $start_date instanceof WC_DateTime ) {
-                    $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' );
-                    if ( $end_date instanceof WC_DateTime ) {
-                        $price_html .= '<br>E' . $end_date->date( 'm/d/y' );
-                    }
-                    $price_html .= '</small>';
-                }
+    // Admin: always show sale info if set
+    if ( is_admin() && $sale_price ) {
+        $price_html  = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+        if ( $start_date instanceof WC_DateTime ) {
+            $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' );
+            if ( $end_date instanceof WC_DateTime ) {
+                $price_html .= '<br>E' . $end_date->date( 'm/d/y' );
             }
+            $price_html .= '</small>';
         }
         return $price_html;
     }
 
-    // Simple products (original logic)
-    $sale_price    = $product->get_sale_price();
-    $regular_price = $product->get_regular_price();
-    $start_date    = $product->get_date_on_sale_from();
-    $end_date      = $product->get_date_on_sale_to();
-
-    if ( $sale_price ) {
+    // Frontend: only show sale if active
+    if ( $product->is_on_sale() ) {
         $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
-
-        if ( is_admin() ) {
-            if ( $start_date instanceof WC_DateTime ) {
-                $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' ) . '<br>' . 'E' . $end_date->date( 'm/d/y' ) . '</small>';
-            }
-        }
     }
 
     return $price_html;
@@ -687,7 +662,11 @@ add_filter( 'woocommerce_get_price_html', function( $price_html, $product ) {
 add_filter( 'woocommerce_cart_item_price', function( $price, $cart_item, $cart_item_key ) {
     $product = $cart_item['data'];
 
-    if ( $product->is_on_sale() ) {
+    if ( is_admin() && $product->get_sale_price() ) {
+        $regular = wc_price( $product->get_regular_price() );
+        $sale    = wc_price( $product->get_sale_price() );
+        $price   = '<del>' . $regular . '</del> <ins>' . $sale . '</ins>';
+    } elseif ( $product->is_on_sale() ) {
         $regular = wc_price( $product->get_regular_price() );
         $sale    = wc_price( $product->get_sale_price() );
 
