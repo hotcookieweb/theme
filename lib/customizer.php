@@ -267,15 +267,24 @@ function hc_custom_product_tabs($tabs) {
         'priority' => 50,
         'callback' => function ($key, $tab) use ($product) {
 
-      echo '<h2 class="availability-heading">Availability Information</h2>';
+      echo '<h2 class="availability-heading">Availability information</h2>';
       echo '<table class="woocommerce-product-attributes shop_attributes">';
+
+      $available_from = get_field( 'first_date', $product->get_id() );
+      $available_to   = get_field( 'last_date', $product->get_id() );
+      if ( $available_from || $available_to ) {
+            echo '<tr class="woocommerce-product-attributes-item">';
+            echo '<th class="woocommerce-product-attributes-item__label" scope="row">Availability</th>';
+            echo '<td class="woocommerce-product-attributes-item__value">' . $available_from . " to " . $available_to . '</td>';
+            echo  '</tr>';
+      }
       // 🔸 Delivery Type
       $delivery_type = get_post_meta($product->get_id(), '_custom_delivery_method', true);
       if (!empty($delivery_type)) {
         $term = get_term_by('slug', $delivery_type, 'pa_delivery-type');
         if ($term && !is_wp_error($term) && !empty($term->description)) {
           echo '<tr class="woocommerce-product-attributes-item">';
-          echo '<th class="woocommerce-product-attributes-item__label" scope="row">Availability</th>';
+          echo '<th class="woocommerce-product-attributes-item__label" scope="row">Delivery</th>';
           echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
           echo  '</tr>';
         }
@@ -325,18 +334,6 @@ function hc_custom_product_tabs($tabs) {
 	
 	if (isset($tabs['description'])) {
 		$tabs['description']['callback'] = function ($key, $tab) use($product) {
-			global $post;
-			// Display the content of the Description tab if not empty
-			if (!empty($post->post_content)) {
-				the_content();
-			}
-      // Fallback to WooCommerce default
-      do_action('woocommerce_product_description', $product);
-		};
-	}
-
-	if (isset($tabs['additional_information'])) {
-		$tabs['additional_information']['callback'] = function ($key, $tab) use ($product) {
 			if (have_rows('months')) {
 				$months = get_field('months');
 				echo '<table cellspacing="0" cellpadding="0" border="5"><tbody>';
@@ -357,11 +354,26 @@ function hc_custom_product_tabs($tabs) {
 				}
 				echo '</tbody></table><br>';
 			}
-      // Output WooCommerce default
-      do_action('woocommerce_product_additional_information', $product);
+      else {
+        global $post;
+        // Display the content of the Description tab if not empty
+        if (!empty($post->post_content)) {
+          the_content();
+        }
+      }
+      // Fallback to WooCommerce default
+      do_action('woocommerce_product_description', $product);
 		};
+    if (isset($tabs['additional_information'])) {
+      $tabs['additional_information']['callback'] = function ($key, $tab) use ($product) {
+        // Output WooCommerce default
+        do_action('woocommerce_product_additional_information', $product);
+      };
+    }
 	}
-	return $tabs;
+
+
+  return $tabs;
 }
 
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );

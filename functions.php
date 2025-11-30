@@ -553,3 +553,90 @@ function on_user_logout($user_id)
 }
 
 add_filter('wp_logout', 'on_user_logout', 10, 1);
+
+add_action( 'woocommerce_product_bulk_edit_end', 'my_bulk_edit_fields' );
+function my_bulk_edit_fields() {
+    ?>
+    <div class="inline-edit-group">
+        <label>
+            <?php esc_html_e( 'Sale Start Date', 'woocommerce' ); ?>
+            <input type="date" name="bulk_sale_start_date" />
+        </label>
+        <label>
+            <?php esc_html_e( 'Sale End Date', 'woocommerce' ); ?>
+            <input type="date" name="bulk_sale_end_date" />
+        </label>
+    </div>
+    <?php
+}
+add_action( 'woocommerce_product_bulk_edit_save', function( $product ) {
+    if ( ! empty( $_REQUEST['bulk_sale_start_date'] ) ) {
+        $start_date = wc_clean( $_REQUEST['bulk_sale_start_date'] );
+        $product->set_date_on_sale_from( new WC_DateTime( $start_date ) );
+    }
+
+    if ( ! empty( $_REQUEST['bulk_sale_end_date'] ) ) {
+        $end_date = wc_clean( $_REQUEST['bulk_sale_end_date'] );
+        $product->set_date_on_sale_to( new WC_DateTime( $end_date ) );
+    }
+
+    $product->save();
+});
+
+add_filter( 'woocommerce_get_price_html', function( $price_html, $product ) {
+    $sale_price   = $product->get_sale_price();
+    $regular_price = $product->get_regular_price();
+    $start_date   = $product->get_date_on_sale_from();
+    $end_date     = $product->get_date_on_sale_to();
+
+    // Only show if a sale price is set
+    if ( $sale_price ) {
+        $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+
+        if (is_admin()) {
+            // Append start date if scheduled
+            if ( $start_date instanceof WC_DateTime ) {
+                $price_html .= '<br><small>'
+                    . sprintf( __( 'S%s', 'woocommerce' ), $start_date->date( 'm/d/y' ))
+                    . '</small>';
+            }
+
+            // Optionally append end date too
+            if ( $end_date instanceof WC_DateTime ) {
+                $price_html .= '<br><small>'
+                    . sprintf( __( 'E%s', 'woocommerce' ), $end_date->date( 'm/d/y' ))
+                    . '</small>';
+            }
+        }
+    }
+
+    return $price_html;
+}, 10, 2 );
+
+// Show both regular and sale price in cart line items
+add_filter( 'woocommerce_cart_item_price', function( $price, $cart_item, $cart_item_key ) {
+    $product = $cart_item['data'];
+
+    if ( $product->is_on_sale() ) {
+        $regular = wc_price( $product->get_regular_price() );
+        $sale    = wc_price( $product->get_sale_price() );
+
+        $price = '<del>' . $regular . '</del> <ins>' . $sale . '</ins>';
+    }
+
+    return $price;
+}, 10, 3 );
+
+// Show both regular and sale price in cart subtotal line
+add_filter( 'woocommerce_cart_item_subtotal', function( $subtotal, $cart_item, $cart_item_key ) {
+    $product = $cart_item['data'];
+
+    if ( $product->is_on_sale() ) {
+        $regular_total = wc_price( $product->get_regular_price() * $cart_item['quantity'] );
+        $sale_total    = wc_price( $product->get_sale_price() * $cart_item['quantity'] );
+
+        $subtotal = '<del>' . $regular_total . '</del> <ins>' . $sale_total . '</ins>';
+    }
+
+    return $subtotal;
+}, 10, 3 );
