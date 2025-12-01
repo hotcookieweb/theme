@@ -417,3 +417,36 @@ add_action('woocommerce_after_checkout_form', function(){
         </script>
     <?php endif;
 });
+
+add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+
+    foreach ( $cart->get_cart() as $cart_item ) {
+        $product = $cart_item['data'];
+
+        // Handle variable and variable-subscription: use first variation
+        if ( $product->is_type( [ 'variable', 'variable-subscription' ] ) ) {
+            $variations = $product->get_children();
+            foreach ( $variations as $variation_id ) {
+                $variation = wc_get_product( $variation_id );
+                if ( $variation && $variation->is_on_sale() ) {
+                    $sale_price = $variation->get_sale_price();
+                    if ( $sale_price > 0 ) {
+                        $product->set_price( $sale_price );
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Handle simple, subscription, subscription_variation
+        elseif ( $product->is_type( [ 'simple', 'subscription', 'subscription_variation' ] ) ) {
+            if ( $product->is_on_sale() ) {
+                $sale_price = $product->get_sale_price();
+                if ( $sale_price > 0 ) {
+                    $product->set_price( $sale_price );
+                }
+            }
+        }
+    }
+}, 10 );
