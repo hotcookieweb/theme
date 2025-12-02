@@ -53,7 +53,7 @@ if ( ! empty( $product_tabs ) ) :
                 <div class="signage-block signage-<?php echo esc_attr( $key ); ?>">
                     <?php
                     // Only output <h2> if the callback doesn't already include it
-                    if ( ! in_array( $key, [ 'availability' ] ) ) {
+                    if ( ! in_array( $key, [ 'availability', 'additional_information' ] ) ) {
                         echo '<h2>' . esc_html( $tab['title'] ) . '</h2>';
                     }
                     call_user_func( $tab['callback'], $key, $tab );
