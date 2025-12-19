@@ -1,5 +1,4 @@
 <?php
-add_action( 'wp_enqueue_scripts', 'my_enqueue_dashicons' );
 add_action('wp_ajax_hc_get_box_products', 'hc_get_box_products');
 add_action('wp_ajax_nopriv_hc_get_box_products', 'hc_get_box_products');
 add_action('wp_enqueue_scripts', function() {
@@ -132,7 +131,7 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
         error_log(sprintf("%s line: %s: Build-a-Box error: selections payload invalid", __FILE__, __LINE__));
         return $cart_item_data; // skip attaching metadata
     }
-    error_log(sprintf("%s line: %s: Build-a-Box selections: %s", __FILE__, __LINE__, print_r($selections, true)));
+
     $total_price = 0;
     foreach ($selections as $pid => $qty) {
         $pid = intval($pid);

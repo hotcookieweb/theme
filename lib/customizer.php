@@ -489,45 +489,26 @@ add_action('woocommerce_after_shop_loop_item_title', 'hc_shop_content', 6);
  * @return string HTML table + appended divs
  */
 function hc_format_content($html, $page) {
-    $output = '';
-
-    if ($page === 'product') {
-        // ✅ Single product: WooCommerce attribute-style table
-        $output .= '<table class="woocommerce-product-attributes shop_attributes" style="text-align:left;"><tbody>';
-
-        preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $match) {
-            $key   = !empty($match[1]) ? trim($match[1]) : '1';
-            $value = isset($match[2]) ? trim($match[2]) : '';
-
-            $output .= '<tr class="woocommerce-product-attributes-item">';
-            $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
-            $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
-            $output .= '</tr>';
+    $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
+    preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+    error_log(sprintf('hc_format_content: %s', json_encode($matches)));
+    foreach ($matches as $match) {
+        $key   = !empty($match[1]) ? trim($match[1]) : '1';
+        $value = isset($match[2]) ? trim($match[2]) : '';
+        if ($page === 'product') {
+                $output .= '<tr class="woocommerce-product-attributes-item">';
+                $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
+                $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
+                $output .= '</tr>';
         }
-
-        $output .= '</tbody></table>';
-    } else {
-        // ✅ Not single: centered table, rows centered, one column "key - value"
-        $output .= '<table class="hc-format-content" style="margin:0 auto; text-align:center;"><tbody>';
-
-        preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $match) {
-            $key   = !empty($match[1]) ? trim($match[1]) : '';
-            $value = isset($match[2]) ? trim($match[2]) : '';
-
-            $display = $key !== '' ? ($key . ' - ' . $value) : $value;
-
-            $output .= '<tr style="text-align:center;">';
-            $output .= '<td>' . esc_html($display) . '</td>';
-            $output .= '</tr>';
+        else { /* shop */
+                $display = $key !== '' ? ($key . ' - ' . $value) : $value;
+                $output .= '<tr style="text-align:center;">';
+                $output .= '<td>' . esc_html($display) . '</td>';
+                $output .= '</tr>';
         }
-
-        $output .= '</tbody></table>';
     }
-
+    $output .= '</tbody></table>';
     // ✅ Append any <div> blocks found in the input
     preg_match_all('/<div[^>]*>.*?<\/div>/s', $html, $divs);
     if (!empty($divs[0])) {
