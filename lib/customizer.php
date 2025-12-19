@@ -183,129 +183,6 @@ add_action('template_redirect', function () {
   }
 });
 
-// 1 Disable State
-//add_filter( 'woocommerce_shipping_calculator_enable_state', '__return_false' );
-
-// 2 Disable City
-//add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' )
-
-add_filter('woocommerce_product_tabs', 'hc_custom_product_tabs', 98, 1);
-
-function hc_custom_product_tabs($tabs) {
-    $product = wc_get_product(get_the_ID());
-
-    // 🔸 Availability tab
-    $tabs['availability'] = [
-        'title'    => __('Availability Information', 'woocommerce'),
-        'priority' => 50,
-        'callback' => function ($key, $tab) use ($product) {
-            echo '<table class="woocommerce-product-attributes shop_attributes">';
-
-            // Availability dates
-            $available_from = get_field('first_date', $product->get_id());
-            $available_to   = get_field('last_date', $product->get_id());
-            if ($available_from || $available_to) {
-                echo '<tr class="woocommerce-product-attributes-item">';
-                echo '<th class="woocommerce-product-attributes-item__label" scope="row">Availability</th>';
-                echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($available_from . " to " . $available_to) . '</td>';
-                echo '</tr>';
-            }
-
-            // Delivery type
-            $delivery_type = get_post_meta($product->get_id(), '_custom_delivery_method', true);
-            if (!empty($delivery_type)) {
-                $term = get_term_by('slug', $delivery_type, 'pa_delivery-type');
-                if ($term && !is_wp_error($term) && !empty($term->description)) {
-                    echo '<tr class="woocommerce-product-attributes-item">';
-                    echo '<th class="woocommerce-product-attributes-item__label" scope="row">Delivery</th>';
-                    echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
-                    echo '</tr>';
-                }
-            }
-
-            // Lead time
-            $lead_time = get_post_meta($product->get_id(), '_custom_lead_time', true);
-            if (!empty($lead_time)) {
-                $term = get_term_by('slug', $lead_time, 'pa_lead-time');
-                if ($term && !is_wp_error($term) && !empty($term->description)) {
-                    echo '<tr class="woocommerce-product-attributes-item">';
-                    echo '<th class="woocommerce-product-attributes-item__label" scope="row">Lead Time</th>';
-                    echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
-                    echo '</tr>';
-                }
-            }
-
-            // Stores
-            $locations = get_post_meta($product->get_id(), '_custom_location', true);
-            global $hc_stores;
-            if (!empty($locations) && is_array($locations)) {
-                $store_labels = [];
-                foreach ($locations as $location) {
-                    $store_labels[] = ($location === 'any-zone') ? 'All Stores' : ($hc_stores[$location] ?? $location);
-                }
-
-                if (!empty($store_labels)) {
-                    foreach ($store_labels as $index => $store_label) {
-                        echo '<tr class="woocommerce-product-attributes-item">';
-                        if ($index === 0) {
-                            echo '<th class="woocommerce-product-attributes-item__label" scope="row">Stores</th>';
-                        } else {
-                            echo '<th> </th>';
-                        }
-                        echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($store_label) . '</td>';
-                        echo '</tr>';
-                    }
-                }
-            }
-
-            echo '</table>';
-        }
-    ];
-
-    // 🔸 Description tab override
-    if (isset($tabs['description'])) {
-        $tabs['description']['callback'] = function ($key, $tab) use ($product) {
-            if (have_rows('months')) {
-                $months = get_field('months');
-                echo '<table cellspacing="0" cellpadding="0" border="5"><tbody>';
-                foreach ($months as $index => $month) {
-                    if ($index % 3 === 0) echo '<tr>';
-                    echo '<td style="width:33%; vertical-align: top; padding: 5px;">';
-                    echo '<strong>' . esc_html($month['month_name']) . ':</strong><br><ol>';
-                    if (!empty($month['cookies']) && is_array($month['cookies'])) {
-                        foreach ($month['cookies'] as $cookie) {
-                            $title = get_the_title($cookie['cookie_name']);
-                            $title = preg_replace('/ Cookie$/', '', $title);
-                            $details = !empty($cookie['details']) ? ' ' . $cookie['details'] : '';
-                            echo '<li>' . esc_html($title . $details) . '</li>';
-                        }
-                    }
-                    echo '</ol></td>';
-                    if (($index + 1) % 3 === 0) echo '</tr>';
-                }
-                echo '</tbody></table><br>';
-            } else {
-                global $post;
-                if (!empty($post->post_content)) {
-                    echo hc_format_content(get_the_content(), 'product');
-                }
-            }
-            // Fallback to WooCommerce default
-            do_action('woocommerce_product_description', $product);
-        };
-    }
-
-    // 🔸 Additional Information tab override
-    if (isset($tabs['additional_information'])) {
-        $tabs['additional_information']['callback'] = function ($key, $tab) use ($product) {
-            // Output attributes table only, no heading
-            wc_display_product_attributes($product, []); 
-        };
-    }
-
-    return $tabs;
-}
-
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
 add_filter('woocommerce_shortcode_products_query', 'hc_filter_products_by_store_meta', 10, 2);
@@ -406,14 +283,6 @@ function heart_option_hack() {
   <?php }
 }
 
-add_filter('woocommerce_add_cart_item_data', 'product_description', 20, 2);
-function product_description($cart_item_data, $product_id) {
-  if (get_field('description_packing', $product_id) == 'show') {
-    $cart_item_data['description_packing'] = wc_get_product($product_id)->get_description();
-  }
-  return ($cart_item_data);
-}
-
 /**
  * Replace product description editor with a plain textarea (no TinyMCE)
  */
@@ -436,36 +305,119 @@ add_action('init', function() {
     });
 });
 
-add_filter('woocommerce_get_item_data', 'product_description_get', 20, 2);
-function product_description_get($item_data, $cart_item) {
-    // Only run if your custom field exists
-    if (!empty($cart_item['description_packing'])) {
-        $html = $cart_item['description_packing'];
-        // Extract <ol>key</ol><li>value</li> pairs
-        preg_match_all('/<ol>(.*?)<\/ol>\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            $item_data[] = array(
-                'key'   => trim($match[1]),
-                'value' => trim($match[2]),
-            );
+
+add_filter('woocommerce_product_tabs', 'hc_custom_product_tabs', 98, 1);
+function hc_custom_product_tabs($tabs) {
+    $product = wc_get_product(get_the_ID());
+
+    // 🔸 Availability tab
+    $tabs['availability'] = [
+        'title'    => __('Availability Information', 'woocommerce'),
+        'priority' => 50,
+        'callback' => function ($key, $tab) use ($product) {
+            echo '<table class="woocommerce-product-attributes shop_attributes">';
+
+            // Availability dates
+            $available_from = get_field('first_date', $product->get_id());
+            $available_to   = get_field('last_date', $product->get_id());
+            if ($available_from || $available_to) {
+                echo '<tr class="woocommerce-product-attributes-item">';
+                echo '<th class="woocommerce-product-attributes-item__label" scope="row">Availability</th>';
+                echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($available_from . " to " . $available_to) . '</td>';
+                echo '</tr>';
+            }
+
+            // Delivery type
+            $delivery_type = get_post_meta($product->get_id(), '_custom_delivery_method', true);
+            if (!empty($delivery_type)) {
+                $term = get_term_by('slug', $delivery_type, 'pa_delivery-type');
+                if ($term && !is_wp_error($term) && !empty($term->description)) {
+                    echo '<tr class="woocommerce-product-attributes-item">';
+                    echo '<th class="woocommerce-product-attributes-item__label" scope="row">Delivery</th>';
+                    echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
+                    echo '</tr>';
+                }
+            }
+
+            // Lead time
+            $lead_time = get_post_meta($product->get_id(), '_custom_lead_time', true);
+            if (!empty($lead_time)) {
+                $term = get_term_by('slug', $lead_time, 'pa_lead-time');
+                if ($term && !is_wp_error($term) && !empty($term->description)) {
+                    echo '<tr class="woocommerce-product-attributes-item">';
+                    echo '<th class="woocommerce-product-attributes-item__label" scope="row">Lead Time</th>';
+                    echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($term->description) . '</td>';
+                    echo '</tr>';
+                }
+            }
+
+            // Stores
+            $locations = get_post_meta($product->get_id(), '_custom_location', true);
+            global $hc_stores;
+            if (!empty($locations) && is_array($locations)) {
+                $store_labels = [];
+                foreach ($locations as $location) {
+                    $store_labels[] = ($location === 'any-zone') ? 'All Stores' : ($hc_stores[$location] ?? $location);
+                }
+
+                if (!empty($store_labels)) {
+                    foreach ($store_labels as $index => $store_label) {
+                        echo '<tr class="woocommerce-product-attributes-item">';
+                        if ($index === 0) {
+                            echo '<th class="woocommerce-product-attributes-item__label" scope="row">Stores</th>';
+                        } else {
+                            echo '<th> </th>';
+                        }
+                        echo '<td class="woocommerce-product-attributes-item__value">' . esc_html($store_label) . '</td>';
+                        echo '</tr>';
+                    }
+                }
+            }
+
+            echo '</table>';
         }
+    ];
+
+    // 🔸 Description tab override
+    if (isset($tabs['description'])) {
+        $tabs['description']['callback'] = function ($key, $tab) use ($product) {
+            if (have_rows('months')) {
+                $months = get_field('months');
+                echo '<table cellspacing="0" cellpadding="0" border="5"><tbody>';
+                foreach ($months as $index => $month) {
+                    if ($index % 3 === 0) echo '<tr>';
+                    echo '<td style="width:33%; vertical-align: top; padding: 5px;">';
+                    echo '<strong>' . esc_html($month['month_name']) . ':</strong><br><ol>';
+                    if (!empty($month['cookies']) && is_array($month['cookies'])) {
+                        foreach ($month['cookies'] as $cookie) {
+                            $title = get_the_title($cookie['cookie_name']);
+                            $title = preg_replace('/ Cookie$/', '', $title);
+                            $details = !empty($cookie['details']) ? ' ' . $cookie['details'] : '';
+                            echo '<li>' . esc_html($title . $details) . '</li>';
+                        }
+                    }
+                    echo '</ol></td>';
+                    if (($index + 1) % 3 === 0) echo '</tr>';
+                }
+                echo '</tbody></table><br>';
+            } else {
+                global $post;
+                if (!empty($post->post_content)) {
+                    echo hc_format_content(get_the_content(), 'product');
+                }
+            }
+        };
     }
 
-    return $item_data;
-}
+    // 🔸 Additional Information tab override
+    if (isset($tabs['additional_information'])) {
+        $tabs['additional_information']['callback'] = function ($key, $tab) use ($product) {
+            // Output attributes table only, no heading
+            wc_display_product_attributes($product, []); 
+        };
+    }
 
-/**
- * Add custom meta to order
- */
-add_filter('woocommerce_checkout_create_order_line_item', 'product_description_meta', 20, 4);
-function product_description_meta($item, $cart_item_key, $values, $order) {
-  if (isset($values['description_packing'])) {
-    $item->add_meta_data(
-      'contains',
-      $values['description_packing'],
-      true
-    );
-  }
+    return $tabs;
 }
 
 /* custom description processing */
@@ -489,33 +441,72 @@ add_action('woocommerce_after_shop_loop_item_title', 'hc_shop_content', 6);
  * @return string HTML table + appended divs
  */
 function hc_format_content($html, $page) {
-    $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
     preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
-    error_log(sprintf('hc_format_content: %s', json_encode($matches)));
-    foreach ($matches as $match) {
-        $key   = !empty($match[1]) ? trim($match[1]) : '1';
-        $value = isset($match[2]) ? trim($match[2]) : '';
-        if ($page === 'product') {
-                $output .= '<tr class="woocommerce-product-attributes-item">';
-                $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
-                $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
-                $output .= '</tr>';
-        }
-        else { /* shop */
-                $display = $key !== '' ? ($key . ' - ' . $value) : $value;
-                $output .= '<tr style="text-align:center;">';
-                $output .= '<td>' . esc_html($display) . '</td>';
-                $output .= '</tr>';
-        }
+    if (!empty($matches)) {
+      $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
+      foreach ($matches as $match) {
+          $key   = !empty($match[1]) ? trim($match[1]) : '1';
+          $value = isset($match[2]) ? trim($match[2]) : '';
+          if ($page === 'product') {
+                  $output .= '<tr class="woocommerce-product-attributes-item">';
+                  $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
+                  $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
+                  $output .= '</tr>';
+          }
+          else { /* shop */
+                  $display = $key !== '' ? ($key . ' - ' . $value) : $value;
+                  $output .= '<tr style="text-align:center;">';
+                  $output .= '<td>' . esc_html($display) . '</td>';
+                  $output .= '</tr>';
+          }
+      }
+      $output .= '</tbody></table>';
     }
-    $output .= '</tbody></table>';
-    // ✅ Append any <div> blocks found in the input
-    preg_match_all('/<div[^>]*>.*?<\/div>/s', $html, $divs);
-    if (!empty($divs[0])) {
-        foreach ($divs[0] as $div) {
-            $output .= $div;
+
+    // Split on your <ol>/<li> pattern
+    $parts = preg_split('/(?:<ol>.*?<\/ol>)?\s*<li>.*?<\/li>/s', $html);
+
+    // $parts now contains everything NOT matched by your regex
+    foreach ($parts as $part) {
+        if (trim($part) !== '') {
+            $output = $part; // or wrap in <tr><td>…</td></tr>
         }
     }
 
     return $output;
 }
+
+add_filter('woocommerce_get_item_data', 'product_description_get', 20, 2);
+function product_description_get($item_data, $cart_item) {
+    if (!get_field('description_packing', $cart_item['product_id'])) {
+        return $item_data;
+    }
+    
+    $product = $cart_item['data'];
+    $html = $product->get_description();
+
+    // 🔹 1) Extract <ol>key</ol><li>value</li> pairs
+    preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+    foreach ($matches as $match) {
+        $item_data[] = [
+            'key'   => !empty($match[1]) ? trim($match[1]) : 'Item',
+            'value' => isset($match[2]) ? trim($match[2]) : '',
+        ];
+    }
+
+    // 🔹 2) Collect everything NOT matched by the <li> regex
+    $parts = preg_split('/(?:<ol>.*?<\/ol>)?\s*<li>.*?<\/li>/s', $html);
+
+    foreach ($parts as $part) {
+        $part = trim(wp_strip_all_tags($part));
+        if ($part !== '') {
+            $item_data[] = [
+                'key'   => 'Note',
+                'value' => $part,
+            ];
+        }
+    }
+
+    return $item_data;
+}
+
