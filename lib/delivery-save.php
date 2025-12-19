@@ -10,7 +10,7 @@ function hc_set_store() {
 	wp_send_json_success(['zone' => sanitize_text_field($_POST['zone'])]);
   }
   else {
-	error_log("hc_set_store: no zone set in POST");
+	error_log(sprintf("%s line: %s: hc_set_store: no zone set in POST", __FILE__, __LINE__));
 	wp_send_json_error(['message' => 'No zone set in Post.']);
   }
 }
@@ -31,7 +31,7 @@ function hc_save_delivery() {
 			}
 			$location = lookupLocationFromZip($zipcode);
 			if (empty($location['zip'])) { // Try our local file
-				error_log("ZIP {$zipcode} not found via Nominatim, trying local CSV");
+				error_log(sprintf("%s line: %s: ZIP %s not found via Nominatim, trying local CSV", __FILE__, __LINE__, $zipcode));
 				$location = hc_ziplocal($zipcode);
 				if (empty($location)) {
 					wp_send_json_error(['message' => 'Invalid ZIP.']);
@@ -247,7 +247,7 @@ function lookupLocationFromIP() {
 function hc_get_store_data($field, $zone) {
 	$post = get_page_by_path('/our-stores/' . $zone);
 	if (!$post || !isset($post->ID)) {
-		error_log("hc_get_store_data: could not find 'our-stores/" . $zone);
+		error_log(sprintf("%s line: %s: hc_get_store_data: could not find 'our-stores/%s'", __FILE__, __LINE__, $zone));
 		return 'hc_get_store_data error';
 	}
 	return get_field($field, $post->ID);

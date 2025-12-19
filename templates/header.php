@@ -184,6 +184,11 @@ jQuery(document).ready(function() {
       jQuery('.header .navigation, .header-mobile .navigation').removeClass('active');
     }
   });
+  // woo commerce does not update the cart on remove items from cart page, so we trigger it here
+  jQuery(document.body).on('removed_from_cart', function(){
+      // Force WooCommerce to refresh all fragments
+      jQuery(document.body).trigger('wc_fragment_refresh');
+  });
 });
 
 document.addEventListener('DOMContentLoaded', function () {

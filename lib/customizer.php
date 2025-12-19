@@ -1,7 +1,4 @@
 <?php
-
-namespace Roots\Sage\Customizer;
-
 use Roots\Sage\Assets;
 
 require_once "alias-product-attributes.php";
@@ -17,7 +14,7 @@ remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
 function customize_register($wp_customize) {
   $wp_customize->get_setting('blogname')->transport = 'postMessage';
 }
-add_action('customize_register', __NAMESPACE__ . '\\customize_register');
+add_action('customize_register', 'customize_register');
 
 /**
  * Customizer JS
@@ -25,7 +22,7 @@ add_action('customize_register', __NAMESPACE__ . '\\customize_register');
 function customize_preview_js() {
   wp_enqueue_script('sage/customizer', Assets\asset_path('scripts/customizer.js'), ['customize-preview'], null, true);
 }
-add_action('customize_preview_init', __NAMESPACE__ . '\\customize_preview_js');
+add_action('customize_preview_init', 'customize_preview_js');
 
 add_action('init', function () {
     if (function_exists('acf_add_options_page')) {
@@ -39,7 +36,7 @@ add_action('init', function () {
     }
 });
 
-add_action('after_setup_theme', __NAMESPACE__ . '\\mytheme_add_woocommerce_support');
+add_action('after_setup_theme', 'mytheme_add_woocommerce_support');
 function mytheme_add_woocommerce_support() {
   add_theme_support('woocommerce');
 }
@@ -47,10 +44,10 @@ function mytheme_add_woocommerce_support() {
 /**
  * Show cart contents / total Ajax
  */
-add_filter('woocommerce_add_to_cart_fragments', __NAMESPACE__ . '\\woocommerce_header_add_to_cart_fragment');
+add_filter( 'woocommerce_add_to_cart_fragments', 'woocommerce_header_add_to_cart_fragment' );
+add_filter( 'woocommerce_update_cart_action_cart_updated', 'woocommerce_header_add_to_cart_fragment' );
 function woocommerce_header_add_to_cart_fragment($fragments) {
   global $woocommerce;
-
   ob_start();
 
   ?>
@@ -61,14 +58,6 @@ function woocommerce_header_add_to_cart_fragment($fragments) {
 }
 
 
-function hc_shop_content() {
-  if (get_field('display_content_on_shop_page') == 'show') {
-    echo get_the_content(null, false, null);
-  }
-
-}
-add_action('woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop_content', 6);
-
 /**
  * Changes the redirect URL for the Return To Shop button in the cart.
  *
@@ -77,7 +66,7 @@ add_action('woocommerce_after_shop_loop_item_title', __NAMESPACE__ . '\\hc_shop_
 function wc_empty_cart_redirect_url() {
   return get_home_url();
 }
-add_filter('woocommerce_return_to_shop_redirect', __NAMESPACE__ . '\\wc_empty_cart_redirect_url');
+add_filter('woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url');
 
 /**
  * WooCommerce: Hide 'Coupon form' on checkout page if a coupon was already applied in the cart
@@ -89,71 +78,13 @@ function woocommerce_coupons_enabled_checkout($coupons_enabled) {
   }
   return $coupons_enabled;
 }
-add_filter('woocommerce_coupons_enabled', __NAMESPACE__ . '\\woocommerce_coupons_enabled_checkout');
-
-add_filter('woocommerce_after_single_product', __NAMESPACE__ . '\\heart_option_hack', 10);
-function heart_option_hack() {
-  global $product;
-
-  if ($product->get_slug() == 'heart-cookie-cake') {?>
-    <script>
-      xxElement = document.getElementsByClassName("wc-pao-addons-container")[0];
-      xxElement.input = document.getElementById("addon-49833-enter-xxyy-text-e-g-jbar-0");
-      selectElement = document.getElementById("pa_heart-cake-writing");
-      if (selectElement.value != 'xx-yy') {
-        xxElement.style.display = "none";
-      }
-      selectElement.onchange = function () {
-        if (selectElement.value == 'xx-yy') {
-          xxElement.style.display = "";
-        }
-        else {
-          xxElement.style.display = "none";
-          xxElement.value = "";
-        }
-      }
-    </script>
-  <?php }
-}
-
-add_filter('woocommerce_add_cart_item_data', __NAMESPACE__ . '\\product_description', 20, 2);
-function product_description($cart_item_data, $product_id) {
-  if (get_field('description_packing', $product_id) == 'show') {
-    $cart_item_data['description_packing'] = wc_get_product($product_id)->get_description();
-  }
-  return ($cart_item_data);
-}
-
-add_filter('woocommerce_get_item_data', __NAMESPACE__ . '\\product_description_get', 20, 2);
-function product_description_get($item_data, $cart_item_data) {
-  if (isset($cart_item_data['description_packing'])) {
-    $item_data[] = array(
-      'key' => 'contains',
-      'value' => wc_clean($cart_item_data['description_packing']),
-    );
-  }
-  return $item_data;
-}
-
-/**
- * Add custom meta to order
- */
-add_filter('woocommerce_checkout_create_order_line_item', __NAMESPACE__ . '\\product_description_meta', 20, 4);
-function product_description_meta($item, $cart_item_key, $values, $order) {
-  if (isset($values['description_packing'])) {
-    $item->add_meta_data(
-      'contains',
-      $values['description_packing'],
-      true
-    );
-  }
-}
+add_filter('woocommerce_coupons_enabled', 'woocommerce_coupons_enabled_checkout');
 
 /**
  * @snippet       New Products Table Column @ WooCommerce Admin
  */
 
-add_filter('manage_edit-product_columns', __NAMESPACE__ . '\\hc_edit_column', 9999);
+add_filter('manage_edit-product_columns', 'hc_edit_column', 9999);
 function hc_edit_column($columns) {
     unset($columns['date']);
     unset($columns['taxonomy-product_brand']);
@@ -177,7 +108,7 @@ function hc_edit_column($columns) {
     return $new_columns;
 }
 
-add_action('manage_product_posts_custom_column', __NAMESPACE__ . '\\hc_column_content', 10, 2);
+add_action('manage_product_posts_custom_column', 'hc_column_content', 10, 2);
 function hc_column_content($column, $product_id) {
   if ($column == 'hc_stock') {
     $product = wc_get_product($product_id);
@@ -194,7 +125,7 @@ function hc_column_content($column, $product_id) {
   }
 }
 
-add_action('admin_enqueue_scripts', __NAMESPACE__ . '\\wc_product_list_css_overrides');
+add_action('admin_enqueue_scripts', 'wc_product_list_css_overrides');
 function wc_product_list_css_overrides() {
   wp_add_inline_style('woocommerce_admin_styles',
     "table.wp-list-table .column-product_cat{ width: 25% !important; } table.wp-list-table .column-shipping_weight{ width: 7%; } table.wp-list-table .column-stock{ width: 6%; }");
@@ -207,7 +138,7 @@ function hc_maybe_redirect($url, $product) {
   }
   return $url;
 }
-add_filter('woocommerce_product_add_to_cart_url', __NAMESPACE__ . '\hc_maybe_redirect', 10, 2);
+add_filter('woocommerce_product_add_to_cart_url', 'hc_maybe_redirect', 10, 2);
 
 function hc_maybe_redirect_button($text, $product) {
   $redirect = get_field('redirect_to_link');
@@ -216,7 +147,7 @@ function hc_maybe_redirect_button($text, $product) {
   }
   return $text;
 }
-add_filter('woocommerce_product_add_to_cart_text', __NAMESPACE__ . '\hc_maybe_redirect_button', 10, 2);
+add_filter('woocommerce_product_add_to_cart_text', 'hc_maybe_redirect_button', 10, 2);
 
 /* filter for woocomerce order export to get meta version of shipping zone */
 add_filter('woe_fetch_order_row', function ($row, $order_id) {
@@ -258,7 +189,7 @@ add_action('template_redirect', function () {
 // 2 Disable City
 //add_filter( 'woocommerce_shipping_calculator_enable_city', '__return_false' )
 
-add_filter('woocommerce_product_tabs', __NAMESPACE__ . '\\hc_custom_product_tabs', 98, 1);
+add_filter('woocommerce_product_tabs', 'hc_custom_product_tabs', 98, 1);
 
 function hc_custom_product_tabs($tabs) {
     $product = wc_get_product(get_the_ID());
@@ -356,7 +287,7 @@ function hc_custom_product_tabs($tabs) {
             } else {
                 global $post;
                 if (!empty($post->post_content)) {
-                    the_content();
+                    echo hc_format_content(get_the_content(), 'product');
                 }
             }
             // Fallback to WooCommerce default
@@ -377,7 +308,7 @@ function hc_custom_product_tabs($tabs) {
 
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 
-add_filter('woocommerce_shortcode_products_query', __NAMESPACE__ . '\\hc_filter_products_by_store_meta', 10, 2);
+add_filter('woocommerce_shortcode_products_query', 'hc_filter_products_by_store_meta', 10, 2);
 function hc_filter_products_by_store_meta($query_args, $atts) {
 	$store = isset($atts['current_store']) ? $atts['current_store'] : 'any-zone';
 	if ($store === 'any-zone') {
@@ -449,3 +380,161 @@ add_action( 'woocommerce_before_calculate_totals', function( $cart ) {
         }
     }
 }, 10 );
+
+add_filter('woocommerce_after_single_product', 'heart_option_hack', 10);
+function heart_option_hack() {
+  global $product;
+
+  if ($product->get_slug() == 'heart-cookie-cake') {?>
+    <script>
+      xxElement = document.getElementsByClassName("wc-pao-addons-container")[0];
+      xxElement.input = document.getElementById("addon-49833-enter-xxyy-text-e-g-jbar-0");
+      selectElement = document.getElementById("pa_heart-cake-writing");
+      if (selectElement.value != 'xx-yy') {
+        xxElement.style.display = "none";
+      }
+      selectElement.onchange = function () {
+        if (selectElement.value == 'xx-yy') {
+          xxElement.style.display = "";
+        }
+        else {
+          xxElement.style.display = "none";
+          xxElement.value = "";
+        }
+      }
+    </script>
+  <?php }
+}
+
+add_filter('woocommerce_add_cart_item_data', 'product_description', 20, 2);
+function product_description($cart_item_data, $product_id) {
+  if (get_field('description_packing', $product_id) == 'show') {
+    $cart_item_data['description_packing'] = wc_get_product($product_id)->get_description();
+  }
+  return ($cart_item_data);
+}
+
+/**
+ * Replace product description editor with a plain textarea (no TinyMCE)
+ */
+add_action('init', function() {
+    // Disable Gutenberg for products
+    add_filter('use_block_editor_for_post_type', function($use_block_editor, $post_type) {
+        if ($post_type === 'product') {
+            return false;
+        }
+        return $use_block_editor;
+    }, 10, 2);
+
+    // Disable TinyMCE for products
+    add_filter('user_can_richedit', function($can) {
+        global $post;
+        if ($post && $post->post_type === 'product') {
+            return false; // force plain textarea
+        }
+        return $can;
+    });
+});
+
+add_filter('woocommerce_get_item_data', 'product_description_get', 20, 2);
+function product_description_get($item_data, $cart_item) {
+    // Only run if your custom field exists
+    if (!empty($cart_item['description_packing'])) {
+        $html = $cart_item['description_packing'];
+        // Extract <ol>key</ol><li>value</li> pairs
+        preg_match_all('/<ol>(.*?)<\/ol>\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $item_data[] = array(
+                'key'   => trim($match[1]),
+                'value' => trim($match[2]),
+            );
+        }
+    }
+
+    return $item_data;
+}
+
+/**
+ * Add custom meta to order
+ */
+add_filter('woocommerce_checkout_create_order_line_item', 'product_description_meta', 20, 4);
+function product_description_meta($item, $cart_item_key, $values, $order) {
+  if (isset($values['description_packing'])) {
+    $item->add_meta_data(
+      'contains',
+      $values['description_packing'],
+      true
+    );
+  }
+}
+
+/* custom description processing */
+function hc_shop_content() {
+  if (get_field('display_content_on_shop_page') == 'show') {
+    global $product;
+    $content = get_post_field( 'post_content', $product->get_id() );
+    if ($content) {
+        echo hc_format_content( $content, 'shop');
+    }
+  }
+}
+add_action('woocommerce_after_shop_loop_item_title', 'hc_shop_content', 6);
+
+/**
+ * Parse custom <ol>/<li> markup into an HTML table
+ * Also append any <div> blocks found in the input.
+ *
+ * @param string $html Raw HTML string containing <ol>/<li> pairs and optional <div> blocks
+ * @param string $page Context: 'product' for single product, anything else for shop/archive
+ * @return string HTML table + appended divs
+ */
+function hc_format_content($html, $page) {
+    $output = '';
+
+    if ($page === 'product') {
+        // ✅ Single product: WooCommerce attribute-style table
+        $output .= '<table class="woocommerce-product-attributes shop_attributes" style="text-align:left;"><tbody>';
+
+        preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $key   = !empty($match[1]) ? trim($match[1]) : '1';
+            $value = isset($match[2]) ? trim($match[2]) : '';
+
+            $output .= '<tr class="woocommerce-product-attributes-item">';
+            $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
+            $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</tbody></table>';
+    } else {
+        // ✅ Not single: centered table, rows centered, one column "key - value"
+        $output .= '<table class="hc-format-content" style="margin:0 auto; text-align:center;"><tbody>';
+
+        preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $key   = !empty($match[1]) ? trim($match[1]) : '';
+            $value = isset($match[2]) ? trim($match[2]) : '';
+
+            $display = $key !== '' ? ($key . ' - ' . $value) : $value;
+
+            $output .= '<tr style="text-align:center;">';
+            $output .= '<td>' . esc_html($display) . '</td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</tbody></table>';
+    }
+
+    // ✅ Append any <div> blocks found in the input
+    preg_match_all('/<div[^>]*>.*?<\/div>/s', $html, $divs);
+    if (!empty($divs[0])) {
+        foreach ($divs[0] as $div) {
+            $output .= $div;
+        }
+    }
+
+    return $output;
+}

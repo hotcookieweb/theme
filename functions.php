@@ -17,6 +17,7 @@ $sage_includes = [
     'lib/wrapper.php', // Theme wrapper class
     'lib/customizer.php', // Theme customizer
     'lib/ahotcookie.php',
+    'lib/buildabox.php',
 ];
 
 foreach ($sage_includes as $file) {
@@ -689,3 +690,8 @@ add_filter( 'woocommerce_cart_item_subtotal', function( $subtotal, $cart_item, $
 
     return $subtotal;
 }, 10, 3 );
+
+// need to update cart details in header
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_script('wc-cart-fragments');
+});
