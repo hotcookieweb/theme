@@ -183,7 +183,9 @@ add_action('template_redirect', function () {
   }
 });
 
+/* remove related and upsell products */
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
 
 add_filter('woocommerce_shortcode_products_query', 'hc_filter_products_by_store_meta', 10, 2);
 function hc_filter_products_by_store_meta($query_args, $atts) {
