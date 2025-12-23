@@ -1,66 +1,112 @@
 jQuery(function($){
-    // remove default WooCommerce ajax handler
-    $('.product_cat-build-a-box a.add_to_cart_button')
-        .removeClass('ajax_add_to_cart')
-        .off('click');
-
-    // intercept single product form submit
-    $(document).on('submit', 'form.cart', function(e){
-        if ($(this).find('.single_add_to_cart_button').length) {
-            e.preventDefault();
-            $(this).find('.single_add_to_cart_button').trigger('hc_buildabox');
-        }
-    });
-
-    // intercept shop page button click
-    $(document).on('click', '.product_cat-build-a-box a.add_to_cart_button', function(e){
-        e.preventDefault();
-        $(this).trigger('hc_buildabox');
-    });
-    // Globals
+    // ===============================
+    // GLOBALS
+    // ===============================
     let boxSize = 0;
     let productId = 0;
-    let boxDiscount = '';
 
-    $(document).on('hc_buildabox', '.single_add_to_cart_button, .add_to_cart_button', function(){
-        const $buildButton = $(this);
-        const $product     = $buildButton.closest('.product');
 
-        boxSize     = parseInt($product.find('.box-config').data('box-size'), 10) || 0;
-        productId   = parseInt($product.find('[name="add-to-cart"]').val(), 10)
-                    || parseInt($product.find('.add_to_cart_button').data('product_id'), 10)
-                    || 0;
-        boxDiscount = ($product.find('.box-discount').data('box-discount') ?? '').toString().trim();
-
-        if (boxSize <= 0 || productId === 0 || boxDiscount === '') {
-            alert('Product config error: missing box size, product ID, or discount');
-            return;
-        }
-
-        // disable the button while modal is active
-        $buildButton.prop('disabled', true).addClass('disabled');
-
-        $.ajax({
-            url: hc_box_modal_params.ajax_url,
-            data: { action: 'hc_get_box_products' },
-            type: 'GET',
-            dataType: 'json',
-            success: function(response){
-                if (response.success) {
-                    $(document.body).WCBackboneModal({
-                        template: 'hc-modal-add-box-products',
-                        variable: response.data
-                    });
-                }
-            },
-            error: function(xhr, status, error){
-                // re‑enable on AJAX error
-                reenableBuildBoxButtons();
-                alert('Error loading box products.');
-            }
-        });
+    // ===============================
+    // DISABLE WOO AJAX FOR BOX PRODUCTS
+    // ===============================
+    jQuery(function($){
+        $('.add_to_cart_button[data-box-size], .single_add_to_cart_button[data-box-size]')
+            .removeClass('ajax_add_to_cart')
+            .off('click');
     });
 
+
+    // ===============================
+    // SHOP PAGE — INTERCEPT CLICK
+    // ===============================
+    jQuery(document).on('click', '.add_to_cart_button[data-box-size]', function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        jQuery(this).trigger('hc_buildabox');
+    });
+
+
+    // ===============================
+    // SINGLE PRODUCT PAGE — INTERCEPT FORM SUBMIT
+    // ===============================
+    jQuery(document).on('submit', 'form.cart', function(e){
+
+        const $btn = jQuery(this).find('.single_add_to_cart_button[data-box-size]');
+        if (!$btn.length) return;
+
+        // Prevent WooCommerce from adding to cart
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        // Only open modal if the user actually clicked the button
+        if (e.originalEvent !== undefined) {
+            $btn.trigger('hc_buildabox');
+        }
+    });
+
+    // ===============================
+    // UNIFIED BUILD-A-BOX HANDLER
+    // ===============================
+    jQuery(document).on(
+        'hc_buildabox',
+        '.add_to_cart_button[data-box-size], .single_add_to_cart_button[data-box-size]',
+        function () {
+
+            const $btn = jQuery(this);
+            const $product = $btn.closest('.product');
+
+            // Primary source: data attributes
+            productId = parseInt($btn.data('product_id'), 10) ||
+                        parseInt($btn.val(), 10) || 0;
+
+            boxSize   = parseInt($btn.data('box-size'), 10) || 0;
+
+
+            if (boxSize <= 0 || productId === 0) {
+                alert('Product config error: missing box size or product ID');
+                return;
+            }
+
+            $btn.prop('disabled', true).addClass('disabled');
+
+            // 2. Fallbacks ONLY if needed (single product forms)
+            if (!productId) {
+                productId =
+                    parseInt($product.find('[name="add-to-cart"]').val(), 10) ||
+                    parseInt($product.find('.add_to_cart_button').data('product_id'), 10) ||
+                    0;
+            }
+
+            // 3. Validate
+            if (boxSize <= 0 || productId === 0) {
+                alert('Product config error: missing box size or product ID');
+                return;
+            }
+
+            // 4. Disable button
+            $btn.prop('disabled', true).addClass('disabled');
+
+            // 5. Load modal
+            jQuery.ajax({
+                url: hc_box_modal_params.ajax_url,
+                data: { action: 'hc_get_box_products', box_size: boxSize, product_id: productId },
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        jQuery(document.body).WCBackboneModal({
+                            template: 'hc-modal-add-box-products',
+                            variable: response.data
+                        });
+                    }
+                },
+                error: function () {
+                    reenableBuildBoxButtons();
+                    alert('Error loading box products.');
+                }
+            });
+        }
+    );
     jQuery(document.body).on('wc_backbone_modal_loaded', function(evt, templateId) {
         const text = document.querySelector('.hc-progress-text');
         text.textContent = `0 / ${boxSize}`;
@@ -145,7 +191,6 @@ jQuery(function($){
             product_id: productId,
             quantity: 1,
             selections: JSON.stringify(selections),
-            discount: boxDiscount
         }, function(response) {
             if (response && response.fragments) {
                 $.each(response.fragments, function(selector, html) {

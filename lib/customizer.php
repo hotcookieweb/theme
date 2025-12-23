@@ -90,7 +90,6 @@ function hc_edit_column($columns) {
     unset($columns['taxonomy-product_brand']);
     unset($columns['shipping_category']);
     unset($columns['product_cat']);
-    unset($columns['product_tag']);
 
     $new_columns = array();
   // add new order status after processing
@@ -101,6 +100,7 @@ function hc_edit_column($columns) {
             $new_columns['hc_shipping'] = '<span>Location<br>Lead Time<br>Method</span>';
             $new_columns['hc_stock'] = 'Stock';
             $new_columns['product_cat'] = 'Categories';
+            $new_columns['product_tag'] = 'Tags';
         } else {
             $new_columns[$key] = $data;
         }

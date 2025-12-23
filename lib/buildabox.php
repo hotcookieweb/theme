@@ -2,20 +2,24 @@
 add_action('wp_ajax_hc_get_box_products', 'hc_get_box_products');
 add_action('wp_ajax_nopriv_hc_get_box_products', 'hc_get_box_products');
 add_action('wp_enqueue_scripts', function() {
-    if ( function_exists('WC') ) {
-        // Single product check
-        if ( is_product() ) {
-            global $post;
-            $product = wc_get_product($post->ID);
-            if ( $product && has_term('build-a-box', 'product_cat', $product->get_id()) ) {
-                hc_enqueue_box_scripts();
-            }
-        }
-        // ACF-driven product listing pages
-        if ( is_page() && get_field('product_category') ) {
+    if ( ! function_exists('WC') ) {
+        return;
+    }
+    // Conditionally load on single product pages
+    if ( is_product() ) {
+        global $post;
+        $box_size = get_field('size_of_box', $post->ID);
+
+        if ( $box_size > 0 ) {
             hc_enqueue_box_scripts();
         }
     }
+
+    // Always load on shop + category pages
+    if (( is_page() && get_field('product_category') ) || is_shop() || is_product_category()){
+        hc_enqueue_box_scripts();
+    }
+
 });
 
 function hc_enqueue_box_scripts() {
@@ -39,32 +43,108 @@ function hc_enqueue_box_scripts() {
         'ajax_url'=>admin_url('admin-ajax.php'),
         'cart_url'=>wc_get_cart_url(),
     ]);
+
     wp_enqueue_style( 'dashicons' );
 }
+
+add_filter('woocommerce_loop_add_to_cart_args', function($args, $product) {
+    $box_size = get_field('size_of_box', $product->get_id());
+
+    if ($box_size > 0) {
+        $args['attributes']['data-box-size'] = $box_size;
+    }
+
+    return $args;
+}, 10, 2);
+
+/* from my version of simple.php template from woocommerce */
+add_filter('hc_add_to_cart_button_attributes', function($attrs, $product) {
+    $box_size = get_field('size_of_box', $product->get_id());
+
+    if ($box_size > 0) {
+        $attrs['data-box-size']   = $box_size;
+        $attrs['data-product_id'] = $product->get_id();
+    }
+    return $attrs;
+}, 10, 2);
 
 add_action('wp_print_footer_scripts', 'hc_get_box_builder_template');
 
 add_filter('woocommerce_product_single_add_to_cart_text', function($text, $product) {
-    if (has_term('build-a-box', 'product_cat', $product->get_id())) {
+    $box_size = get_field('size_of_box', $product->get_id());
+    if ($box_size > 0) {
         return __('Build a Box', 'hotcookie');
     }
     return $text;
 }, 10, 2);
 
 add_filter('woocommerce_product_add_to_cart_text', function($text, $product) {
-    if (has_term('build-a-box', 'product_cat', $product->get_id())) {
-        return __('Build a Box', 'your-textdomain');
+    $box_size = get_field('size_of_box', $product->get_id());
+    if ($box_size > 0) {
+        return __('Build a Box', 'hotcookie');
     }
     return $text;
+}, 10, 2);
+
+add_filter('woocommerce_post_class', function($classes, $product) {
+    $box_size = get_field('size_of_box', $product->get_id());
+    if ($box_size > 0) {
+        $classes[] = 'product_cat-build-a-box';
+    }
+    return $classes;
 }, 10, 2);
 
 function hc_get_box_products() {
     ob_start();
 
-    $products = wc_get_products([
-        'category' => ['build-product'], // slug array
-        'limit'    => -1,
-    ]);
+    $assigned = wp_get_post_terms($_POST['product_id'], 'product_cat' );
+    error_log('assigned: ' . json_encode($assigned));
+    $parent = get_term_by( 'slug', 'build-a-box', 'product_cat' );
+    $parent_id = $parent ? $parent->term_id : 0;
+
+    $box_product_cats = [];
+
+    foreach ( $assigned as $cat ) {
+
+        // Must be a child or descendant of Build-a-Box
+        if ( $cat->parent != $parent_id && ! term_is_ancestor_of( $parent_id, $cat->term_id, 'product_cat' ) ) {
+            error_log('skipping ' . $cat->name);
+            continue;
+        }
+
+        // Check if this category has children
+        $children = get_terms([
+            'taxonomy'   => 'product_cat',
+            'parent'     => $cat->term_id,
+            'hide_empty' => false,
+            'fields'     => 'ids'
+        ]);
+
+        // If no children → it's a leaf
+        if ( empty( $children ) ) {
+            $box_product_cats[] = $cat;
+        }
+    }
+
+    $products = [];
+
+    if ( ! empty( $box_product_cats ) ) {
+
+        $box_product_ids = wp_list_pluck( $box_product_cats, 'term_id' );
+
+        $products = wc_get_products([
+            'limit'   => -1,
+            'exclude' => [ $product_id ],
+            'tax_query' => [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'term_id',
+                    'terms'    => $box_product_ids,
+                    'operator' => 'IN',
+                ]
+            ]
+        ]);
+    }
 
     if ($products) {
         echo '<ul class="hc-product-list">';
@@ -73,10 +153,6 @@ function hc_get_box_products() {
         echo '<tbody>';
 
         foreach ($products as $product) {
-            $regular_price = $product->get_regular_price();
-            $sale_price    = $product->get_sale_price();
-            $thumb         = $product->get_image('thumbnail');
-
             echo '<tr class="product-item">';
 
             // thumbnail cell
@@ -152,7 +228,8 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
     }
 
     // Discount parsing
-    $discount_raw = isset($_POST['discount']) ? trim($_POST['discount']) : '';
+    $discount_raw = get_field('percent_or_discount_amount', $product_id);
+    $discount_raw = trim((string) $discount_raw);;
     $discount     = 0;
     $is_percent   = false;
 
@@ -188,12 +265,19 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
 
 add_filter('woocommerce_cart_item_price', function($price, $cart_item, $cart_item_key) {
     if (!empty($cart_item['box_contents'])) {
-        $standard_total   = $cart_item['box_total'];
-        $discounted_total = $cart_item['box_discounted_total'];
+        $standard_total   = floatval($cart_item['box_total']);
+        $discounted_total = floatval($cart_item['box_discounted_total']);
 
-        $price = '<del>' . wc_price($standard_total) . '</del> ' .
-                 '<ins>' . wc_price($discounted_total) . '</ins>';
+        // If no discount, show only the price
+        if ($standard_total == $discounted_total) {
+            $price = wc_price($discounted_total);
+        } else {
+            // Show regular + discounted
+            $price = '<del>' . wc_price($standard_total) . '</del> ' .
+                     '<ins>' . wc_price($discounted_total) . '</ins>';
+        }
     }
+
     return $price;
 }, 10, 3);
 

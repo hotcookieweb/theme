@@ -253,6 +253,12 @@ function hotcookie_admin_menu() {
         remove_menu_page('branding');
         remove_menu_page('googlesitekit-dashboard');
         remove_menu_page('postman');
+        /* Don't use tags in my implementation */
+        remove_submenu_page(
+            'edit.php?post_type=product',
+            'edit-tags.php?taxonomy=product_tag&post_type=product'
+        );
+        remove_meta_box('tagsdiv-product_tag', 'product', 'side');
     }
 }
 add_filter('admin_menu', 'hotcookie_admin_menu', 999);
@@ -694,4 +700,67 @@ add_filter( 'woocommerce_cart_item_subtotal', function( $subtotal, $cart_item, $
 // need to update cart details in header
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_script('wc-cart-fragments');
+});
+
+add_filter('acf/location/rule_types', function($choices) {
+    $choices['Product']['wc_product_type'] = 'Product Type';
+    return $choices;
+});
+
+add_filter('acf/location/rule_values/wc_product_type', function($choices) {
+    $choices['simple_subscription']   = 'Simple Subscription';
+    $choices['variable_subscription'] = 'Variable Subscription';
+    return $choices;
+});
+
+add_action('init', function() {
+
+    // 1. Register rule type
+    add_filter('acf/location/rule_types', function($choices) {
+        $choices['Post']['wc_product_type'] = 'Product Type';
+        return $choices;
+    });
+
+    // 2. Populate rule values
+    add_filter('acf/location/rule_values/wc_product_type', function($choices) {
+
+        // Replace ACF defaults
+        $choices = [];
+
+        if (function_exists('wc_get_product_types')) {
+            foreach (wc_get_product_types() as $type => $label) {
+                $choices[$type] = $label;
+            }
+        }
+
+        return $choices;
+    });
+
+    // 3. Rule matching logic
+    add_filter('acf/location/rule_match/wc_product_type', function($match, $rule, $options) {
+
+        if (!isset($_GET['post'])) {
+            return false;
+        }
+
+        $product = wc_get_product($_GET['post']);
+        if (!$product) {
+            return false;
+        }
+
+        $type = $product->get_type();
+
+        if ($rule['operator'] === '==') {
+            return $type === $rule['value'];
+        }
+
+        return $type !== $rule['value'];
+
+    }, 10, 3);
+
+});
+
+/* Don't use tags in my implementation */
+add_action('admin_menu', function() {
+    remove_meta_box('tagsdiv-product_tag', 'product', 'side');
 });
