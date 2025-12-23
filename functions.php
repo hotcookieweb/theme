@@ -559,7 +559,7 @@ function on_user_logout($user_id)
     exit();
 }
 
-add_filter('wp_logout', 'on_user_logout', 10, 1);
+add_action('wp_logout', 'on_user_logout', 10, 1);
 
 add_action( 'woocommerce_product_bulk_edit_end', 'my_bulk_edit_fields' );
 function my_bulk_edit_fields() {
