@@ -90,6 +90,7 @@ function hc_edit_column($columns) {
     unset($columns['taxonomy-product_brand']);
     unset($columns['shipping_category']);
     unset($columns['product_cat']);
+    unset($columns["global_unique_id"] ); // Replace 'gtin' with the actual tab key
 
     $new_columns = array();
   // add new order status after processing
@@ -285,29 +286,6 @@ function heart_option_hack() {
   <?php }
 }
 
-/**
- * Replace product description editor with a plain textarea (no TinyMCE)
- */
-add_action('init', function() {
-    // Disable Gutenberg for products
-    add_filter('use_block_editor_for_post_type', function($use_block_editor, $post_type) {
-        if ($post_type === 'product') {
-            return false;
-        }
-        return $use_block_editor;
-    }, 10, 2);
-
-    // Disable TinyMCE for products
-    add_filter('user_can_richedit', function($can) {
-        global $post;
-        if ($post && $post->post_type === 'product') {
-            return false; // force plain textarea
-        }
-        return $can;
-    });
-});
-
-
 add_filter('woocommerce_product_tabs', 'hc_custom_product_tabs', 98, 1);
 function hc_custom_product_tabs($tabs) {
     $product = wc_get_product(get_the_ID());
@@ -445,7 +423,12 @@ add_action('woocommerce_after_shop_loop_item_title', 'hc_shop_content', 6);
 function hc_format_content($html, $page) {
     preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
     if (!empty($matches)) {
-      $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
+      if ($page === 'product') {
+        $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
+      }
+      else { /* shop */
+        $output = '<table class="woocommerce-product-attributes shop_attributes" style="margin-bottom:0;"><tbody>';
+      }
       foreach ($matches as $match) {
           $key   = !empty($match[1]) ? trim($match[1]) : '1';
           $value = isset($match[2]) ? trim($match[2]) : '';
@@ -512,3 +495,101 @@ function product_description_get($item_data, $cart_item) {
     return $item_data;
 }
 
+add_filter( 'woocommerce_get_price_html', function( $price_html, $product ) {
+    $regular_price = $product->get_regular_price();
+    $sale_price    = $product->get_sale_price();
+    $start_date    = $product->get_date_on_sale_from();
+    $end_date      = $product->get_date_on_sale_to();
+
+    // Handle variable + variable-subscription: use first variation
+    if ( $product->is_type( array( 'variable', 'variable-subscription' ) ) ) {
+        $variations = $product->get_children();
+        if ( ! empty( $variations ) ) {
+            $variation     = wc_get_product( $variations[0] );
+            $regular_price = $variation->get_regular_price();
+            $sale_price    = $variation->get_sale_price();
+            $start_date    = $variation->get_date_on_sale_from();
+            $end_date      = $variation->get_date_on_sale_to();
+        }
+    }
+
+    // Admin: always show sale info if set
+    if ( is_admin() && $sale_price ) {
+        $price_html  = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+        if ( $start_date instanceof WC_DateTime ) {
+            $price_html .= '<br><small>S' . $start_date->date( 'm/d/y' );
+            if ( $end_date instanceof WC_DateTime ) {
+                $price_html .= '<br>E' . $end_date->date( 'm/d/y' );
+            }
+            $price_html .= '</small>';
+        }
+        return $price_html;
+    }
+
+    // Frontend: only show sale if active
+    if ( $product->is_on_sale() ) {
+        $price_html = '<del>' . wc_price( $regular_price ) . '</del> <ins>' . wc_price( $sale_price ) . '</ins>';
+    }
+
+    return $price_html;
+}, 10, 2 );
+
+// Show both regular and sale price in cart line items
+add_filter( 'woocommerce_cart_item_price', function( $price, $cart_item, $cart_item_key ) {
+    $product = $cart_item['data'];
+
+    if ( is_admin() && $product->get_sale_price() ) {
+        $regular = wc_price( $product->get_regular_price() );
+        $sale    = wc_price( $product->get_sale_price() );
+        $price   = '<del>' . $regular . '</del> <ins>' . $sale . '</ins>';
+    } elseif ( $product->is_on_sale() ) {
+        $regular = wc_price( $product->get_regular_price() );
+        $sale    = wc_price( $product->get_sale_price() );
+
+        $price = '<del>' . $regular . '</del> <ins>' . $sale . '</ins>';
+    }
+
+    return $price;
+}, 10, 3 );
+
+// Show both regular and sale price in cart subtotal line
+add_filter( 'woocommerce_cart_item_subtotal', function( $subtotal, $cart_item, $cart_item_key ) {
+    $product = $cart_item['data'];
+
+    if ( $product->is_on_sale() ) {
+        $regular_total = wc_price( $product->get_regular_price() * $cart_item['quantity'] );
+        $sale_total    = wc_price( $product->get_sale_price() * $cart_item['quantity'] );
+
+        $subtotal = '<del>' . $regular_total . '</del> <ins>' . $sale_total . '</ins>';
+    }
+
+    return $subtotal;
+}, 10, 3 );
+
+
+add_action('admin_print_footer_scripts', function() {
+    $screen = get_current_screen();
+    if ($screen->post_type === 'product') {
+        ?>
+        <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof QTags !== 'undefined') {
+                // Re‑register OL and LI after defaults
+                QTags.addButton(
+                    'ol',
+                    'OL',
+                    '<ol>#</ol>'
+                );
+                QTags.addButton(
+                    'li',
+                    'LI',
+                    '<li>Item</li>'
+                );
+                // Re‑initialize toolbar so changes take effect
+                QTags._buttonsInit();
+            }
+        });
+        </script>
+        <?php
+    }
+});

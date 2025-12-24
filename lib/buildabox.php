@@ -94,11 +94,32 @@ add_filter('woocommerce_post_class', function($classes, $product) {
     return $classes;
 }, 10, 2);
 
+// Replace price HTML with ACF discount field
+add_filter('woocommerce_get_price_html', function($price_html, $product) {
+    if ( has_term('build-a-box', 'product_cat', $product->get_id()) ) {
+        $acf_discount = get_field('percent_or_discount_amount', $product->get_id());
+
+        if ($acf_discount !== '' && $acf_discount !== null) {
+            $acf_discount = trim($acf_discount);
+
+            if (substr($acf_discount, -1) === '%') {
+                $formatted = esc_html($acf_discount) . ' off';
+            } else {
+                $formatted = '$' . esc_html($acf_discount) . ' off';
+            }
+
+            // Only wrap in WooCommerce's amount span, not another .price span
+            $price_html = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted . '</bdi></span>';
+        }
+    }
+    return $price_html;
+}, 10, 2);
+
 function hc_get_box_products() {
     ob_start();
 
     $assigned = wp_get_post_terms($_POST['product_id'], 'product_cat' );
-    error_log('assigned: ' . json_encode($assigned));
+
     $parent = get_term_by( 'slug', 'build-a-box', 'product_cat' );
     $parent_id = $parent ? $parent->term_id : 0;
 
@@ -153,6 +174,13 @@ function hc_get_box_products() {
         echo '<tbody>';
 
         foreach ($products as $product) {
+            $product_id = $product->get_id();
+            // Skip Build-a-Box products
+            if (( has_term( 'build-a-box', 'product_cat', $product_id ) ) ||
+                ( $product->get_type() !== 'simple' ))  {
+                continue;
+            }
+
             echo '<tr class="product-item">';
 
             // thumbnail cell
