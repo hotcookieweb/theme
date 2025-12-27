@@ -3,6 +3,7 @@ jQuery(function($){
     // GLOBALS
     // ===============================
     let boxSize = 0;
+    let baseText = '';
     let productId = 0;
 
 
@@ -15,13 +16,19 @@ jQuery(function($){
             .off('click');
     });
 
-
     // ===============================
     // SHOP PAGE — INTERCEPT CLICK
     // ===============================
     jQuery(document).on('click', '.add_to_cart_button[data-box-size]', function(e){
         e.preventDefault();
         e.stopImmediatePropagation();
+
+        // grab the button text
+        const baseText = jQuery(this).text().trim();
+
+        // attach it to the element so the handler can read it
+        jQuery(this).data('baseText', baseText);
+
         jQuery(this).trigger('hc_buildabox');
     });
 
@@ -30,16 +37,17 @@ jQuery(function($){
     // SINGLE PRODUCT PAGE — INTERCEPT FORM SUBMIT
     // ===============================
     jQuery(document).on('submit', 'form.cart', function(e){
-
         const $btn = jQuery(this).find('.single_add_to_cart_button[data-box-size]');
         if (!$btn.length) return;
 
-        // Prevent WooCommerce from adding to cart
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        // Only open modal if the user actually clicked the button
         if (e.originalEvent !== undefined) {
+            // grab the button text
+            const baseText = $btn.text().trim();
+            $btn.data('baseText', baseText);
+
             $btn.trigger('hc_buildabox');
         }
     });
@@ -54,13 +62,13 @@ jQuery(function($){
 
             const $btn = jQuery(this);
             const $product = $btn.closest('.product');
+            baseText = $btn.data('baseText') || 'Build a Box';
 
             // Primary source: data attributes
             productId = parseInt($btn.data('product_id'), 10) ||
                         parseInt($btn.val(), 10) || 0;
 
             boxSize   = parseInt($btn.data('box-size'), 10) || 0;
-
 
             if (boxSize <= 0 || productId === 0) {
                 alert('Product config error: missing box size or product ID');
@@ -89,11 +97,12 @@ jQuery(function($){
             // 5. Load modal
             jQuery.ajax({
                 url: hc_box_modal_params.ajax_url,
-                data: { action: 'hc_get_box_products', box_size: boxSize, product_id: productId },
+                data: { action: 'hc_get_modal_data', product_id: productId},
                 type: 'POST',
                 dataType: 'json',
                 success: function (response) {
                     if (response.success) {
+                        console.log('Modal data loaded:', response.data);
                         jQuery(document.body).WCBackboneModal({
                             template: 'hc-modal-add-box-products',
                             variable: response.data
@@ -119,11 +128,17 @@ jQuery(function($){
         const $progressText = $modal.find('.hc-progress-text');
         const $finishBtn    = $modal.find('#finish-box');
         const $footer       = $modal.find('footer');
+        const $title        = $modal.find('.modal-title');
 
         let totalCount = 0;
+        let totalPrice = 0;
+
         $modal.find('.qty').each(function() {
-            const count = parseInt(jQuery(this).val(), 10) || 0;
-            totalCount += count;
+            const $input = jQuery(this);
+            const count  = parseInt($input.val(), 10) || 0;
+            const price  = parseFloat($input.data('price')) || 0; // assumes data-price on input
+            totalCount  += count;
+            totalPrice  += count * price;
         });
 
         // 🚨 Exceeded box size
@@ -139,10 +154,8 @@ jQuery(function($){
                 );
             } else {
                 $footer.find('.hc-footer-message')
-                    .text(totalCount + ' selected,' + ' only select ' + boxSize);
+                    .text(totalCount + ' selected, only select ' + boxSize);
             }
-
-            // stop here so later logic doesn’t re‑show the button
             return;
         } else {
             $finishBtn.show();
@@ -155,15 +168,20 @@ jQuery(function($){
         if (clamped >= boxSize) {
             $progressBar.css('display', 'none');
             $finishBtn.css('display', 'flex').removeClass('disabled');
-            return;
+        } else {
+            $progressBar.css('display', 'block');
+            $finishBtn.css('display', 'none').addClass('disabled');
+            $progressFill.css('width', percent + '%');
+            $progressText.text(`${clamped} / ${boxSize}`);
         }
 
-        $progressBar.css('display', 'block');
-        $finishBtn.css('display', 'none').addClass('disabled');
-
-        $progressFill.css('width', percent + '%');
-        $progressText.text(`${clamped} / ${boxSize}`);
+        $title.text(`${baseText} (${wc_price_format(totalPrice)})`);
     });
+
+    // helper to format price
+    function wc_price_format(amount) {
+        return '$' + amount.toFixed(2); // adjust for your currency formatting
+    }
 
     $(document).on('click', '#finish-box', function() {
         let selections = {};

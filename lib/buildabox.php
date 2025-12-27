@@ -1,6 +1,6 @@
 <?php
-add_action('wp_ajax_hc_get_box_products', 'hc_get_box_products');
-add_action('wp_ajax_nopriv_hc_get_box_products', 'hc_get_box_products');
+add_action('wp_ajax_hc_get_modal_data', 'hc_get_modal_data');
+add_action('wp_ajax_nopriv_hc_get_modal_data', 'hc_get_modal_data');
 add_action('wp_enqueue_scripts', function() {
     if ( ! function_exists('WC') ) {
         return;
@@ -52,6 +52,7 @@ add_filter('woocommerce_loop_add_to_cart_args', function($args, $product) {
 
     if ($box_size > 0) {
         $args['attributes']['data-box-size'] = $box_size;
+        $args['attributes']['data-discount'] = get_field('percent_or_discount_amount', $product->get_id());
     }
 
     return $args;
@@ -62,8 +63,9 @@ add_filter('hc_add_to_cart_button_attributes', function($attrs, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
 
     if ($box_size > 0) {
-        $attrs['data-box-size']   = $box_size;
         $attrs['data-product_id'] = $product->get_id();
+        $attrs['data-box-size']   = $box_size;
+        $attrs['data-discount'] = get_field('percent_or_discount_amount', $product->get_id());
     }
     return $attrs;
 }, 10, 2);
@@ -73,7 +75,7 @@ add_action('wp_print_footer_scripts', 'hc_get_box_builder_template');
 add_filter('woocommerce_product_single_add_to_cart_text', function($text, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
     if ($box_size > 0) {
-        return __('Build a Box', 'hotcookie');
+        return __(get_field('button_text', $product->get_id()), 'hotcookie');
     }
     return $text;
 }, 10, 2);
@@ -81,7 +83,7 @@ add_filter('woocommerce_product_single_add_to_cart_text', function($text, $produ
 add_filter('woocommerce_product_add_to_cart_text', function($text, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
     if ($box_size > 0) {
-        return __('Build a Box', 'hotcookie');
+        return __(get_field('button_text', $product->get_id()), 'hotcookie');
     }
     return $text;
 }, 10, 2);
@@ -96,26 +98,100 @@ add_filter('woocommerce_post_class', function($classes, $product) {
 
 // Replace price HTML with ACF discount field
 add_filter('woocommerce_get_price_html', function($price_html, $product) {
-    if ( has_term('build-a-box', 'product_cat', $product->get_id()) ) {
-        $acf_discount = get_field('percent_or_discount_amount', $product->get_id());
-
-        if ($acf_discount !== '' && $acf_discount !== null) {
-            $acf_discount = trim($acf_discount);
-
-            if (substr($acf_discount, -1) === '%') {
-                $formatted = esc_html($acf_discount) . ' off';
-            } else {
-                $formatted = '$' . esc_html($acf_discount) . ' off';
-            }
-
-            // Only wrap in WooCommerce's amount span, not another .price span
-            $price_html = '<span class="woocommerce-Price-amount amount"><bdi>' . $formatted . '</bdi></span>';
-        }
+    $discount = hc_get_discount( $product->get_id() );
+    $price_string = $discount['price_string'];
+    if ( empty( $price_string ) ) {
+        return $price_html;
     }
+    $price_html = '<span class="woocommerce-Price-amount amount"><bdi>' . $price_string . '</bdi></span>';
     return $price_html;
 }, 10, 2);
 
-function hc_get_box_products() {
+/**
+ * Format the Build‑a‑Box discount into a price string
+ *
+ * Handles:
+ * 1. Percentage values (e.g. "10%")
+ * 2. Numeric values (e.g. "10")
+ * 3. Text labels (e.g. "Price varies", "Varies", "Custom")
+ */
+/**
+ * Format the Build‑a‑Box discount into a price string.
+ *
+ * Always returns an array:
+ * [
+ *   'price_string' => string,
+ *   'discount'     => float,
+ *   'is_percent'   => bool
+ * ]
+ */
+function hc_get_discount( $product_id ) {
+
+    // Default return structure (safe for all callers)
+    $result = [
+        'price_string' => '',
+        'discount'     => 0,
+        'is_percent'   => false
+    ];
+
+    // Build‑a‑Box detection via ACF
+    $box_size = get_field( 'size_of_box', $product_id );
+    if ( empty( $box_size ) || intval( $box_size ) <= 0 ) {
+        return $result;
+    }
+
+    // Raw discount field
+    $discount_raw = get_field('percent_or_discount_amount', $product_id);
+    $raw = trim((string) $discount_raw);
+
+    // 1. Percentage (strict: digits + optional dot + %)
+    if (preg_match('/^[0-9]*\.?[0-9]+%$/', $raw)) {
+
+        $numeric = floatval(rtrim($raw, '%')) / 100;
+
+        if ($numeric < 0 || $numeric > 1) {
+            error_log(sprintf(
+                "%s line %s: Build-a-Box error: invalid discount percentage %s",
+                __FILE__, __LINE__, $raw
+            ));
+            return $result;
+        }
+
+        $result['is_percent']   = true;
+        $result['discount']     = $numeric;
+        $result['price_string'] = esc_html($raw) . ' off';
+
+        return $result;
+    }
+
+    // 2. Pure number (numeric discount)
+    if (is_numeric($raw)) {
+
+        $numeric = floatval($raw);
+
+        if ($numeric < 0) {
+            error_log(sprintf(
+                "%s line %s: Build-a-Box error: invalid discount amount %s",
+                __FILE__, __LINE__, $raw
+            ));
+            return $result;
+        }
+
+        $result['discount']     = $numeric;
+        $result['price_string'] = '$' . esc_html($raw) . ' off';
+
+        return $result;
+    }
+
+    // 3. Text label (anything else)
+    $result['price_string'] = esc_html($raw);
+    $result['discount']     = 0;
+    $result['is_percent']   = false;
+
+    return $result;
+}
+
+function hc_get_modal_data() {
     ob_start();
 
     $assigned = wp_get_post_terms($_POST['product_id'], 'product_cat' );
@@ -129,7 +205,6 @@ function hc_get_box_products() {
 
         // Must be a child or descendant of Build-a-Box
         if ( $cat->parent != $parent_id && ! term_is_ancestor_of( $parent_id, $cat->term_id, 'product_cat' ) ) {
-            error_log('skipping ' . $cat->name);
             continue;
         }
 
@@ -152,10 +227,10 @@ function hc_get_box_products() {
     if ( ! empty( $box_product_cats ) ) {
 
         $box_product_ids = wp_list_pluck( $box_product_cats, 'term_id' );
-
+        
         $products = wc_get_products([
             'limit'   => -1,
-            'exclude' => [ $product_id ],
+            'exclude' => [ $_POST['product_id'] ],
             'tax_query' => [
                 [
                     'taxonomy' => 'product_cat',
@@ -167,14 +242,18 @@ function hc_get_box_products() {
         ]);
     }
 
+    $discount_details = hc_get_discount($_POST['product_id']);
+    $discount = $discount_details['discount'];
+    $is_percent = $discount_details['is_percent'];
+    $box_size = get_field('size_of_box', $_POST['product_id']);
     if ($products) {
         echo '<ul class="hc-product-list">';
         echo '<table class="box-products-table">';
-        /* echo '<thead><tr><th></th><th>' . __('Product','hotcookie') . '</th><th>' . __('Quantity','hotcookie') . '</th></tr></thead>'; */
         echo '<tbody>';
 
         foreach ($products as $product) {
             $product_id = $product->get_id();
+
             // Skip Build-a-Box products
             if (( has_term( 'build-a-box', 'product_cat', $product_id ) ) ||
                 ( $product->get_type() !== 'simple' ))  {
@@ -195,8 +274,18 @@ function hc_get_box_products() {
                 )
             ) . '</td>';
 
+            if($discount != 0) {
+                if ($is_percent) {
+                    $price = $product->get_price() * (1 - $discount);
+                } else {
+                    $price = max(0, $product->get_price() - round($discount/$box_size, 2));
+                }
+            } else {
+                $price = $product->get_price();
+            }
+            $price = number_format((float)$price, 2, '.', '');
             // name cell
-            echo '<td class="product-name">' . esc_html( $product->get_name() ) . '</td>';
+            echo '<td class="product-name">' . esc_html( $product->get_name() ) . ' ($' . $price .')</td>';
 
             // quantity cell
             echo '<td class="product-qty">';
@@ -209,7 +298,8 @@ function hc_get_box_products() {
                         inputmode="numeric"
                         autocomplete="off"
                         aria-label="' . esc_attr__('Product quantity','hotcookie') . '"
-                        data-product-id="' . esc_attr($product->get_id()) . '">';
+                        data-product-id="' . esc_attr($product->get_id()) . '"
+                        data-price="' . esc_attr($price) . '">';
             echo '</td>';
 
             echo '</tr>';
@@ -217,7 +307,12 @@ function hc_get_box_products() {
         echo '</tbody></table>';
         echo '</ul>';
     }
-    wp_send_json_success(['modal_html' => ob_get_clean()]);
+
+    wp_send_json_success([
+        'product_html' => ob_get_clean(),
+        'title'        => get_field('button_text', $_POST['product_id']) ?: '',
+        'price'        => $discount_details['price_string']
+    ]);
     exit();
 }
 
@@ -255,37 +350,21 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
         $total_price += $product->get_price() * $qty;
     }
 
-    // Discount parsing
-    $discount_raw = get_field('percent_or_discount_amount', $product_id);
-    $discount_raw = trim((string) $discount_raw);;
-    $discount     = 0;
-    $is_percent   = false;
-
-    if ($discount_raw !== '') {
-        if (substr($discount_raw, -1) === '%') {
-            $is_percent = true;
-            $discount   = floatval(rtrim($discount_raw, '%')) / 100;
-            if ($discount < 0 || $discount > 1) {
-                error_log(sprintf("%s line: %s: Build-a-Box error: invalid discount percentage %s", __FILE__, __LINE__, $discount_raw));
-                $discount = 0;
-            }
-        } else {
-            $discount   = floatval($discount_raw);
-            if ($discount < 0 || $discount > $total_price) {
-                error_log(sprintf("%s line: %s: Build-a-Box error: invalid discount amount %s", __FILE__, __LINE__, $discount_raw));
-                $discount = 0;
-            }
-        }
+    $discount_details = hc_get_discount($product_id);
+    $discount = $discount_details['discount'];
+    if ($discount < 0 || $discount > $total_price) {
+        error_log(sprintf(
+            "%s line %s: Build-a-Box error: invalid discount amount %s",
+            __FILE__, __LINE__, $discount_raw
+        ));
+        $discount = 0;
     }
-
-    $discounted_total = $is_percent
-        ? $total_price * (1 - $discount)
-        : max(0, $total_price - $discount);
+    $is_percent = $discount_details['is_percent'];
+    $discounted_total = $is_percent ? $total_price * (1 - $discount) : max(0, $total_price - $discount);
 
     // Attach metadata
     $cart_item_data['box_contents']         = $selections;
     $cart_item_data['box_total']            = $total_price;
-    $cart_item_data['box_discount']         = $discount_raw;
     $cart_item_data['box_discounted_total'] = $discounted_total;
 
     return $cart_item_data;
@@ -373,14 +452,14 @@ function hc_get_box_builder_template() {
             <div class="wc-backbone-modal-content">
                 <section class="wc-backbone-modal-main" role="main">
                     <header class="wc-backbone-modal-header">
-                    <span class="modal-title">Build a Box</span>
+                    <span class="modal-title">{{{ data.title }}} ({{{data.price}}})</span>
                     <button class="modal-close modal-close-link dashicons dashicons-no-alt">
                         <span class="screen-reader-text">Close modal panel</span>
                     </button>
                     </header>
 
                     <article class="wc-backbone-modal-article hc-product-scroll">
-                        {{{ data.modal_html }}}
+                        {{{ data.product_html }}}
                     </article>
 
                     <footer class="wc-backbone-modal-footer">

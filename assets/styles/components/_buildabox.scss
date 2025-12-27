@@ -165,11 +165,11 @@
 
 /* Fixed widths for thumb + qty */
 .box-products-table td.product-thumb {
-  width: 80px;              /* matches .cart-thumb */
+  width: 70px;              /* matches .cart-thumb */
 }
 
 .box-products-table td.product-qty {
-  width: 100px;             /* enough room for input */
+  width: 60px;             /* enough room for input */
 }
 
 /* Name column fills remaining space, with horizontal padding */
@@ -188,7 +188,7 @@
 
 /* Quantity input */
 .box-products-table .product-qty input.qty {
-  width: 60px;
+  width: 45px;
   text-align: center;
   margin: 0;
 }
@@ -272,8 +272,13 @@ body.wc-backbone-modal-open {
     height: auto !important;
   }
   
+  .box-products-table td.product-qty {
+    width: 50px;             /* enough room for input */
+    padding-left: .4rem !important; /* force spacing on small screens */
+  }
+
   .product-qty input.qty {
-    width: 50px;      // narrower input
+    width: 45px !important;      // narrower input
   }
 
   .box-products-table td.product-name {
