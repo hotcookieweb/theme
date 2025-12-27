@@ -54,7 +54,7 @@ jQuery(function($){
 
             $btn = jQuery(this);
             $product = $btn.closest('.product');
-            baseText = $btn.data('baseText') || 'Build a Box';
+            baseText = $baseText = $btn.text().trim();;
 
             // Primary source: data attributes
             productId = parseInt($btn.data('product_id'), 10) ||
@@ -159,7 +159,7 @@ jQuery(function($){
             $progressText.text(`${clamped} / ${boxSize}`);
         }
 
-        $title.text(`${baseText} ($${amount.toFixed(2)})`);
+        $title.text(`${baseText} ($${totalPrice.toFixed(2)})`);
     });
 
 
