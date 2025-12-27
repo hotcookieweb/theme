@@ -6,9 +6,6 @@
 	}
 }
 
-
-
-
 .tax-product_cat {
 	.header {
 		background: $color-primary-1;
@@ -31,4 +28,11 @@
 			}
 		}
 	}
+}
+
+/* Override WooCommerce shop button hover to add white icon */
+.products li .add_to_cart_button:hover {
+    background-color: $color-primary-2;
+    background-image: url('../images/icon-bag-white.svg');
+    color: #fff;
 }
