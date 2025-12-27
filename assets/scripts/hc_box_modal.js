@@ -5,7 +5,9 @@ jQuery(function($){
     let boxSize = 0;
     let baseText = '';
     let productId = 0;
-
+    let quantity = 1;
+    let $btn = null;
+    let $product = null;
 
     // ===============================
     // DISABLE WOO AJAX FOR BOX PRODUCTS
@@ -23,12 +25,6 @@ jQuery(function($){
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        // grab the button text
-        const baseText = jQuery(this).text().trim();
-
-        // attach it to the element so the handler can read it
-        jQuery(this).data('baseText', baseText);
-
         jQuery(this).trigger('hc_buildabox');
     });
 
@@ -37,17 +33,13 @@ jQuery(function($){
     // SINGLE PRODUCT PAGE — INTERCEPT FORM SUBMIT
     // ===============================
     jQuery(document).on('submit', 'form.cart', function(e){
-        const $btn = jQuery(this).find('.single_add_to_cart_button[data-box-size]');
+        $btn = jQuery(this).find('.single_add_to_cart_button[data-box-size]');
         if (!$btn.length) return;
 
         e.preventDefault();
         e.stopImmediatePropagation();
 
         if (e.originalEvent !== undefined) {
-            // grab the button text
-            const baseText = $btn.text().trim();
-            $btn.data('baseText', baseText);
-
             $btn.trigger('hc_buildabox');
         }
     });
@@ -60,8 +52,8 @@ jQuery(function($){
         '.add_to_cart_button[data-box-size], .single_add_to_cart_button[data-box-size]',
         function () {
 
-            const $btn = jQuery(this);
-            const $product = $btn.closest('.product');
+            $btn = jQuery(this);
+            $product = $btn.closest('.product');
             baseText = $btn.data('baseText') || 'Build a Box';
 
             // Primary source: data attributes
@@ -70,6 +62,12 @@ jQuery(function($){
 
             boxSize   = parseInt($btn.data('box-size'), 10) || 0;
 
+            quantity =
+                parseInt($btn.data('quantity'), 10) ||                     // shop loop
+                parseInt($product.find('input.qty').val(), 10) ||          // single product page1;                                                         // fallback
+                1;                                                         // fallback
+
+
             if (boxSize <= 0 || productId === 0) {
                 alert('Product config error: missing box size or product ID');
                 return;
@@ -77,24 +75,10 @@ jQuery(function($){
 
             $btn.prop('disabled', true).addClass('disabled');
 
-            // 2. Fallbacks ONLY if needed (single product forms)
-            if (!productId) {
-                productId =
-                    parseInt($product.find('[name="add-to-cart"]').val(), 10) ||
-                    parseInt($product.find('.add_to_cart_button').data('product_id'), 10) ||
-                    0;
-            }
-
-            // 3. Validate
-            if (boxSize <= 0 || productId === 0) {
-                alert('Product config error: missing box size or product ID');
-                return;
-            }
-
-            // 4. Disable button
+            // Disable button
             $btn.prop('disabled', true).addClass('disabled');
 
-            // 5. Load modal
+            // Load modal
             jQuery.ajax({
                 url: hc_box_modal_params.ajax_url,
                 data: { action: 'hc_get_modal_data', product_id: productId},
@@ -175,13 +159,9 @@ jQuery(function($){
             $progressText.text(`${clamped} / ${boxSize}`);
         }
 
-        $title.text(`${baseText} (${wc_price_format(totalPrice)})`);
+        $title.text(`${baseText} ($${amount.toFixed(2)})`);
     });
 
-    // helper to format price
-    function wc_price_format(amount) {
-        return '$' + amount.toFixed(2); // adjust for your currency formatting
-    }
 
     $(document).on('click', '#finish-box', function() {
         let selections = {};
@@ -200,14 +180,14 @@ jQuery(function($){
         if (totalCount !== boxSize) {
             alert(`Please select exactly ${boxSize} items.`);
             return;
-        }
+        }                                                // fallback
 
         // Close modal before firing add_to_cart
         $(document.body).trigger('wc_backbone_modal_close');
 
         $.post('/?wc-ajax=add_to_cart', {
             product_id: productId,
-            quantity: 1,
+            quantity: quantity,
             selections: JSON.stringify(selections),
         }, function(response) {
             if (response && response.fragments) {
