@@ -469,9 +469,10 @@ function hc_get_box_builder_template() {
                                 <span class="hc-progress-text">0 / 3</span>
                             </div>
                         </div>
-
-                        <button id="finish-box" class="button button-primary modal-close" style="display:none;">
-                            Add to Cart
+                        <button id="finish-box"
+                            class="button product_type_simple add_to_cart_button modal-close"
+                            style="display:none;">
+                            <span class="hc-btn-text">Add to Cart</span>
                         </button>
                     </footer>
                 </section>
