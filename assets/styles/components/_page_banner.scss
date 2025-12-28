@@ -2,7 +2,6 @@
 	float: left;
 	width: 100%;
 	height: auto;
-	min-height: 416px;
 	background: $color-primary-1;
 	padding-top: 64px;
 	margin-bottom: 32px;
@@ -11,30 +10,24 @@
 	     -o-background-size: cover;
 	        background-size: cover;
 	background-position: center;
-	@include media-breakpoint-down(sm) {
-		height: auto;
-		min-height: 376px;
-	}
 	.container {
 		padding-top: 64px;
+		padding-bottom: 64px;
+		@include media-breakpoint-down(sm) {
+			padding-top: 32px;
+			padding-bottom: 32px;
+		}
 		h1 {
 			@include font-display;
 			color: $white;
 			width: 100%;
 			text-align: center;
-			@include media-breakpoint-down(md) {
-				width: 100%;
-			}
 		}
 		p {
 			@include font-h4;
 			color: $white;
 			width: 100%;
 			text-align: center;
-			@include media-breakpoint-down(md) {
-				width: 100%;
-				@include font-h6;
-			}
 		}
 	}
 }
