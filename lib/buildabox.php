@@ -205,6 +205,7 @@ function hc_get_modal_data() {
 
         // Must be a child or descendant of Build-a-Box
         if ( $cat->parent != $parent_id && ! term_is_ancestor_of( $parent_id, $cat->term_id, 'product_cat' ) ) {
+            error_log( 'Skipping category ' . $cat->name . ' parent ' . $cat->parent . ' parent_id ' . $parent_id . ' term_id ' . $cat->term_id );
             continue;
         }
 
@@ -227,7 +228,7 @@ function hc_get_modal_data() {
     if ( ! empty( $box_product_cats ) ) {
 
         $box_product_ids = wp_list_pluck( $box_product_cats, 'term_id' );
-        
+   
         $products = wc_get_products([
             'limit'   => -1,
             'exclude' => [ $_POST['product_id'] ],
@@ -255,8 +256,9 @@ function hc_get_modal_data() {
             $product_id = $product->get_id();
 
             // Skip Build-a-Box products
-            if (( has_term( 'build-a-box', 'product_cat', $product_id ) ) ||
+            if (( intval(get_field( 'size_of_box', $product_id )) > 0) ||
                 ( $product->get_type() !== 'simple' ))  {
+                    error_log( 'Skipping product ID ' . $product_id . ' type ' . $product->get_type() );
                 continue;
             }
 
@@ -284,6 +286,7 @@ function hc_get_modal_data() {
                 $price = $product->get_price();
             }
             $price = number_format((float)$price, 2, '.', '');
+
             // name cell
             echo '<td class="product-name">' . esc_html( $product->get_name() ) . ' ($' . $price .')</td>';
 

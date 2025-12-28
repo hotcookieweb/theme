@@ -263,6 +263,17 @@ function hotcookie_admin_menu() {
 }
 add_filter('admin_menu', 'hotcookie_admin_menu', 999);
 
+/* don't use product tags */
+add_action( 'admin_head', function() {
+    if (!wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
+        echo '<style>
+            #tagsdiv-product_tag {
+                display: none !important;
+            }
+        </style>';
+    }
+});
+
 function hc_add_link_to_admin_bar($admin_bar) {
     $site_name = parse_url(get_home_url(), PHP_URL_HOST);
     $admin_bar->remove_node('site-name');  // remove current site-name
@@ -631,6 +642,7 @@ add_action('wp_enqueue_scripts', function() {
     wp_enqueue_script('wc-cart-fragments');
 });
 
+/* add custom ACF location rule for WooCommerce product types */
 add_filter('acf/location/rule_types', function($choices) {
     $choices['Product']['wc_product_type'] = 'Product Type';
     return $choices;

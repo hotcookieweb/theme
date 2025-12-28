@@ -91,6 +91,7 @@ function hc_edit_column($columns) {
     unset($columns['shipping_category']);
     unset($columns['product_cat']);
     unset($columns["global_unique_id"] ); // Replace 'gtin' with the actual tab key
+    unset( $columns['product_tag'] );
 
     $new_columns = array();
   // add new order status after processing
@@ -101,13 +102,22 @@ function hc_edit_column($columns) {
             $new_columns['hc_shipping'] = '<span>Location<br>Lead Time<br>Method</span>';
             $new_columns['hc_stock'] = 'Stock';
             $new_columns['product_cat'] = 'Categories';
-            $new_columns['product_tag'] = 'Tags';
         } else {
             $new_columns[$key] = $data;
         }
     }
     return $new_columns;
 }
+add_action( 'admin_head', function() {
+    echo '<style>
+        .column-hc_stock {
+            width: 80px !important;
+            max-width: 80px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>';
+});
 
 add_action('manage_product_posts_custom_column', 'hc_column_content', 10, 2);
 function hc_column_content($column, $product_id) {
