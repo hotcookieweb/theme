@@ -164,7 +164,8 @@ function hc_get_discount( $product_id ) {
     // Raw discount field
     $discount_raw = get_field('percent_or_discount_amount', $product_id);
     $raw = trim((string) $discount_raw);
-
+    $product = wc_get_product( $product_id );
+    $regular_price   = $product->get_price();
     // 1. Percentage (strict: digits + optional dot + %)
     if (preg_match('/^[0-9]*\.?[0-9]+%$/', $raw)) {
 
@@ -180,7 +181,7 @@ function hc_get_discount( $product_id ) {
 
         $result['is_percent']   = true;
         $result['discount']     = $numeric;
-        $result['price_string'] = esc_html($raw) . ' off';
+        $result['price_string'] = esc_html($raw) . ' off of $' . number_format((float)$regular_price, 2, '.', '');
 
         return $result;
     }
@@ -197,9 +198,10 @@ function hc_get_discount( $product_id ) {
             ));
             return $result;
         }
-
+        $product = wc_get_product( $product_id );
+        $regular_price   = $product->get_price();
         $result['discount']     = $numeric;
-        $result['price_string'] = '$' . esc_html($raw) . ' off';
+        $result['price_string'] = '$' . esc_html($raw) . ' off of $' . number_format((float)$regular_price, 2, '.', '');
 
         return $result;
     }
