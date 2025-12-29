@@ -207,15 +207,23 @@ function hc_get_discount( $product_id ) {
             ));
             return $result;
         }
-        $result['discount']     = $numeric;
-        if ( $lowest_price && $highest_price ) {
-            $result['price_string'] = '<del>' . wc_price($lowest_price) . ' - ' . wc_price($highest_price) . '</del> ' .
-                     '<ins>' . wc_price($lowest_price-$numeric) . ' - ' . wc_price($highest_price-$numeric) . '</ins>';
-        } else {
-            $result['price_string'] = '<del>' . wc_price($regular_price) . '</del> ' .
-                     '<ins>' . wc_price($regular_price-$numeric) . '</ins>';
+        $result['discount'] = $numeric;
+        if ( $numeric > 0) {
+            if ( $lowest_price && $highest_price) {
+                $result['price_string'] = '<del>' . wc_price($lowest_price) . ' - ' . wc_price($highest_price) . '</del> ' .
+                        '<ins>' . wc_price($lowest_price-$numeric) . ' - ' . wc_price($highest_price-$numeric) . '</ins>';
+            } else {
+                $result['price_string'] = '<del>' . wc_price($regular_price) . '</del> ' .
+                        '<ins>' . wc_price($regular_price-$numeric) . '</ins>';
+            }
         }
-
+        else {
+            if ( $lowest_price && $highest_price) {
+                $result['price_string'] = wc_price($lowest_price) . ' - ' . wc_price($highest_price);
+            } else {
+                $result['price_string'] = wc_price($regular_price);
+            }
+        }
         return $result;
     }
 
