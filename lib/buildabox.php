@@ -310,15 +310,15 @@ function hc_get_modal_data() {
                 if ($is_percent) {
                     $price = $product->get_price() * (1 - $discount);
                 } else {
-                    $price = max(0, $product->get_price() - round($discount/$box_size, 2));
+                    $price = max(0, $product->get_price() - $discount/$box_size);
                 }
             } else {
                 $price = $product->get_price();
             }
-            $price = number_format((float)$price, 2, '.', '');
+            $display_price = number_format((float)$price, 2, '.', '');
 
             // name cell
-            echo '<td class="product-name">' . esc_html( $product->get_name() ) . ' ($' . $price .')</td>';
+            echo '<td class="product-name">' . esc_html( $product->get_name() ) . ' ($' . $display_price .')</td>';
 
             // quantity cell
             echo '<td class="product-qty">';
