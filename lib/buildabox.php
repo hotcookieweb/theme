@@ -1,4 +1,7 @@
 <?php
+
+use BcMath\Number;
+
 add_action('wp_ajax_hc_get_modal_data', 'hc_get_modal_data');
 add_action('wp_ajax_nopriv_hc_get_modal_data', 'hc_get_modal_data');
 add_action('wp_enqueue_scripts', function() {
@@ -130,6 +133,7 @@ add_action('woocommerce_after_add_to_cart_button', function() {
 add_filter('woocommerce_get_price_html', function($price_html, $product) {
     $discount = hc_get_discount( $product->get_id() );
     $price_string = $discount['price_string'];
+    error_log( 'Price string: ' . $price_string );
     if ( empty( $price_string ) ) {
         return $price_html;
     }
@@ -162,52 +166,61 @@ function hc_get_discount( $product_id ) {
     }
 
     // Raw discount field
-    $discount_raw = get_field('percent_or_discount_amount', $product_id);
-    $raw = trim((string) $discount_raw);
+    $discount = trim(get_field('percent_or_discount_amount', $product_id));
+    $lowest_price = (float)get_field('lowest_price', $product_id);
+    $highest_price = (float)get_field('highest_price', $product_id);
+    error_log( 'Lowest price: ' . $lowest_price . ' Highest price: ' . $highest_price );
     $product = wc_get_product( $product_id );
-    $regular_price   = $product->get_price();
+    $regular_price   = (float)$product->get_price();
     // 1. Percentage (strict: digits + optional dot + %)
-    if (preg_match('/^[0-9]*\.?[0-9]+%$/', $raw)) {
+    if (preg_match('/^[0-9]*\.?[0-9]+%$/', $discount)) {
 
-        $numeric = floatval(rtrim($raw, '%')) / 100;
+        $numeric = floatval(rtrim($discount, '%')) / 100;
 
         if ($numeric < 0 || $numeric > 1) {
             error_log(sprintf(
                 "%s line %s: Build-a-Box error: invalid discount percentage %s",
-                __FILE__, __LINE__, $raw
+                __FILE__, __LINE__, $discount
             ));
             return $result;
         }
 
         $result['is_percent']   = true;
         $result['discount']     = $numeric;
-        $result['price_string'] = esc_html($raw) . ' off of $' . number_format((float)$regular_price, 2, '.', '');
-
+        if ( $lowest_price && $highest_price ) {
+            $result['price_string'] = '<del>' . wc_price($lowest_price) . ' - ' . wc_price($highest_price) . '</del> ' .
+                     '<ins>' . wc_price($lowest_price*(1-$numeric)) . ' - ' . wc_price($highest_price*(1-$numeric)) . '</ins>';
+        } else {
+            $result['price_string'] = '<del>' . wc_price($regular_price) . '</del> ' .
+                     '<ins>' . wc_price($regular_price*(1-$numeric)) . '</ins>';
+        }
         return $result;
     }
 
     // 2. Pure number (numeric discount)
-    if (is_numeric($raw)) {
-
-        $numeric = floatval($raw);
-
+    if (is_numeric($discount) or empty($discount)) {
+        $numeric = floatval($discount);
         if ($numeric < 0) {
             error_log(sprintf(
                 "%s line %s: Build-a-Box error: invalid discount amount %s",
-                __FILE__, __LINE__, $raw
+                __FILE__, __LINE__, $discount
             ));
             return $result;
         }
-        $product = wc_get_product( $product_id );
-        $regular_price   = $product->get_price();
         $result['discount']     = $numeric;
-        $result['price_string'] = '$' . esc_html($raw) . ' off of $' . number_format((float)$regular_price, 2, '.', '');
+        if ( $lowest_price && $highest_price ) {
+            $result['price_string'] = '<del>' . wc_price($lowest_price) . ' - ' . wc_price($highest_price) . '</del> ' .
+                     '<ins>' . wc_price($lowest_price-$numeric) . ' - ' . wc_price($highest_price-$numeric) . '</ins>';
+        } else {
+            $result['price_string'] = '<del>' . wc_price($regular_price) . '</del> ' .
+                     '<ins>' . wc_price($regular_price-$numeric) . '</ins>';
+        }
 
         return $result;
     }
 
     // 3. Text label (anything else)
-    $result['price_string'] = esc_html($raw);
+    $result['price_string'] = esc_html($discount);
     $result['discount']     = 0;
     $result['is_percent']   = false;
 
