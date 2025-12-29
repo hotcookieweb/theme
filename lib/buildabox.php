@@ -50,9 +50,10 @@ function hc_enqueue_box_scripts() {
 add_filter('woocommerce_loop_add_to_cart_args', function($args, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
 
-    if ($box_size > 0) {
+    if ($box_size > 0 && get_field('build_vs_customize', $product->get_id()) != 'customize') {
         $args['attributes']['data-box-size'] = $box_size;
         $args['attributes']['data-discount'] = get_field('percent_or_discount_amount', $product->get_id());
+        $args['attributes']['data-box-mode'] = 'build';
     }
 
     return $args;
@@ -62,10 +63,11 @@ add_filter('woocommerce_loop_add_to_cart_args', function($args, $product) {
 add_filter('hc_add_to_cart_button_attributes', function($attrs, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
 
-    if ($box_size > 0) {
+    if ($box_size > 0 && get_field('build_vs_customize', $product->get_id()) != 'customize') {
         $attrs['data-product_id'] = $product->get_id();
         $attrs['data-box-size']   = $box_size;
-        $attrs['data-discount'] = get_field('percent_or_discount_amount', $product->get_id());
+        $attrs['data-discount']   = get_field('percent_or_discount_amount', $product->get_id());
+        $attrs['data-box-mode']   = 'build';
     }
     return $attrs;
 }, 10, 2);
@@ -74,7 +76,7 @@ add_action('wp_print_footer_scripts', 'hc_get_box_builder_template');
 
 add_filter('woocommerce_product_single_add_to_cart_text', function($text, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
-    if ($box_size > 0) {
+    if ($box_size > 0 && get_field('build_vs_customize', $product->get_id()) != 'customize') {
         return __(get_field('button_text', $product->get_id()), 'hotcookie');
     }
     return $text;
@@ -82,7 +84,7 @@ add_filter('woocommerce_product_single_add_to_cart_text', function($text, $produ
 
 add_filter('woocommerce_product_add_to_cart_text', function($text, $product) {
     $box_size = get_field('size_of_box', $product->get_id());
-    if ($box_size > 0) {
+    if ($box_size > 0 && get_field('build_vs_customize', $product->get_id()) != 'customize') {
         return __(get_field('button_text', $product->get_id()), 'hotcookie');
     }
     return $text;
@@ -95,6 +97,34 @@ add_filter('woocommerce_post_class', function($classes, $product) {
     }
     return $classes;
 }, 10, 2);
+
+add_action('woocommerce_after_add_to_cart_button', function() {
+    global $product;
+
+    $box_size = get_field('size_of_box', $product->get_id());
+    $mode     = get_field('build_vs_customize', $product->get_id());
+    $discount = get_field('percent_or_discount_amount', $product->get_id());
+
+    if ($box_size > 0 && $mode === 'customize') {
+
+        // Pull the button text from ACF
+        $button_text = get_field('button_text', $product->get_id());
+
+        // Fallback if empty
+        if (!$button_text) {
+            $button_text = 'Customize';
+        }
+
+        echo '<button style="margin-left: 12px;"
+                class="single_add_to_cart_button button alt customize-button" 
+                data-product_id="' . $product->get_id() . '" 
+                data-box-size="' . $box_size . '"
+                data-discount="' . $discount . '"
+                data-box-mode="customize">
+                ' . esc_html($button_text) . '
+              </button>';
+    }
+});
 
 // Replace price HTML with ACF discount field
 add_filter('woocommerce_get_price_html', function($price_html, $product) {
@@ -114,16 +144,7 @@ add_filter('woocommerce_get_price_html', function($price_html, $product) {
  * 1. Percentage values (e.g. "10%")
  * 2. Numeric values (e.g. "10")
  * 3. Text labels (e.g. "Price varies", "Varies", "Custom")
- */
-/**
- * Format the Build‑a‑Box discount into a price string.
- *
- * Always returns an array:
- * [
- *   'price_string' => string,
- *   'discount'     => float,
- *   'is_percent'   => bool
- * ]
+
  */
 function hc_get_discount( $product_id ) {
 
@@ -247,6 +268,15 @@ function hc_get_modal_data() {
     $discount = $discount_details['discount'];
     $is_percent = $discount_details['is_percent'];
     $box_size = get_field('size_of_box', $_POST['product_id']);
+    $product = wc_get_product( $_POST['product_id'] );
+    $product_defaults = hc_format_content($product->get_description(), 'customize');
+    // Build a fast lookup: name → quantity
+    $defaults = [];
+    /** @var array $product_defaults */
+    foreach ($product_defaults as $default) {
+        /* product names may have (gluten-free/vegan) or similar suffixes, strip them for matching */
+        $defaults[ trim(preg_replace('/\([^)]*\)/', '', strtolower($default['name'])))] = intval($default['quantity']);
+    }
     if ($products) {
         echo '<ul class="hc-product-list">';
         echo '<table class="box-products-table">';
@@ -295,7 +325,7 @@ function hc_get_modal_data() {
                 echo '<input type="number"
                         class="input-text qty text"
                         name="quantity[' . esc_attr($product->get_id()) . ']"
-                        value="0"
+                        value="' . ($defaults[ strtolower($product->get_name()) ] ?? 0) . '"
                         min="0"
                         step="1"
                         inputmode="numeric"

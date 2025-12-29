@@ -430,44 +430,67 @@ add_action('woocommerce_after_shop_loop_item_title', 'hc_shop_content', 6);
  * @param string $page Context: 'product' for single product, anything else for shop/archive
  * @return string HTML table + appended divs
  */
-function hc_format_content($html, $page) {
-    preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
+/** @var array $product_defaults */
+function hc_format_content($content, $page) {
+    $items = [];
+    preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $content, $matches, PREG_SET_ORDER);
     if (!empty($matches)) {
-      if ($page === 'product') {
-        $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
-      }
-      else { /* shop */
-        $output = '<table class="woocommerce-product-attributes shop_attributes" style="margin-bottom:0;"><tbody>';
-      }
-      foreach ($matches as $match) {
-          $key   = !empty($match[1]) ? trim($match[1]) : '1';
-          $value = isset($match[2]) ? trim($match[2]) : '';
-          if ($page === 'product') {
-                  $output .= '<tr class="woocommerce-product-attributes-item">';
-                  $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($key) . '</th>';
-                  $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($value) . '</td>';
-                  $output .= '</tr>';
-          }
-          else { /* shop */
-                  $display = $key !== '' ? ($key . ' - ' . $value) : $value;
-                  $output .= '<tr style="text-align:center;">';
-                  $output .= '<td>' . esc_html($display) . '</td>';
-                  $output .= '</tr>';
-          }
-      }
-      $output .= '</tbody></table>';
+        foreach ($matches as $match) {
+            $qty  = !empty($match[1]) ? intval(trim($match[1])) : 1;
+            $name = isset($match[2]) ? trim($match[2]) : '';
+            $items[] = [
+                'name'     => $name,
+                'quantity' => $qty,
+            ];
+        }  
     }
 
     // Split on your <ol>/<li> pattern
-    $parts = preg_split('/(?:<ol>.*?<\/ol>)?\s*<li>.*?<\/li>/s', $html);
+    $parts = preg_split('/(?:<ol>.*?<\/ol>)?\s*<li>.*?<\/li>/s', $content);
 
     // $parts now contains everything NOT matched by your regex
     foreach ($parts as $part) {
         if (trim($part) !== '') {
-            $output = $part; // or wrap in <tr><td>…</td></tr>
+            $items[] = [
+                'quantity'     => '',
+                'name' => trim(wp_strip_all_tags($part)),
+            ];
         }
     }
-
+    
+    switch ($page) {
+    case 'customize':
+    case 'item_data':
+        return $items;
+        break;
+    case 'product':
+        $output = '<table class="woocommerce-product-attributes shop_attributes"><tbody>';
+        foreach ($items as $item) {
+            if ($item['quantity'] != '') {
+                $output .= '<tr class="woocommerce-product-attributes-item">';
+                $output .= '<th class="woocommerce-product-attributes-item__label" scope="row">' . esc_html($item['quantity']) . '</th>';
+                $output .= '<td class="woocommerce-product-attributes-item__value">' . esc_html($item['name']) . '</td>';
+                $output .= '</tr>';
+            }
+            else {
+                $output .= '<tr class="hc-extra-row"><td colspan="2">' . wp_kses_post($item['name']) . '</td></tr>';
+            }
+        }
+        break;
+    default: // shop/archive
+        $output = '<table class="woocommerce-product-attributes shop_attributes" style="margin-bottom:0;"><tbody>';
+        foreach ($items as $item) {
+            if ($item['quantity'] != '') {
+                $output .= '<tr style="text-align:center;">';
+                $output .= '<td>' . esc_html($item['quantity'] . ' - ' . $item['name']) . '</td>';
+                $output .= '</tr>';
+            }
+            else {
+                $output .= '<tr class="hc-extra-row"><td>' . wp_kses_post($item['name']) . '</td></tr>';
+            }
+        }
+    }
+    $output .= '</tbody></table>';
     return $output;
 }
 
@@ -478,26 +501,18 @@ function product_description_get($item_data, $cart_item) {
     }
     
     $product = $cart_item['data'];
-    $html = $product->get_description();
+    $items = hc_format_content($product->get_description(), 'item_data');
 
-    // 🔹 1) Extract <ol>key</ol><li>value</li> pairs
-    preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $html, $matches, PREG_SET_ORDER);
-    foreach ($matches as $match) {
-        $item_data[] = [
-            'key'   => !empty($match[1]) ? trim($match[1]) : 'Item',
-            'value' => isset($match[2]) ? trim($match[2]) : '',
-        ];
-    }
-
-    // 🔹 2) Collect everything NOT matched by the <li> regex
-    $parts = preg_split('/(?:<ol>.*?<\/ol>)?\s*<li>.*?<\/li>/s', $html);
-
-    foreach ($parts as $part) {
-        $part = trim(wp_strip_all_tags($part));
-        if ($part !== '') {
+    foreach ($items as $item) {
+        if ($item['quantity'] != '') {
+            $item_data[] = [
+                'key'   => $item['quantity'],
+                'value' => $item['name'],
+            ];
+        } else {
             $item_data[] = [
                 'key'   => 'Note',
-                'value' => $part,
+                'value' => $item['name'],
             ];
         }
     }

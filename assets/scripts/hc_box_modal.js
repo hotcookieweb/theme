@@ -8,6 +8,12 @@ jQuery(function($){
     let quantity = 1;
     let $btn = null;
     let $product = null;
+    let lastClickedButton = null;
+
+    // Track last clicked add-to-cart button because on form submit we can't easily tell
+    $(document).on('click', '.single_add_to_cart_button, .add_to_cart_button', function() {
+        lastClickedButton = $(this);
+    });
 
     // ===============================
     // DISABLE WOO AJAX FOR BOX PRODUCTS
@@ -32,9 +38,16 @@ jQuery(function($){
     // ===============================
     // SINGLE PRODUCT PAGE — INTERCEPT FORM SUBMIT
     // ===============================
-    jQuery(document).on('submit', 'form.cart', function(e){
-        $btn = jQuery(this).find('.single_add_to_cart_button[data-box-size]');
-        if (!$btn.length) return;
+    $(document).on('submit', 'form.cart', function(e) {
+        const $clicked = lastClickedButton;
+
+        // If clicked button has no box-size → normal add-to-cart
+        if (!$clicked.data('box-size')) {
+            return;
+        }
+
+        // Use the clicked button as the modal trigger
+        $btn = $clicked;
 
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -53,6 +66,14 @@ jQuery(function($){
         function () {
 
             $btn = jQuery(this);
+            // Determine mode
+            const mode = $btn.data('box-mode') || 'build';
+
+            // If customize mode AND this is the add-to-cart button → do NOT open modal
+            if (mode === 'customize' && !$btn.hasClass('customize-button')) {
+                return; // allow normal add-to-cart behavior
+            }
+
             $product = $btn.closest('.product');
             baseText = $baseText = $btn.text().trim();;
 
@@ -86,7 +107,6 @@ jQuery(function($){
                 dataType: 'json',
                 success: function (response) {
                     if (response.success) {
-                        console.log('Modal data loaded:', response.data);
                         jQuery(document.body).WCBackboneModal({
                             template: 'hc-modal-add-box-products',
                             variable: response.data
@@ -100,6 +120,17 @@ jQuery(function($){
             });
         }
     );
+    // initial footer based on first qty input
+    jQuery(document.body).on('wc_backbone_modal_loaded', function(event, modal) {
+        // modal is a Backbone view; the element is modal.$el
+        const $modal = modal.$el || jQuery('.wc-backbone-modal:visible');
+        // Trigger your quantity logic once
+        const $firstQty = $modal.find('.qty').first();
+        if ($firstQty.length) {
+            $firstQty.trigger('input'); // runs your entire footer/progress logic
+        }
+    });
+
     jQuery(document.body).on('wc_backbone_modal_loaded', function(evt, templateId) {
         const text = document.querySelector('.hc-progress-text');
         text.textContent = `0 / ${boxSize}`;
