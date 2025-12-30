@@ -237,7 +237,6 @@ add_filter(
     function( $wp_query_args, $query_vars ) {
 
         $store = WC()->session->get('current_zone');
-        error_log('Filtering products for store: ' . $store);
 
         if ( $store === 'any-zone' ) {
             return $wp_query_args;
