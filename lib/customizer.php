@@ -45,7 +45,6 @@ function mytheme_add_woocommerce_support() {
  * Show cart contents / total Ajax
  */
 add_filter( 'woocommerce_add_to_cart_fragments', 'woocommerce_header_add_to_cart_fragment' );
-add_filter( 'woocommerce_update_cart_action_cart_updated', 'woocommerce_header_add_to_cart_fragment' );
 function woocommerce_header_add_to_cart_fragment($fragments) {
   global $woocommerce;
   ob_start();
@@ -198,24 +197,71 @@ add_action('template_redirect', function () {
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
 
+add_filter('shortcode_atts_products', function($out, $pairs, $atts) {
+    if (isset($atts['current_store'])) {
+        $out['current_store'] = $atts['current_store'];
+    }
+    return $out;
+}, 10, 3);
+
 add_filter('woocommerce_shortcode_products_query', 'hc_filter_products_by_store_meta', 10, 2);
 function hc_filter_products_by_store_meta($query_args, $atts) {
 	$store = isset($atts['current_store']) ? $atts['current_store'] : 'any-zone';
 	if ($store === 'any-zone') {
 		return $query_args; // no store set, skip filtering
 	}
-	$query_args['meta_query'] = [
-		'relation' => 'OR',
-		[
-			'key'     => '_custom_location',
-			'value'   => '"' . $store . '"',
-			'compare' => 'LIKE'
-		],
-	];
+
+    // Ensure outer relation is AND
+    $query_args['meta_query']['relation'] = 'AND';
+
+    // Add our OR block
+    $query_args['meta_query'][] = [
+        'relation' => 'OR',
+        [
+            'key'     => '_custom_location',
+            'value'   => '"' . $store . '"',
+            'compare' => 'LIKE'
+        ],
+        [
+            'key'     => '_custom_location',
+            'value'   => '"any-zone"',
+            'compare' => 'LIKE'
+        ],
+    ];
 
 	return $query_args;
 }
 
+add_filter(
+    'woocommerce_product_data_store_cpt_get_products_query',
+    function( $wp_query_args, $query_vars ) {
+
+        $store = WC()->session->get('current_zone');
+        error_log('Filtering products for store: ' . $store);
+
+        if ( $store === 'any-zone' ) {
+            return $wp_query_args;
+        }
+
+        $wp_query_args['meta_query'][] = [
+            'relation' => 'OR',
+            [
+                'key'     => '_custom_location',
+                'value'   => '"' . $store . '"',
+                'compare' => 'LIKE',
+            ],
+            [
+                'key'     => '_custom_location',
+                'value'   => '"any-zone"',
+                'compare' => 'LIKE',
+            ],
+        ];
+
+        return $wp_query_args;
+    },
+    10,
+    2
+);
 // trigger shipping updates for users not logged in
 
 add_action('woocommerce_after_checkout_form', function(){

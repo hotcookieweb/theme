@@ -133,7 +133,6 @@ add_action('woocommerce_after_add_to_cart_button', function() {
 add_filter('woocommerce_get_price_html', function($price_html, $product) {
     $discount = hc_get_discount( $product->get_id() );
     $price_string = $discount['price_string'];
-    error_log( 'Price string: ' . $price_string );
     if ( empty( $price_string ) ) {
         return $price_html;
     }
@@ -169,7 +168,6 @@ function hc_get_discount( $product_id ) {
     $discount = trim(get_field('percent_or_discount_amount', $product_id));
     $lowest_price = (float)get_field('lowest_price', $product_id);
     $highest_price = (float)get_field('highest_price', $product_id);
-    error_log( 'Lowest price: ' . $lowest_price . ' Highest price: ' . $highest_price );
     $product = wc_get_product( $product_id );
     $regular_price   = (float)$product->get_price();
     // 1. Percentage (strict: digits + optional dot + %)
@@ -178,8 +176,7 @@ function hc_get_discount( $product_id ) {
         $numeric = floatval(rtrim($discount, '%')) / 100;
 
         if ($numeric < 0 || $numeric > 1) {
-            error_log(sprintf(
-                "%s line %s: Build-a-Box error: invalid discount percentage %s",
+            error_log(sprintf("%s line %s: Build-a-Box error: invalid discount percentage %s",
                 __FILE__, __LINE__, $discount
             ));
             return $result;
@@ -201,8 +198,7 @@ function hc_get_discount( $product_id ) {
     if (is_numeric($discount) or empty($discount)) {
         $numeric = floatval($discount);
         if ($numeric < 0) {
-            error_log(sprintf(
-                "%s line %s: Build-a-Box error: invalid discount amount %s",
+            error_log(sprintf("%s line %s: Build-a-Box error: invalid discount amount %s",
                 __FILE__, __LINE__, $discount
             ));
             return $result;
@@ -249,7 +245,6 @@ function hc_get_modal_data() {
 
         // Must be a child or descendant of Build-a-Box
         if ( $cat->parent != $parent_id && ! term_is_ancestor_of( $parent_id, $cat->term_id, 'product_cat' ) ) {
-            error_log( 'Skipping category ' . $cat->name . ' parent ' . $cat->parent . ' parent_id ' . $parent_id . ' term_id ' . $cat->term_id );
             continue;
         }
 
@@ -272,7 +267,6 @@ function hc_get_modal_data() {
     if ( ! empty( $box_product_cats ) ) {
 
         $box_product_ids = wp_list_pluck( $box_product_cats, 'term_id' );
-   
         $products = wc_get_products([
             'limit'   => -1,
             'exclude' => [ $_POST['product_id'] ],
@@ -283,7 +277,7 @@ function hc_get_modal_data() {
                     'terms'    => $box_product_ids,
                     'operator' => 'IN',
                 ]
-            ]
+            ],
         ]);
     }
 
@@ -311,7 +305,6 @@ function hc_get_modal_data() {
             // Skip Build-a-Box products
             if (( intval(get_field( 'size_of_box', $product_id )) > 0) ||
                 ( $product->get_type() !== 'simple' ))  {
-                    error_log( 'Skipping product ID ' . $product_id . ' type ' . $product->get_type() );
                 continue;
             }
 
@@ -409,8 +402,7 @@ add_filter('woocommerce_add_cart_item_data', function($cart_item_data, $product_
     $discount_details = hc_get_discount($product_id);
     $discount = $discount_details['discount'];
     if ($discount < 0 || $discount > $total_price) {
-        error_log(sprintf(
-            "%s line %s: Build-a-Box error: invalid discount amount %s",
+        error_log(sprintf("%s line %s: Build-a-Box error: invalid discount amount %s",
             __FILE__, __LINE__, $discount_raw
         ));
         $discount = 0;
