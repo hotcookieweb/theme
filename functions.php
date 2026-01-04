@@ -723,4 +723,64 @@ add_action('init', function() {
     });
 });
 
+// Register new status
+add_action( 'init', 'hc_reg_order_status' );
+function hc_reg_order_status() {
 
+    register_post_status( 'wc-printed', array(
+        'label'                     => 'Printed',
+        'public'                    => true, // must be true for customer visibility
+        'exclude_from_search'       => false,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop( 'Printed (%s)', 'Printed (%s)' ),
+    ) );
+
+    register_post_status( 'wc-picked-up', array(
+        'label'                     => 'Picked-up',
+        'public'                    => true,
+        'exclude_from_search'       => false,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop( 'Picked-up (%s)', 'Picked-up (%s)' ),
+    ) );
+
+    register_post_status( 'wc-delivery', array(
+        'label'                     => 'Delivery',
+        'public'                    => true,
+        'exclude_from_search'       => false,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop( 'Delivery (%s)', 'Delivery (%s)' ),
+    ) );
+}
+
+
+// Add to list of WC Order statuses
+add_filter( 'wc_order_statuses', 'hc_order_statuses' );
+function hc_order_statuses( $order_statuses ) {
+
+    $new_order_statuses = array();
+
+    foreach ( $order_statuses as $key => $status ) {
+        $new_order_statuses[ $key ] = $status;
+
+        if ( 'wc-processing' === $key ) {
+            $new_order_statuses['wc-printed']   = 'Printed';
+            $new_order_statuses['wc-picked-up'] = 'Picked-up';
+            $new_order_statuses['wc-delivery']  = 'Delivery';
+        }
+    }
+
+    return $new_order_statuses;
+}
+
+
+// Make custom statuses visible in My Account
+add_filter( 'woocommerce_my_account_my_orders_query', 'hc_show_custom_statuses_in_my_account' );
+function hc_show_custom_statuses_in_my_account( $args ) {
+    $args['status'][] = 'printed';
+    $args['status'][] = 'picked-up';
+    $args['status'][] = 'delivery';
+    return $args;
+}
