@@ -488,6 +488,32 @@ add_action('woocommerce_checkout_create_order_line_item', function($item, $cart_
     }
 }, 10, 4);
 
+add_filter( 'woocommerce_attribute', 'hc_link_ingredient_terms', 10, 3 );
+function hc_link_ingredient_terms( $text, $attribute, $values ) {
+
+    // Only modify the Ingredients attribute
+    if ( strtolower( $attribute->get_name() ) !== 'ingredients' ) {
+        return $text;
+    }
+
+    $terms = wc_get_product_terms( get_the_ID(), $attribute->get_name(), array( 'fields' => 'names' ) );
+    $linked = array();
+
+    foreach ( $terms as $term_name ) {
+
+        // Try to find a product with this exact title
+        $product = get_page_by_title( $term_name, OBJECT, 'product' );
+
+        if ( $product ) {
+            $linked[] = '<a href="' . get_permalink( $product->ID ) . '">' . esc_html( $term_name ) . '</a>';
+        } else {
+            $linked[] = esc_html( $term_name );
+        }
+    }
+
+    return implode( ', ', $linked );
+}
+
 function hc_get_box_builder_template() {
     // sage runs wp_footer multiple times, prevent duplicate templates
     static $printed = false;
