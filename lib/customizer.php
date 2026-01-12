@@ -235,10 +235,18 @@ function hc_filter_products_by_store_meta($query_args, $atts) {
 add_filter(
     'woocommerce_product_data_store_cpt_get_products_query',
     function( $wp_query_args, $query_vars ) {
+                // Never filter product queries in admin
+        if ( is_admin() ) {
+            return $wp_query_args;
+        }
 
-        $store = WC()->session->get('current_zone');
+        $store = null;
 
-        if ( $store === 'any-zone' ) {
+        if ( WC()->session && method_exists( WC()->session, 'get' ) ) {
+            $store = WC()->session->get('current_zone');
+        }
+
+        if ( $store === null ||$store === 'any-zone' ) {
             return $wp_query_args;
         }
 

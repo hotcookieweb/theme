@@ -348,6 +348,14 @@ function hc_add_link_to_admin_bar($admin_bar) {
         $admin_bar->add_node(
             array(
                 'parent' => 'from-store',
+                'id' => 'famous',
+                'title' => __('famous'),
+                'href' => home_url('/our-store/ice-cream'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'parent' => 'from-store',
                 'id' => 'gear',
                 'title' => __('gear'),
                 'href' => home_url('/our-store/gear'),
@@ -408,8 +416,8 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node(
             array(
-                'id' => 'woocommerce-settings',
-                'title' => 'Woocommerce settings',
+                'id' => 'woocommerce-orders',
+                'title' => 'Woocommerce orders',
                 'parent' => 'site-name',
                 'href' => admin_url('edit.php?post_type=shop_order'),
             )
@@ -784,3 +792,20 @@ function hc_show_custom_statuses_in_my_account( $args ) {
     $args['status'][] = 'delivery';
     return $args;
 }
+
+add_action('admin_init', function() {
+    $product = wc_get_product(90047);
+
+    if ( $product instanceof WC_Product ) {
+        error_log('HPOS DEBUG children: ' . print_r($product->get_children(), true));
+    } else {
+        error_log('HPOS DEBUG: wc_get_product returned false');
+    }
+});
+add_action('admin_init', function() {
+    $variation_ids = [90050, 90105, 90106, 90107]; // add all 30 if you want
+    foreach ($variation_ids as $id) {
+        $v = wc_get_product($id);
+        error_log("VAR $id ATTRS: " . print_r($v->get_attributes(), true));
+    }
+});
