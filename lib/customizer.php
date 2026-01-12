@@ -489,7 +489,7 @@ function hc_format_content($content, $page) {
     preg_match_all('/(?:<ol>(.*?)<\/ol>)?\s*<li>(.*?)<\/li>/s', $content, $matches, PREG_SET_ORDER);
     if (!empty($matches)) {
         foreach ($matches as $match) {
-            $qty  = !empty($match[1]) ? intval(trim($match[1])) : 1;
+            $qty  = !empty($match[1]) ? trim($match[1]) : 1;
             $name = isset($match[2]) ? trim($match[2]) : '';
             $items[] = [
                 'name'     => $name,
