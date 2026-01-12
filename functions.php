@@ -792,3 +792,29 @@ function hc_show_custom_statuses_in_my_account( $args ) {
     $args['status'][] = 'delivery';
     return $args;
 }
+
+add_filter('woocommerce_variation_is_active', function($active, $variation) {
+
+    if (!isset($_POST['attributes'])) {
+        return $active;
+    }
+
+    $selected = $_POST['attributes'];
+
+    foreach ($selected as $attr_name => $selected_value) {
+
+        // Only apply logic when user selected "none"
+        if ($selected_value === 'none') {
+
+            $variation_value = $variation->get_attribute($attr_name);
+
+            // If variation has ANY real value, block it
+            if ($variation_value && $variation_value !== 'none') {
+                return false;
+            }
+        }
+    }
+
+    return $active;
+
+}, 10, 2);
