@@ -213,24 +213,21 @@ add_filter('custom_menu_order', function () {
     return true;
 }, 10);
 
-// Return the custom order
 add_filter('menu_order', function ($menu_order) {
     return array(
         'order-manager',
-        'woocommerce',                          // WooCommerce
-        'edit.php?post_type=shop_subscription', // Subscriptions
+        'quickbooks-hc',
+        'edit.php?post_type=product',           // Products
         'upload.php',                           // Media
         'edit.php?post_type=page',              // Pages
         'edit.php',                             // Posts
         'newsletter_main_index',                // Newsletter
         'users.php',                            // Users
-        'woocommerce-marketing',                // WooCommerce Marketing
-        'edit-comments.php',                    // Comments
-        'gf_edit_forms',                        // Gravity Forms
-        'separator-woocommerce',                // WooCommerce separator (if it exists)
-        'index.php',                            // Dashboard
+        'edit.php?post_type=shop_coupon',       // Coupons
+        'woocommerce',                          // WooCommerce (main menu)
     );
 }, 10, 1);
+
 
 /*
 add_action('admin_init', function () {
@@ -351,8 +348,8 @@ function hc_add_link_to_admin_bar($admin_bar) {
         $admin_bar->add_node(
             array(
                 'parent' => 'from-store',
-                'id' => 'famous',
-                'title' => __('famous'),
+                'id' => 'icecream',
+                'title' => __('ice cream'),
                 'href' => home_url('/our-store/ice-cream'),
             )
         );
@@ -419,32 +416,6 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node(
             array(
-                'id' => 'woocommerce-orders',
-                'title' => 'Woocommerce orders',
-                'parent' => 'site-name',
-                'href' => admin_url('edit.php?post_type=shop_order'),
-            )
-        );
-        $admin_bar->add_node(
-            array(
-                'id' => 'woocommerce-subscriptions',
-                'title' => 'Woocommerce subscriptions',
-                'parent' => 'site-name',
-                'href' => admin_url('edit.php?post_type=shop_subscription'),
-            )
-        );
-        if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
-            $admin_bar->add_node(
-                array(
-                'id' => 'wc-settings',
-                'title' => 'Woocommerce settings',
-                'parent' => 'site-name',
-                'href' => admin_url('admin.php?page=wc-settings'),
-                )
-            );
-        }
-        $admin_bar->add_node(
-            array(
                 'id' => 'products',
                 'title' => 'Products',
                 'parent' => 'site-name',
@@ -485,20 +456,13 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node(
             array(
-                'id' => 'users',
-                'title' => 'Users',
+                'id' => 'quickbooks-hc',
+                'title' => 'Quickbooks',
                 'parent' => 'site-name',
-                'href' => admin_url('users.php'),
+                'href' => admin_url('admin.php?page=quickbooks-hc'),
             )
         );
-        $admin_bar->add_node(
-            array(
-                'id' => 'simple-history',
-                'title' => 'Simple history',
-                'parent' => 'site-name',
-                'href' => admin_url('index.php?page=simple_history_page'),
-            )
-        );
+
         if (wc_user_has_role(wp_get_current_user(), 'super_admin')) { /* Only Tony Roug  */
             $admin_bar->add_node(
                 array(
@@ -510,10 +474,26 @@ function hc_add_link_to_admin_bar($admin_bar) {
             );
             $admin_bar->add_node(
                 array(
+                    'id' => 'simple-history',
+                    'title' => 'Simple history',
+                    'parent' => 'site-name',
+                    'href' => admin_url('index.php?page=simple_history_page'),
+                )
+            );
+            $admin_bar->add_node(
+                array(
                     'id' => 'wp-migrate',
                     'title' => 'WP Migrate',
                     'parent' => 'site-name',
                     'href' => admin_url('tools.php?page=wp-migrate-db-pro'),
+                )
+            );
+            $admin_bar->add_node(
+                array(
+                'id' => 'wc-settings',
+                'title' => 'Woocommerce settings',
+                'parent' => 'site-name',
+                'href' => admin_url('admin.php?page=wc-settings'),
                 )
             );
         }
