@@ -276,7 +276,6 @@ add_action( 'admin_head', function() {
 
 function hc_add_link_to_admin_bar($admin_bar) {
     $site_name = parse_url(get_home_url(), PHP_URL_HOST);
-    $admin_bar->remove_node('site-name');  // remove current site-name
     if (is_admin()) { // admin view
         $admin_bar->add_node (
             array(
