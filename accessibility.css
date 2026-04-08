@@ -72,3 +72,9 @@ button.hamburger:focus-visible {
 a.woocommerce-privacy-policy-link {
     text-decoration: underline;
 }
+
+/* Inline content links must be distinguishable without color alone */
+.entry-content a,
+.entry-summary a {
+    text-decoration: underline;
+}
