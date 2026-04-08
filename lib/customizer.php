@@ -122,7 +122,42 @@ add_action('manage_product_posts_custom_column', 'hc_column_content', 10, 2);
 function hc_column_content($column, $product_id) {
   if ($column == 'hc_stock') {
     $product = wc_get_product($product_id);
-    echo ($product->is_in_stock() ? "In" : "Out");
+
+    if ( $product->is_type( 'variable' ) ) {
+        $variation_ids = $product->get_children();
+        $any_enabled   = false;
+        $any_out       = false;
+        $all_fully_out = true;
+
+        foreach ( $variation_ids as $vid ) {
+            if ( get_post_status( $vid ) !== 'publish' ) continue;
+            if ( ! get_post_meta( $vid, '_hc_location_stock_enabled', true ) ) {
+                $all_fully_out = false;
+                continue;
+            }
+            $any_enabled = true;
+            $stock = get_post_meta( $vid, '_hc_location_stock', true );
+            if ( ! is_array( $stock ) || empty( $stock ) ) { $all_fully_out = false; continue; }
+            foreach ( $stock as $status ) {
+                if ( $status === 'outofstock' ) { $any_out = true; }
+                else { $all_fully_out = false; }
+            }
+        }
+
+        if ( $any_enabled ) {
+            if ( $all_fully_out && $any_out ) {
+                echo 'out';
+            } elseif ( $any_out ) {
+                echo 'var-some-out';
+            } else {
+                echo 'var-in-stock';
+            }
+            return;
+        }
+    }
+
+    // Default: simple product or variable without location stock
+    echo ( $product->is_in_stock() ? 'In' : 'Out' );
   }
   if ($column == 'adate') {
     echo get_field('first_date', $product_id) . '<br>' .  get_field('last_date', $product_id);
@@ -138,7 +173,13 @@ function hc_column_content($column, $product_id) {
 add_action('admin_enqueue_scripts', 'wc_product_list_css_overrides');
 function wc_product_list_css_overrides() {
   wp_add_inline_style('woocommerce_admin_styles',
-    "table.wp-list-table .column-product_cat{ width: 25% !important; } table.wp-list-table .column-shipping_weight{ width: 7%; } table.wp-list-table .column-stock{ width: 6%; }");
+    "table.wp-list-table .column-name{ width: 18%; }
+     table.wp-list-table .column-adate{ width: 8%; }
+     table.wp-list-table .column-hc_shipping{ width: 15%; }
+     table.wp-list-table .column-hc_stock{ width: 6%; }
+     table.wp-list-table .column-product_cat{ width: 20%; }
+     table.wp-list-table .column-shipping_weight{ width: 8%; white-space: nowrap; }
+     table.wp-list-table .column-stock{ width: 6%; }");
 }
 
 function hc_maybe_redirect($url, $product) {

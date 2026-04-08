@@ -14,7 +14,12 @@
 		} ?>
 		>
 		<div class="container">
-				<?= get_field('header_content_above');?>
+				<?php
+				$_hca = get_field('header_content_above');
+				// Add aria-hidden to empty H1 placeholders so screen readers skip them
+				$_hca = preg_replace('/<h1([^>]*)>\s*<\/h1>/', '<h1$1 aria-hidden="true"></h1>', $_hca ?? '');
+				echo $_hca;
+				?>
 				<?= get_field('header_title'); ?>
 				<?php get_template_part('templates/components/delivery', 'form'); ?>
 				<?= get_field('header_content_below'); ?>
@@ -70,9 +75,9 @@
 	<div class="frontpage-blog">
 		<ul class="container">
 			<li>
-				<a href="<?= get_field('featured_image_url'); ?>">
+				<a href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
 					<?php if (has_post_thumbnail()) {
-						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
+						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white','alt'=>get_the_title()]);
 					} ?>
 				</a>
 				<article class="container">
@@ -80,7 +85,7 @@
 							<?php the_title(); ?>
 					</h1>
 					<?php the_content(); ?>
-					<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
+					<a style="float:none" href="<?php echo get_permalink() . '#respond'; ?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
 					Hit us up with your thoughts</a>
 				</article>
 				</article>
@@ -100,14 +105,14 @@
 		<?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 			<li>
 				<h1><?php the_title(); ?></h1>
-				<a href="<?= get_field('featured_image_url'); ?>">
+				<a href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
 					<?php if (has_post_thumbnail()) {
-						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white']);
+						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white','alt'=>get_the_title()]);
 					} ?>
 				</a>
 				<article class="entry-summary">
 						<?php the_content(); ?>
-						<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
+						<a style="float:none" href="<?php echo get_permalink() . '#respond'; ?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
 							Hit us up with your thoughts</a>
 				</article>
 			</li>

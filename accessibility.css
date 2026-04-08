@@ -36,25 +36,39 @@
     border: 0;
 }
 
-/* Ensure keyboard focus is always visible site-wide */
-:focus-visible {
-    outline: 3px solid #ffbf47;
-    outline-offset: 2px;
-}
-
-/* Hamburger button accessibility */
-.hamburger {
+/* Hamburger button — reset browser default button styling */
+button.hamburger {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.hamburger:focus,
-.hamburger:focus-visible {
+button.hamburger:focus-visible {
     outline: 3px solid #ffbf47;
     outline-offset: 2px;
 }
 
-/* Store dropdown focus */
-.store-dropdown a:focus,
-.store-dropdown a:focus-visible {
+/* Nav links and store dropdown — ensure focus visible */
+.nav-primary a:focus-visible,
+.store-dropdown a:focus-visible,
+.navigation a:focus-visible {
     outline: 3px solid #ffbf47;
     outline-offset: 2px;
+}
+
+/* Cookie banner ACCEPT button — override plugin's low-contrast colors */
+#cookie_action_close_header.wt-cli-accept-btn,
+.cli-plugin-main-button.wt-cli-accept-btn {
+    background-color: #1a7a1a !important;
+    color: #ffffff !important;
+    border-color: #1a7a1a !important;
+}
+
+/* Checkout privacy policy link — must be distinguishable without color alone */
+a.woocommerce-privacy-policy-link {
+    text-decoration: underline;
 }

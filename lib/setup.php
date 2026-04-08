@@ -108,7 +108,7 @@ function display_sidebar() {
  */
 function assets() {
   wp_enqueue_style('sage/css', Assets\asset_path('styles/main.css'), false, null);
-  wp_enqueue_style('hc/accessibility', get_template_directory_uri() . '/accessibility.css', ['sage/css'], '1.0');
+  wp_enqueue_style('hc/accessibility', get_template_directory_uri() . '/accessibility.css', ['sage/css'], '1.1');
 
   if (is_single() && comments_open() && get_option('thread_comments')) {
     wp_enqueue_script('comment-reply');

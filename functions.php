@@ -18,6 +18,7 @@ $sage_includes = [
     'lib/customizer.php', // Theme customizer
     'lib/ahotcookie.php',
     'lib/buildabox.php',
+    'lib/location-stock.php',
 ];
 
 foreach ($sage_includes as $file) {
@@ -800,3 +801,32 @@ add_filter('woocommerce_variation_is_active', function($active, $variation) {
     return $active;
 
 }, 10, 2);
+/**
+ * Prevent publishing posts without a title.
+ * Reverts to draft and shows an admin notice.
+ */
+add_action('save_post', function($post_id, $post) {
+    if (
+        $post->post_type !== 'post' ||
+        $post->post_status !== 'publish' ||
+        defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ||
+        !current_user_can('edit_post', $post_id)
+    ) {
+        return;
+    }
+    if (empty(trim($post->post_title))) {
+        // Revert to draft
+        remove_action('save_post', __FUNCTION__);
+        wp_update_post(['ID' => $post_id, 'post_status' => 'draft']);
+        // Show admin notice on next page load
+        set_transient('hc_post_no_title_' . get_current_user_id(), true, 30);
+    }
+}, 10, 2);
+
+add_action('admin_notices', function() {
+    if (get_transient('hc_post_no_title_' . get_current_user_id())) {
+        delete_transient('hc_post_no_title_' . get_current_user_id());
+        echo '<div class="notice notice-error"><p><strong>Post reverted to draft:</strong> A title is required before publishing.</p></div>';
+    }
+});
+

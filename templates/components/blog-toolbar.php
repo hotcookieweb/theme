@@ -38,24 +38,24 @@
 <?php if ($addlinks == 'post') { ?>
   <div class=nav-toolbar>
     <div class=container>
-      <h1 class="prev-link" style="float: left;">
-        <?php previous_post_link('%link','« Previous Post'); ?>
-      </h1>
-      <h1 class="next-link" style="float: right;">
-        <?php next_post_link('%link','Next Post »'); ?>
-      </h1>
+      <div class="prev-link" style="float:left;color:#fff;">
+        <?php $l = get_previous_post_link('%link','« Previous Post'); echo $l ? str_replace('<a ', '<a style="color:#fff;" ', $l) : ''; ?>
+      </div>
+      <div class="next-link" style="float:right;color:#fff;">
+        <?php $l = get_next_post_link('%link','Next Post »'); echo $l ? str_replace('<a ', '<a style="color:#fff;" ', $l) : ''; ?>
+      </div>
     </div>
   </div>
 <?php } ?>
 <?php if ($addlinks == 'posts') { ?>
   <div class=nav-toolbar>
     <div class=container>
-      <h1 class="prev-link" style="float: left;">
-        <?php echo get_previous_posts_link('« Newer Posts');?>
-      </h1>
-      <h1 class="next-link" style="float: right;">
-        <?php echo get_next_posts_link('Older Posts »');?>
-      </h1>
+      <div class="prev-link" style="float:left;color:#fff;">
+        <?php $l = get_previous_posts_link('« Newer Posts'); echo $l ? str_replace('<a ', '<a style="color:#fff;" ', $l) : ''; ?>
+      </div>
+      <div class="next-link" style="float:right;color:#fff;">
+        <?php $l = get_next_posts_link('Older Posts »'); echo $l ? str_replace('<a ', '<a style="color:#fff;" ', $l) : ''; ?>
+      </div>
     </div>
   </div>
 <?php } ?>
