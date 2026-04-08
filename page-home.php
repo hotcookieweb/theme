@@ -6,7 +6,6 @@
 			if ($image = get_field( 'featured_image_mobile' )) { ?>
 				style="background-image:url('<?php echo $image; ?>')"
 			<?php }
-			var_dump('small:', $image);
 		}
 		if ($image == FALSE) {
 			if ($image = get_the_post_thumbnail_url()) { ?>
@@ -81,7 +80,7 @@
 							<?php the_title(); ?>
 					</h1>
 					<?php the_content(); ?>
-					<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
+					<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
 					Hit us up with your thoughts</a>
 				</article>
 				</article>
@@ -108,7 +107,7 @@
 				</a>
 				<article class="entry-summary">
 						<?php the_content(); ?>
-						<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" class="link">
+						<a style="float:none" href="<?php the_permalink();?>" title="<?php echo strip_tags(get_the_title());?>" aria-label="<?php echo esc_attr('Read more: ' . strip_tags(get_the_title())); ?>" class="link">
 							Hit us up with your thoughts</a>
 				</article>
 			</li>
