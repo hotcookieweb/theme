@@ -44,10 +44,14 @@
     width: 100%;
     background: $color-primary-1;
     margin-top: -12px;
-    padding-bottom: 12px;
-    h1, div {
-      float: left;
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding-top: 12px;
+      padding-bottom: 12px;
+    }
+    h1, div {
       @include font-h5;
       @include media-breakpoint-down(sm) {
         @include font-h6;
