@@ -14,14 +14,14 @@ $hc_zone = WC()->session->get('current_zone');
 ?>
 <div class="header">
   <div class="container-fluid">
-    <nav class="nav-primary">
-      <div class="hamburger">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <nav class="nav-primary" role="navigation" aria-label="Main navigation">
+      <button class="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="desktop-nav">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M2.66663 5.3335H29.3333V8.00016H2.66663V5.3335ZM2.66663 14.6668H29.3333V17.3335H2.66663V14.6668ZM29.3333 24.0002H2.66663V26.6668H29.3333V24.0002Z" fill="#ffffff" />
         </svg>
-      </div>
+      </button>
       <div class="store-switcher">
-        <div class="current-store">
+        <div class="current-store" role="button" tabindex="0" aria-haspopup="listbox" aria-label="Select store">
           <span class="store-icon"></span>
           <span class="store-name"><?= (empty($hc_zone) ? "Choose Store" : $hc_stores[$hc_zone]); ?></span>
           <ul class="store-dropdown">
@@ -52,7 +52,7 @@ $hc_zone = WC()->session->get('current_zone');
     </div>
   </div>
 
-  <div class="navigation">
+  <div class="navigation" id="desktop-nav">
     <?php if (has_nav_menu('mobile_navigation')):
       wp_nav_menu([
         'theme_location' => 'mobile_navigation',
@@ -73,7 +73,7 @@ $hc_zone = WC()->session->get('current_zone');
   </div>
 </div>
 
-<div class="header-mobile">
+<div class="header-mobile" aria-hidden="true" tabindex="-1">
   <div class="topbar">
     <div class="hamburger">
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,6 +160,9 @@ jQuery(document).ready(function() {
     event.stopPropagation();
     jQuery('.header .navigation').toggleClass('active');
     jQuery('.store-switcher').removeClass('active');
+    // ADA: toggle aria-expanded
+    var expanded = jQuery('.header .navigation').hasClass('active');
+    jQuery('.header .hamburger').attr('aria-expanded', expanded ? 'true' : 'false');
   });
 
   // Mobile hamburger

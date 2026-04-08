@@ -10,6 +10,8 @@ use Roots\Sage\Wrapper;
   <?php get_template_part('templates/head'); ?>
   <body <?php body_class(); ?>>
 
+    <a class="skip-to-content" href="#main-content">Skip to main content</a>
+
     <!--[if IE]>
       <div class="alert alert-warning">
         <?php _e('You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.', 'sage'); ?>
@@ -20,7 +22,9 @@ use Roots\Sage\Wrapper;
       get_template_part('templates/header');
     ?>
 
-      <?php include Wrapper\template_path(); ?>
+      <main id="main-content">
+        <?php include Wrapper\template_path(); ?>
+      </main>
 
     <?php
       do_action('get_footer');
