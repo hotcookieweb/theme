@@ -218,6 +218,7 @@ add_filter('menu_order', function ($menu_order) {
     return array(
         'order-manager',
         'quickbooks-hc',
+        'store-manager',
         'edit.php?post_type=product',           // Products
         'upload.php',                           // Media
         'edit.php?post_type=page',              // Pages
@@ -407,11 +408,19 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node (
             array(
-                'id' => 'order-manager',
+                'id' => 'store-manager',
                 'parent' => 'site-name',
-                'title' => 'Order manager',
-                'href' => admin_url('admin.php?page=order-manager'),
+                'title' => 'Store manager',
+                'href' => admin_url('admin.php?page=store-manager'),
                 'meta' => array('class' => 'ab-item-order-manager'),
+            )
+        );
+        $admin_bar->add_node(
+            array(
+                'id' => 'quickbooks-hc',
+                'title' => 'Quickbooks',
+                'parent' => 'site-name',
+                'href' => admin_url('admin.php?page=quickbooks-hc'),
             )
         );
         $admin_bar->add_node(
@@ -452,14 +461,6 @@ function hc_add_link_to_admin_bar($admin_bar) {
                 'title' => 'Newsletter',
                 'parent' => 'site-name',
                 'href' => admin_url('admin.php?page=newsletter_main_index'),
-            )
-        );
-        $admin_bar->add_node(
-            array(
-                'id' => 'quickbooks-hc',
-                'title' => 'Quickbooks',
-                'parent' => 'site-name',
-                'href' => admin_url('admin.php?page=quickbooks-hc'),
             )
         );
 
