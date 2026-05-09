@@ -408,6 +408,15 @@ function hc_add_link_to_admin_bar($admin_bar) {
         );
         $admin_bar->add_node (
             array(
+                'id' => 'order-manager',
+                'parent' => 'site-name',
+                'title' => 'Order manager',
+                'href' => admin_url('admin.php?page=order-manager'),
+                'meta' => array('class' => 'ab-item-order-manager'),
+            )
+        );
+        $admin_bar->add_node (
+            array(
                 'id' => 'store-manager',
                 'parent' => 'site-name',
                 'title' => 'Store manager',

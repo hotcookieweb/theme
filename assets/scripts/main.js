@@ -75,3 +75,37 @@
   $(document).ready(UTIL.loadEvents);
 
 })(jQuery); // Fully reference jQuery after this point.
+
+// Gift note & order note character limit
+(function($) {
+  var LIMIT = 400;
+
+  function applyLimit(selector) {
+    $(selector).each(function() {
+      var $el = $(this);
+      if ($el.data('hc-limited')) { return; }
+      $el.attr('maxlength', LIMIT).data('hc-limited', true);
+
+      var $counter = $('<div class="hc-note-counter"></div>').css({
+        fontSize: '12px', color: '#888', textAlign: 'right', marginTop: '2px'
+      });
+      $el.after($counter);
+
+      function update() {
+        var remaining = LIMIT - $el.val().length;
+        $counter.text(remaining + ' characters remaining');
+        $counter.css('color', remaining <= 10 ? '#c00' : '#888');
+      }
+      $el.on('input', update);
+      update();
+    });
+  }
+
+  function init() {
+    applyLimit('#giftnote, #order_comments');
+  }
+
+  $(document).ready(init);
+  $(document.body).on('updated_checkout', init);
+
+})(jQuery);
