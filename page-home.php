@@ -75,7 +75,8 @@
 	<div class="frontpage-blog">
 		<ul class="container">
 			<li>
-				<a href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
+				<?php $_img_url = get_field('featured_image_url') ?: get_permalink(); ?>
+				<a href="<?php echo esc_url($_img_url); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
 					<?php if (has_post_thumbnail()) {
 						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white','alt'=>get_the_title()]);
 					} ?>
@@ -105,7 +106,8 @@
 		<?php while ( $the_query->have_posts() ) : $the_query->the_post(); ?>
 			<li>
 				<h1><?php the_title(); ?></h1>
-				<a href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
+				<?php $_img_url = get_field('featured_image_url') ?: get_permalink(); ?>
+				<a href="<?php echo esc_url($_img_url); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
 					<?php if (has_post_thumbnail()) {
 						the_post_thumbnail('post-thumbnail',['style'=>'border:5px solid white','alt'=>get_the_title()]);
 					} ?>
